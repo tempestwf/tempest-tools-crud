@@ -1,0 +1,25 @@
+{
+    "name": "tempest-tools/crud",
+    "description": "Tools for making restful apis using laravel and doctrine.",
+    "keywords": ["doctrine", "orm", "database", "laravel", "acl", "crud", "tempest tools"],
+    "require": {
+        "php": ">=7.1.0",
+        "laravel/framework": "5.3.*",
+        "laravel-doctrine/orm": "1.2.*",
+        "tempest-tools/common": "1.0.*"
+    },
+    "require-dev": {
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "TempestTools\\Crud\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "William Tempest Wright Ferrer",
+            "email": "tempestwf@gmail.com"
+        }
+    ]
+}
