@@ -5,10 +5,12 @@ use Doctrine\Common\EventManager;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Mockery\Exception;
 use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Crud\Constants\RepositoryEvents;
 use TempestTools\Crud\Contracts\QueryHelper as QueryHelperContract;
+use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
 use TempestTools\Crud\Doctrine\Helper\QueryHelper;
 
 abstract class RepositoryAbstract extends EntityRepository implements EventSubscriber {
@@ -46,15 +48,62 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     }
 
     /**
+     * Makes sure every wraps up
+     *
+     * @param bool $failure
+     * @throws \Doctrine\DBAL\ConnectionException
+     */
+    protected function stop($failure = false) {
+        /** @noinspection NullPointerExceptionInspection */
+        if (
+            !isset($this->getArrayHelper()->getArray()['backend']['options']['transaction']) ||
+            $this->getArrayHelper()->getArray()['backend']['options']['transaction'] !== false
+        ) {
+            if ($failure === true) {
+                $this->getEntityManager()->getConnection()->rollBack();
+            } else {
+                $this->getEntityManager()->getConnection()->commit();
+            }
+        }
+    }
+
+    /**
+     * Makes event args to use
+     * @param array $params
+     * @return GenericEventArgs
+     */
+    protected function makeEventArgs(array $params): Events\GenericEventArgs
+    {
+        return new GenericEventArgs(new \ArrayObject(['params'=>$params,'arrayHelper'=>$this->getArrayHelper()]));
+    }
+
+    /**
      * @param array $params
      * @throws \RuntimeException
+     * @throws \Doctrine\DBAL\ConnectionException
+     * @throws \Mockery\Exception
      */
     public function create(array $params){
         $this->start();
         $evm = $this->getEvm();
-        $evm->dispatchEvent(RepositoryEvents::PRE_CREATE);
-        $evm->dispatchEvent(RepositoryEvents::PRE_CREATE);
+        $eventArgs = $this->makeEventArgs($params);
+        try {
+            $evm->dispatchEvent(RepositoryEvents::PRE_CREATE, $eventArgs);
+            $evm->dispatchEvent(RepositoryEvents::VALIDATE_CREATE, $eventArgs);
+            $evm->dispatchEvent(RepositoryEvents::VERIFY_CREATE, $eventArgs);
+            $result = $this->doCreate($params);
+            $eventArgs->getArgs()['result'] = $result;
+            $evm->dispatchEvent(RepositoryEvents::PROCESS_RESULTS_CREATE, $eventArgs);
+            $evm->dispatchEvent(RepositoryEvents::POST_CREATE, $eventArgs);
+            $evm->dispatchEvent(RepositoryEvents::POST_COMMIT_CREATE, $eventArgs);
+        } catch (Exception $e) {
+            $this->stop(true);
+            throw $e;
+        }
+        $this->stop();
+    }
 
+    protected function doCreate (array $params) {
 
     }
 
