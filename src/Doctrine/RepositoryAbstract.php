@@ -6,19 +6,57 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use TempestTools\Common\Helper\ArrayHelperTrait;
+use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Crud\Constants\RepositoryEvents;
 use TempestTools\Crud\Contracts\QueryHelper as QueryHelperContract;
 use TempestTools\Crud\Doctrine\Helper\QueryHelper;
 
 abstract class RepositoryAbstract extends EntityRepository implements EventSubscriber {
 
-    use ArrayHelperTrait;
+    use ArrayHelperTrait, ErrorConstantsTrait;
+
+    const ERRORS = [
+        'noArrayHelper'=>[
+            'message'=>'Error: No array helper set on repository.'
+        ]
+    ];
 
     /** @var EventManager|null */
     public $evm;
 
     /** @var  QueryHelperContract|null  */
     protected $queryHelper;
+
+    /**
+     * Makes sure the repo is ready to run
+     *
+     * @throws \RuntimeException
+     */
+    protected function start() {
+        if ($this->getArrayHelper() === NULL) {
+            throw new \RuntimeException($this->getErrorFromConstant('noArrayHelper')['message']);
+        }
+        /** @noinspection NullPointerExceptionInspection */
+        if (
+            !isset($this->getArrayHelper()->getArray()['backend']['options']['transaction']) ||
+            $this->getArrayHelper()->getArray()['backend']['options']['transaction'] !== false
+        ) {
+            $this->getEntityManager()->getConnection()->beginTransaction();
+        }
+    }
+
+    /**
+     * @param array $params
+     * @throws \RuntimeException
+     */
+    public function create(array $params){
+        $this->start();
+        $evm = $this->getEvm();
+        $evm->dispatchEvent(RepositoryEvents::PRE_CREATE);
+        $evm->dispatchEvent(RepositoryEvents::PRE_CREATE);
+
+
+    }
 
     public function __construct($em, ClassMetadata $class){
         parent::__construct($em, $class);
