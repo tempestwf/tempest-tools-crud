@@ -44,9 +44,20 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         return $this->evm;
     }
 
+    /**
+     * Subscribes to the available events that are present on the class
+     * @return array
+     */
     public function getSubscribedEvents():array
     {
-        return RepositoryEvents::getAll();
+        $all = RepositoryEvents::getAll();
+        $subscribe = [];
+        foreach ($all as $event) {
+            if (method_exists ($this, $event)) {
+                $subscribe[] = $event;
+            }
+        }
+        return $subscribe;
     }
 
     /**
