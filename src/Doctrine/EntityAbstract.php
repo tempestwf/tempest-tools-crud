@@ -4,6 +4,7 @@ namespace TempestTools\Crud\Doctrine;
 use App\Entities\Entity;
 use Doctrine\Common\EventManager;
 use Doctrine\Common\EventSubscriber;
+use RuntimeException;
 use TempestTools\Common\Contracts\ArrayHelpable;
 use TempestTools\Common\Contracts\ArrayHelper as ArrayHelperContract;
 use TempestTools\Common\Contracts\Evm;
@@ -24,35 +25,84 @@ abstract class EntityAbstract extends Entity implements EventSubscriber, TTConfi
     const ERRORS = [
         'fieldNotAllow'=>[
             'message'=>'Error: Access to field not allowed.'
+        ],
+        'noArrayHelper'=>[
+            'message'=>'Error: No array helper on entity.'
         ]
     ];
 
     /**
      * Makes sure the entity is ready to go
      *
-     * @param ArrayHelperContract $arrayHelper
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
-    public function __construct(ArrayHelperContract $arrayHelper) {
-        $this->setArrayHelper($arrayHelper);
-        $this->parseTTConfig();
+    public function __construct() {
         $this->setEvm(new EventManager());
         /** @noinspection NullPointerExceptionInspection */
         $this->getEvm()->addEventSubscriber($this);
     }
+    /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
-     * @param string $action
-     * @param string $fieldName
-     * @param $value
+     * @param string $mode
+     * @param ArrayHelperContract|null $arrayHelper
+     * @param array|null $path
+     * @param array|null $fallBack
      * @throws \RuntimeException
      */
-    public function setField(string $action, string $fieldName, $value){
-        $config = $this->getTTConfigParsed();
+    public function init(string $mode, ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL) {
+        if ($arrayHelper !== NULL) {
+            $this->setArrayHelper($arrayHelper);
+        }
+
+        if ($path !== NULL) {
+            $this->setTTPath($path);
+        }
+
+        if ($fallBack !== NULL) {
+            $this->setTTFallBack($path);
+        }
+
+        if (!$this->getArrayHelper() instanceof ArrayHelperContract) {
+            throw new \RuntimeException($this->getErrorFromConstant('noArrayHelper'));
+        }
+
+        $path = $this->getTTPath();
+        $path[] = $mode;
+        $this->parseTTConfig();
+    }
+
+    /**
+     * @param string $fieldName
+     * @param string $keyName
+     * @return mixed
+     */
+    public function getConfigForField(string $fieldName, string $keyName) {
+        $arrayHelper = $this->getConfigArrayHelper();
+        return $arrayHelper->parseArrayPath(['fields', $fieldName, $keyName]);
+    }
+
+    /**
+     * @param string $fieldName
+     * @param $value
+     * @throws RuntimeException
+     */
+    public function setField(string $fieldName, $value){
         $baseArrayHelper = $this->getArrayHelper();
-        $arrayHelper = new ArrayHelper($config);
-        $actionSettings = $arrayHelper->parseArrayPath([$action]);
-        $fieldSettings = $arrayHelper->parseArrayPath([$action, 'fields', $fieldName]);
+        $arrayHelper = $this->getConfigArrayHelper();
+        $params = ['fieldName'=>$fieldName, 'value'=>$value, 'configArrayHelper'=>$arrayHelper];
+        $eventArgs = $this->makeEventArgs($params);
+
+        // Give event listeners a chance to do something
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getEvm()->dispatchEvent(EntityEvents::PRE_SET_FIELD, $eventArgs);
+
+        $processedParams = $eventArgs->getArgs()['params'];
+        $fieldName = $processedParams['params']['fieldName'];
+        $value = $processedParams['params']['value'];
+
+        $actionSettings = $arrayHelper->getArray();
+        $fieldSettings = $arrayHelper->parseArrayPath(['fields', $fieldName]);
         $actionPermissive = isset($actionSettings['permissive']) ?? $actionSettings['permissive'];
         $fieldPermissive = $fieldSettings !== NULL && isset($fieldSettings['permissive']) ?? $actionSettings['permissive'];
 
@@ -68,12 +118,12 @@ abstract class EntityAbstract extends Entity implements EventSubscriber, TTConfi
 
         // Any validation failure error out
         if ($allowed === false) {
-            throw new \RuntimeException($this->getErrorFromConstant('fieldNotAllow'));
+            throw new RuntimeException($this->getErrorFromConstant('fieldNotAllow'));
         }
 
         // setTo or mutate value
         $value = isset($fieldSettings['setTo'])?$baseArrayHelper->parse($fieldSettings['setTo']):$value;
-        $value = isset($fieldSettings['mutate']) === false?$baseArrayHelper->parse($fieldSettings['mutate'], ['value'=>$value]):$value;
+        $value = isset($fieldSettings['mutate']) === false?$baseArrayHelper->parse($fieldSettings['mutate'], ['fieldName'=>$fieldName, 'value'=>$value, 'self'=>$this]):$value;
 
         // All is ok so set it
         $setName = 'set' . ucfirst($fieldName);
@@ -87,7 +137,7 @@ abstract class EntityAbstract extends Entity implements EventSubscriber, TTConfi
      */
     protected function makeEventArgs(array $params): Events\GenericEventArgs
     {
-        return new GenericEventArgs(new \ArrayObject(['params'=>$params,'arrayHelper'=>$this->getArrayHelper()]));
+        return new GenericEventArgs(new \ArrayObject(['params'=>$params,'arrayHelper'=>$this->getArrayHelper(), 'self'=>$this]));
     }
 
     /**

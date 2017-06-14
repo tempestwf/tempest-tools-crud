@@ -12,15 +12,13 @@ namespace TempestTools\Crud\Constants;
 
 class EntityEvents{
     const PRE_SET_FIELD = 'preSetField';
-    const POST_SET_FIELD = 'postSetField';
 
     /**
      * @return array
      */
     static public function getAll():array {
         return [
-            static::PRE_SET_FIELD,
-            static::POST_SET_FIELD
+            static::PRE_SET_FIELD
         ];
     }
 }
