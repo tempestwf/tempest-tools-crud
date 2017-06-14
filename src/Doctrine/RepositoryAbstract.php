@@ -6,25 +6,27 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mockery\Exception;
+use TempestTools\Common\Contracts\ArrayHelpable;
+use TempestTools\Common\Contracts\Evm;
+use TempestTools\Common\Contracts\TTConfig;
 use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
+use TempestTools\Common\Utility\EvmTrait;
+use TempestTools\Common\Utility\TTConfigTrait;
 use TempestTools\Crud\Constants\RepositoryEvents;
 use TempestTools\Crud\Contracts\QueryHelper as QueryHelperContract;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
 use TempestTools\Crud\Doctrine\Helper\QueryHelper;
 
-abstract class RepositoryAbstract extends EntityRepository implements EventSubscriber {
+abstract class RepositoryAbstract extends EntityRepository implements EventSubscriber, TTConfig, Evm, ArrayHelpable {
 
-    use ArrayHelperTrait, ErrorConstantsTrait;
+    use ArrayHelperTrait, ErrorConstantsTrait, TTConfigTrait, EvmTrait;
 
     const ERRORS = [
         'noArrayHelper'=>[
             'message'=>'Error: No array helper set on repository.',
         ],
     ];
-
-    /** @var EventManager|null */
-    public $evm;
 
     /** @var  QueryHelperContract|null  */
     protected $queryHelper;
@@ -38,6 +40,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         if ($this->getArrayHelper() === NULL) {
             throw new \RuntimeException($this->getErrorFromConstant('noArrayHelper')['message']);
         }
+        $this->parseTTConfig();
         /** @noinspection NullPointerExceptionInspection */
         if (
             !isset($this->getArrayHelper()->getArray()['backend']['options']['transaction']) ||
@@ -85,17 +88,23 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      */
     public function create(array $params){
         $this->start();
+        $evm = $this->getEvm();
 
         $eventArgs = $this->makeEventArgs($params);
         try {
             if (isset($params['batch'])) {
+                $eventArgs->getArgs()['batchParams'] = $eventArgs->getArgs()['params'];
+                $evm->dispatchEvent(RepositoryEvents::PRE_CREATE_BATCH, $eventArgs);
                 /** @var array[] $batch */
                 $batch = $params['batch'];
                 foreach ($batch as $batchParams) {
-                    $this->doCreate($batchParams, $eventArgs);
+                    $eventArgs->getArgs()['params'] = $batchParams;
+                    /** @noinspection DisconnectedForeachInstructionInspection */
+                    $this->doCreate($eventArgs);
                 }
+                $evm->dispatchEvent(RepositoryEvents::POST_CREATE_BATCH, $eventArgs);
             } else {
-                $this->doCreate($params, $eventArgs);
+                $this->doCreate($eventArgs);
             }
         } catch (Exception $e) {
             $this->stop(true);
@@ -105,27 +114,31 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         return $eventArgs->getArgs()['results'];
     }
 
-    protected function doCreate (array $params, GenericEventArgs $eventArgs) {
+    protected function doCreate (GenericEventArgs $eventArgs) {
         $evm = $this->getEvm();
         $evm->dispatchEvent(RepositoryEvents::PRE_CREATE, $eventArgs);
         $evm->dispatchEvent(RepositoryEvents::VALIDATE_CREATE, $eventArgs);
         $evm->dispatchEvent(RepositoryEvents::VERIFY_CREATE, $eventArgs);
-        $result = $this->doCreateSingle($params, $eventArgs);
+        $result = $this->doCreateSingle($eventArgs);
         $eventArgs->getArgs()['results'][] = $result;
         $evm->dispatchEvent(RepositoryEvents::PROCESS_RESULTS_CREATE, $eventArgs);
         $evm->dispatchEvent(RepositoryEvents::POST_CREATE, $eventArgs);
         $evm->dispatchEvent(RepositoryEvents::POST_COMMIT_CREATE, $eventArgs);
     }
 
-    protected function doCreateSingle(array $params, GenericEventArgs $eventArgs) {
+    protected function doCreateSingle(GenericEventArgs $eventArgs) {
         $className = $this->getClassName();
         $entity = new $className();
-        $this->bind($entity, $params);
+        $this->bind($entity,  $eventArgs);
         return $entity;
     }
 
     //TODO: Type this entity
-    protected function bind($entity, array $params) {
+    protected function bind(EntityAbstract $entity, GenericEventArgs $eventArgs) {
+        $entity->setArrayHelper($this->getArrayHelper());
+        $entity->init();
+        /** @var array $params */
+        $params = $eventArgs->getArgs()['params'];
         $metadata = $this->getEntityManager()->getClassMetadata($entity);
         $associateNames = $metadata->getAssociationNames();
         foreach ($params as $fieldName => $value) {
@@ -147,7 +160,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection */
-    public function bindAssociation($entity, string $associationName, array $info, string $targetClass) {
+    public function bindAssociation(EntityAbstract $entity, string $associationName, array $info, string $targetClass) {
         $bindType = $info['bindType'] ?? 'set';
         $chainType = $info['chainType'] ?? NULL;
         /** @var RepositoryAbstract $repo */
@@ -182,23 +195,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         $this->setQueryHelper(new QueryHelper());
     }
 
-    /**
-     * @param EventManager|null $evm
-     * @return RepositoryAbstract
-     */
-    public function setEvm(EventManager $evm):RepositoryAbstract
-    {
-        $this->evm = $evm;
-        return $this;
-    }
 
-    /**
-     * @return EventManager|null
-     */
-    public function getEvm()
-    {
-        return $this->evm;
-    }
 
     /**
      * Subscribes to the available events that are present on the class
@@ -232,6 +229,11 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     public function getQueryHelper()
     {
         return $this->queryHelper;
+    }
+
+    public function getTTConfig(): array
+    {
+        return [];
     }
 }
 ?>
