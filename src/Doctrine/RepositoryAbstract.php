@@ -48,6 +48,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         ) {
             $this->getEntityManager()->getConnection()->beginTransaction();
         }
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getEvm()->addEventSubscriber($this);
     }
 
     /**
@@ -82,6 +84,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
 
     /**
      * @param array $params
+     * @return mixed
      * @throws \RuntimeException
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \Mockery\Exception
@@ -91,6 +94,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         $evm = $this->getEvm();
 
         $eventArgs = $this->makeEventArgs($params);
+        $eventArgs->getArgs()['action'] = 'create';
         try {
             if (isset($params['batch'])) {
                 $eventArgs->getArgs()['batchParams'] = $eventArgs->getArgs()['params'];
@@ -114,6 +118,9 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         return $eventArgs->getArgs()['results'];
     }
 
+    /**
+     * @param GenericEventArgs $eventArgs
+     */
     protected function doCreate (GenericEventArgs $eventArgs) {
         $evm = $this->getEvm();
         $evm->dispatchEvent(RepositoryEvents::PRE_CREATE, $eventArgs);
@@ -128,15 +135,21 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
 
     protected function doCreateSingle(GenericEventArgs $eventArgs) {
         $className = $this->getClassName();
-        $entity = new $className();
+        $entity = new $className($this->getArrayHelper());
         $this->bind($entity,  $eventArgs);
         return $entity;
     }
 
-    //TODO: Type this entity
-    protected function bind(EntityAbstract $entity, GenericEventArgs $eventArgs) {
+    /**
+     * @param EntityAbstract $entity
+     * @param GenericEventArgs $eventArgs
+     * @return EntityAbstract
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     */
+    protected function bind(EntityAbstract $entity, GenericEventArgs $eventArgs): EntityAbstract
+    {
         $entity->setArrayHelper($this->getArrayHelper());
-        $entity->init();
         /** @var array $params */
         $params = $eventArgs->getArgs()['params'];
         $metadata = $this->getEntityManager()->getClassMetadata($entity);
@@ -150,25 +163,25 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
                         $this->bindAssociation($entity, $fieldName, $info, $targetClass);
                     }
                 } else {
-                    $this->bindAssociation($entity, $fieldName, $value, $targetClass);
+                    $this->bindAssociation($eventArgs->getArgs()['action'], $entity, $fieldName, $value, $targetClass);
                 }
             } else {
-                $entity->setField($fieldName, $value);
+                $entity->setField($eventArgs->getArgs()['action'], $fieldName, $value);
             }
         }
         return $entity;
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection */
-    public function bindAssociation(EntityAbstract $entity, string $associationName, array $info, string $targetClass) {
+    public function bindAssociation($action, EntityAbstract $entity, string $associationName, array $info, string $targetClass) {
         $bindType = $info['bindType'] ?? 'set';
         $chainType = $info['chainType'] ?? NULL;
         /** @var RepositoryAbstract $repo */
         $repo = $this->getEntityManager()->getRepository($targetClass);
         $repo->setArrayHelper($this->getArrayHelper());
 
-        if ($chainType !== NULL && $entity->canChain($associationName, $chainType)) {
-
+        // TODO: Add a pre chain event
+        if ($chainType !== NULL && $entity->canChain($action, $associationName, $chainType)) {
             //TODO: Throw error if wrong type of repo
             //TODO: Use constants instead of strings
             switch ($chainType) {
@@ -185,8 +198,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         } else {
             $foundEntity = $repo->findOneBy($info['id']);
         }
-
-        $entity->bindAssociation($bindType, $foundEntity);
+        // TODO: Add a pre bind event
+        $entity->bindAssociation($action, $bindType, $foundEntity);
     }
 
     public function __construct($em, ClassMetadata $class){
