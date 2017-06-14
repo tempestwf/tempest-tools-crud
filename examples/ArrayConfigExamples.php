@@ -150,7 +150,12 @@ $readInfo = [
 $entityInfo = [
     'create'=>[
         'permissive'=>'<true or false>',
-        'validator'=>'<path to validator class>',
+        'validator'=>[
+            'fields'=>['<array of fields to validate>'],
+            'rules'=>['<rules>'],
+            'messages'=>['<messages>'],
+            'customAttributes'=>['<customAttributes>'],
+        ],
         'closure'=>'<validation closure>',
         'mutate'=>'<mutate closure>',
         'fields'=>[
@@ -160,10 +165,12 @@ $entityInfo = [
                 'enforce'=>'<error if not this value>',
                 'closure'=>'<validation closure>',
                 'mutate'=>'<mutate closure>',
-                'operations'=>[
+                'actions'=>[
                     'set'=>'<true or false>',
                     'add'=>'<true or false>',
                     'remove'=>'<true or false>',
+                ],
+                'chains'=>[
                     'create'=>'<true or false>',
                     'update'=>'<true or false>',
                     'delete'=>'<true or false>'
@@ -177,7 +184,12 @@ $entityInfo = [
     ],
     'update'=>[
         'permissive'=>'<true or false>',
-        'validator'=>'<path to validator class>',
+        'validator'=>[
+            'fields'=>['<array of fields to validate>'],
+            'rules'=>['<rules>'],
+            'messages'=>['<messages>'],
+            'customAttributes'=>['<customAttributes>'],
+        ],
         'closure'=>'<validation closure>',
         'mutate'=>'<mutate closure>',
         'fields'=>[
@@ -187,10 +199,12 @@ $entityInfo = [
                 'enforce'=>'<error if not this value>',
                 'closure'=>'<validation closure>',
                 'mutate'=>'<mutate closure>',
-                'operations'=>[
+                'actions'=>[
                     'set'=>'<true or false>',
                     'add'=>'<true or false>',
                     'remove'=>'<true or false>',
+                ],
+                'chains'=>[
                     'create'=>'<true or false>',
                     'update'=>'<true or false>',
                     'delete'=>'<true or false>'
@@ -204,7 +218,12 @@ $entityInfo = [
     ],
     'delete'=>[
         'permissive'=>'<true or false>',
-        'validator'=>'<path to validator class>',
+        'validator'=>[
+            'fields'=>['<array of fields to validate>'],
+            'rules'=>['<rules>'],
+            'messages'=>['<messages>'],
+            'customAttributes'=>['<customAttributes>'],
+        ],
         'closure'=>'<validation closure>',
         'mutate'=>'<mutate closure>',
         'fields'=>[
@@ -214,10 +233,12 @@ $entityInfo = [
                 'enforce'=>'<error if not this value>',
                 'closure'=>'<validation closure>',
                 'mutate'=>'<mutate closure>',
-                'operations'=>[
+                'actions'=>[
                     'set'=>'<true or false>',
                     'add'=>'<true or false>',
                     'remove'=>'<true or false>',
+                ],
+                'chains'=>[
                     'create'=>'<true or false>',
                     'update'=>'<true or false>',
                     'delete'=>'<true or false>'

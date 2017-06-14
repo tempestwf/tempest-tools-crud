@@ -19,8 +19,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
 
     const ERRORS = [
         'noArrayHelper'=>[
-            'message'=>'Error: No array helper set on repository.'
-        ]
+            'message'=>'Error: No array helper set on repository.',
+        ],
     ];
 
     /** @var EventManager|null */
@@ -74,7 +74,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      */
     protected function makeEventArgs(array $params): Events\GenericEventArgs
     {
-        return new GenericEventArgs(new \ArrayObject(['params'=>$params,'arrayHelper'=>$this->getArrayHelper()]));
+        return new GenericEventArgs(new \ArrayObject(['params'=>$params,'arrayHelper'=>$this->getArrayHelper(), 'results'=>[]]));
     }
 
     /**
@@ -85,26 +85,95 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      */
     public function create(array $params){
         $this->start();
-        $evm = $this->getEvm();
+
         $eventArgs = $this->makeEventArgs($params);
         try {
-            $evm->dispatchEvent(RepositoryEvents::PRE_CREATE, $eventArgs);
-            $evm->dispatchEvent(RepositoryEvents::VALIDATE_CREATE, $eventArgs);
-            $evm->dispatchEvent(RepositoryEvents::VERIFY_CREATE, $eventArgs);
-            $result = $this->doCreate($params);
-            $eventArgs->getArgs()['result'] = $result;
-            $evm->dispatchEvent(RepositoryEvents::PROCESS_RESULTS_CREATE, $eventArgs);
-            $evm->dispatchEvent(RepositoryEvents::POST_CREATE, $eventArgs);
-            $evm->dispatchEvent(RepositoryEvents::POST_COMMIT_CREATE, $eventArgs);
+            if (isset($params['batch'])) {
+                /** @var array[] $batch */
+                $batch = $params['batch'];
+                foreach ($batch as $batchParams) {
+                    $this->doCreate($batchParams, $eventArgs);
+                }
+            } else {
+                $this->doCreate($params, $eventArgs);
+            }
         } catch (Exception $e) {
             $this->stop(true);
             throw $e;
         }
         $this->stop();
+        return $eventArgs->getArgs()['results'];
     }
 
-    protected function doCreate (array $params) {
+    protected function doCreate (array $params, GenericEventArgs $eventArgs) {
+        $evm = $this->getEvm();
+        $evm->dispatchEvent(RepositoryEvents::PRE_CREATE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEvents::VALIDATE_CREATE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEvents::VERIFY_CREATE, $eventArgs);
+        $result = $this->doCreateSingle($params, $eventArgs);
+        $eventArgs->getArgs()['results'][] = $result;
+        $evm->dispatchEvent(RepositoryEvents::PROCESS_RESULTS_CREATE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEvents::POST_CREATE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEvents::POST_COMMIT_CREATE, $eventArgs);
+    }
 
+    protected function doCreateSingle(array $params, GenericEventArgs $eventArgs) {
+        $className = $this->getClassName();
+        $entity = new $className();
+        $this->bind($entity, $params);
+        return $entity;
+    }
+
+    //TODO: Type this entity
+    protected function bind($entity, array $params) {
+        $metadata = $this->getEntityManager()->getClassMetadata($entity);
+        $associateNames = $metadata->getAssociationNames();
+        foreach ($params as $fieldName => $value) {
+            if (in_array($fieldName, $associateNames, true)) {
+                $targetClass = $metadata->getAssociationTargetClass($fieldName);
+                if (isset($value[0]) && is_array($value[0])) {
+                    /** @var array $value */
+                    foreach ($value as $info) {
+                        $this->bindAssociation($entity, $fieldName, $info, $targetClass);
+                    }
+                } else {
+                    $this->bindAssociation($entity, $fieldName, $value, $targetClass);
+                }
+            } else {
+                $entity->setField($fieldName, $value);
+            }
+        }
+        return $entity;
+    }
+
+    /** @noinspection MoreThanThreeArgumentsInspection */
+    public function bindAssociation($entity, string $associationName, array $info, string $targetClass) {
+        $bindType = $info['bindType'] ?? 'set';
+        $chainType = $info['chainType'] ?? NULL;
+        /** @var RepositoryAbstract $repo */
+        $repo = $this->getEntityManager()->getRepository($targetClass);
+        $repo->setArrayHelper($this->getArrayHelper());
+
+        if ($chainType !== NULL && $entity->canChain($associationName, $chainType)) {
+
+            //TODO: Throw error if wrong type of repo
+            //TODO: Use constants instead of strings
+            switch ($chainType) {
+                case 'create':
+                    $foundEntity = $repo->create($info)[0];
+                    break;
+                case 'update':
+                    $foundEntity = $repo->update($info)[0];
+                    break;
+                case 'delete':
+                    $foundEntity = $repo->delete($info)[0];
+                    break;
+            }
+        } else {
+            $foundEntity = $repo->findOneBy($info['id']);
+        }
+
+        $entity->bindAssociation($bindType, $foundEntity);
     }
 
     public function __construct($em, ClassMetadata $class){
