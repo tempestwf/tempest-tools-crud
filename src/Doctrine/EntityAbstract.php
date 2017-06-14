@@ -5,11 +5,7 @@ use App\Entities\Entity;
 use Doctrine\Common\EventManager;
 use Doctrine\Common\EventSubscriber;
 use RuntimeException;
-use TempestTools\Common\Contracts\ArrayHelpable;
 use TempestTools\Common\Contracts\ArrayHelper as ArrayHelperContract;
-use TempestTools\Common\Contracts\Evm;
-use TempestTools\Common\Contracts\TTConfig;
-use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\EvmTrait;
@@ -18,7 +14,7 @@ use TempestTools\Crud\Constants\EntityEvents;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
 
 
-abstract class EntityAbstract extends Entity implements EventSubscriber, TTConfig, Evm, ArrayHelpable {
+abstract class EntityAbstract extends Entity implements EventSubscriber {
 
     use ArrayHelperTrait, ErrorConstantsTrait, TTConfigTrait, EvmTrait;
 

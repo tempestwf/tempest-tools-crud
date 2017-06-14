@@ -6,9 +6,6 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mockery\Exception;
-use TempestTools\Common\Contracts\ArrayHelpable;
-use TempestTools\Common\Contracts\Evm;
-use TempestTools\Common\Contracts\TTConfig;
 use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\EvmTrait;
@@ -19,7 +16,7 @@ use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
 use TempestTools\Crud\Doctrine\Helper\QueryHelper;
 use TempestTools\Common\Contracts\ArrayHelper as ArrayHelperContract;
 
-abstract class RepositoryAbstract extends EntityRepository implements EventSubscriber, TTConfig, Evm, ArrayHelpable {
+abstract class RepositoryAbstract extends EntityRepository implements EventSubscriber {
 
     use ArrayHelperTrait, ErrorConstantsTrait, TTConfigTrait, EvmTrait;
 
