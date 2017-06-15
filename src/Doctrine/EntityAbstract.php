@@ -95,39 +95,41 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
      */
     public function setField(string $fieldName, $value)
     {
-        $baseArrayHelper = $this->getArrayHelper();
-        $configArrayHelper = $this->getConfigArrayHelper();
-        $params = ['fieldName'=>$fieldName, 'value'=>$value, 'configArrayHelper'=>$configArrayHelper];
-        $eventArgs = $this->makeEventArgs($params);
+        $fastMode = $this->checkFastMode($fieldName);
+        if ($fastMode !== true) {
+            $baseArrayHelper = $this->getArrayHelper();
+            $configArrayHelper = $this->getConfigArrayHelper();
+            $params = ['fieldName'=>$fieldName, 'value'=>$value, 'configArrayHelper'=>$configArrayHelper];
+            $eventArgs = $this->makeEventArgs($params);
 
-        // Give event listeners a chance to do something then pull out the args again
-        /** @noinspection NullPointerExceptionInspection */
-        $this->getEvm()->dispatchEvent(EntityEvents::PRE_SET_FIELD, $eventArgs);
+            // Give event listeners a chance to do something then pull out the args again
+            /** @noinspection NullPointerExceptionInspection */
+            $this->getEvm()->dispatchEvent(EntityEvents::PRE_SET_FIELD, $eventArgs);
 
-        $processedParams = $eventArgs->getArgs()['params'];
-        $fieldName = $processedParams['params']['fieldName'];
-        $value = $processedParams['params']['value'];
+            $processedParams = $eventArgs->getArgs()['params'];
+            $fieldName = $processedParams['params']['fieldName'];
+            $value = $processedParams['params']['value'];
 
-        // Get the settings for the field so we can do quick comparisons
-        $fieldSettings = $configArrayHelper->parseArrayPath(['fields', $fieldName]);
-        $fieldSettings = $fieldSettings??[];
+            // Get the settings for the field so we can do quick comparisons
+            $fieldSettings = $configArrayHelper->parseArrayPath(['fields', $fieldName]);
+            $fieldSettings = $fieldSettings??[];
 
-        // Check permission to set
-        $allowed = $this->canAssign($fieldName, 'set');
+            // Check permission to set
+            $allowed = $this->canAssign($fieldName, 'set');
 
-        // Additional validation
-        $allowed = isset($fieldSettings['enforce']) && $baseArrayHelper->parse($value) !== $baseArrayHelper->parse($fieldSettings['enforce'])?false:$allowed;
-        $allowed = isset($fieldSettings['closure']) && $baseArrayHelper->parse($fieldSettings['closure'], ['fieldName'=>$fieldName, 'value'=>$value, 'self'=>$this]) === false?false:$allowed;
+            // Additional validation
+            $allowed = isset($fieldSettings['enforce']) && $baseArrayHelper->parse($value) !== $baseArrayHelper->parse($fieldSettings['enforce'])?false:$allowed;
+            $allowed = isset($fieldSettings['closure']) && $baseArrayHelper->parse($fieldSettings['closure'], ['fieldName'=>$fieldName, 'value'=>$value, 'self'=>$this]) === false?false:$allowed;
 
-        // Any validation failure error out
-        if ($allowed === false) {
-            throw new RuntimeException($this->getErrorFromConstant('fieldNotAllow'));
+            // Any validation failure error out
+            if ($allowed === false) {
+                throw new RuntimeException($this->getErrorFromConstant('fieldNotAllow'));
+            }
+
+            // setTo or mutate value
+            $value = isset($fieldSettings['setTo'])?$baseArrayHelper->parse($fieldSettings['setTo']):$value;
+            $value = isset($fieldSettings['mutate'])?$baseArrayHelper->parse($fieldSettings['mutate'], ['fieldName'=>$fieldName, 'value'=>$value, 'self'=>$this]):$value;
         }
-
-        // setTo or mutate value
-        $value = isset($fieldSettings['setTo'])?$baseArrayHelper->parse($fieldSettings['setTo']):$value;
-        $value = isset($fieldSettings['mutate'])?$baseArrayHelper->parse($fieldSettings['mutate'], ['fieldName'=>$fieldName, 'value'=>$value, 'self'=>$this]):$value;
-
         // All is ok so set it
         $setName = 'set' . ucfirst($fieldName);
         $this->$setName($value);
@@ -142,53 +144,56 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
      */
     public function processAssociationParams(string $associationName, array $values):array
     {
-        $baseArrayHelper = $this->getArrayHelper();
-        $configArrayHelper = $this->getConfigArrayHelper();
+        $fastMode = $this->checkFastMode($associationName);
+        if ($fastMode !== true) {
+            $baseArrayHelper = $this->getArrayHelper();
+            $configArrayHelper = $this->getConfigArrayHelper();
 
-        $params = ['associationName'=>$associationName, 'values'=>$values, 'configArrayHelper'=>$configArrayHelper];
-        $eventArgs = $this->makeEventArgs($params);
-        // Give event listeners a chance to do something and pull the args out again after wards
-        /** @noinspection NullPointerExceptionInspection */
-        $this->getEvm()->dispatchEvent(EntityEvents::PRE_PROCESS_ASSOCIATION_PARAMS, $eventArgs);
+            $params = ['associationName' => $associationName, 'values' => $values, 'configArrayHelper' => $configArrayHelper];
+            $eventArgs = $this->makeEventArgs($params);
+            // Give event listeners a chance to do something and pull the args out again after wards
+            /** @noinspection NullPointerExceptionInspection */
+            $this->getEvm()->dispatchEvent(EntityEvents::PRE_PROCESS_ASSOCIATION_PARAMS, $eventArgs);
 
-        $processedParams = $eventArgs->getArgs()['params'];
-        $associationName = $processedParams['params']['associationName'];
-        $values = $processedParams['params']['values'];
+            $processedParams = $eventArgs->getArgs()['params'];
+            $associationName = $processedParams['params']['associationName'];
+            $values = $processedParams['params']['values'];
 
-        // Get the settings for the field so we can do quick comparisons
-        $fieldSettings = $configArrayHelper->parseArrayPath(['fields', $associationName]);
-        $fieldSettings = $fieldSettings??[];
+            // Get the settings for the field so we can do quick comparisons
+            $fieldSettings = $configArrayHelper->parseArrayPath(['fields', $associationName]);
+            $fieldSettings = $fieldSettings??[];
 
-        // Check if assignment and chaining settings are allowed
-        $assignType = $values['assignType'] ?? 'set';
-        $chainType = $values['chainType'] ?? NULL;
-        if ($chainType!==NULL) {
-            $this->canChain($associationName, $chainType);
+            // Check if assignment and chaining settings are allowed
+            $assignType = $values['assignType'] ?? 'set';
+            $chainType = $values['chainType'] ?? null;
+            if ($chainType !== null) {
+                $this->canChain($associationName, $chainType);
+            }
+            $this->canAssign($associationName, $assignType);
+
+            // Check if fields that are needed to be enforced as enforced
+            $enforce = isset($fieldSettings['enforce']) ? $baseArrayHelper->parse($fieldSettings['enforce']) : [];
+            $allowed = !array_diff($enforce, $values);
+
+            // Run it through closure validation if there is a closure
+            $allowed = isset($fieldSettings['closure']) && $baseArrayHelper->parse($fieldSettings['closure'], ['associationName' => $associationName, 'values' => $values, 'self' => $this]) === false ? false : $allowed;
+
+            // Any validation failure error out
+            if ($allowed === false) {
+                throw new RuntimeException($this->getErrorFromConstant('fieldNotAllow'));
+            }
+
+            // Figure out if there are values that need to be set to, and set it to those values if any found
+            $setTo = isset($fieldSettings['setTo']) ? $baseArrayHelper->parse($fieldSettings['setTo']) : [];
+
+            if ($setTo !== null) {
+                $values = array_replace_recursive($values, $setTo);
+            }
+
+            // Run mutation closure if one is present
+            /** @noinspection CallableParameterUseCaseInTypeContextInspection */
+            $values = isset($fieldSettings['mutate']) ? $baseArrayHelper->parse($fieldSettings['mutate'], ['associationName' => $associationName, 'values' => $values, 'self' => $this]) : $values;
         }
-        $this->canAssign($associationName, $assignType);
-
-        // Check if fields that are needed to be enforced as enforced
-        $enforce = isset($fieldSettings['enforce'])?$baseArrayHelper->parse($fieldSettings['enforce']):[];
-        $allowed = !array_diff($enforce, $values);
-
-        // Run it through closure validation if there is a closure
-        $allowed = isset($fieldSettings['closure']) && $baseArrayHelper->parse($fieldSettings['closure'],['associationName'=>$associationName, 'values'=>$values, 'self'=>$this]) === false?false:$allowed;
-
-        // Any validation failure error out
-        if ($allowed === false) {
-            throw new RuntimeException($this->getErrorFromConstant('fieldNotAllow'));
-        }
-
-        // Figure out if there are values that need to be set to, and set it to those values if any found
-        $setTo = isset($fieldSettings['setTo'])?$baseArrayHelper->parse($fieldSettings['setTo']):[];
-
-        if ($setTo !== NULL) {
-            $values = array_replace_recursive($values, $setTo);
-        }
-
-        // Run mutation closure if one is present
-        /** @noinspection CallableParameterUseCaseInTypeContextInspection */
-        $values = isset($fieldSettings['mutate'])?$baseArrayHelper->parse($fieldSettings['mutate'], ['associationName'=>$associationName, 'values'=>$values, 'self'=>$this]):$values;
         return $values;
 
     }
@@ -256,6 +261,18 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
         return $allowed;
     }
 
+    /**
+     * @param string $fieldName
+     * @return bool
+     */
+    public function checkFastMode(string $fieldName):bool {
+        $arrayHelper = $this->getConfigArrayHelper();
+
+        /** @noinspection NullPointerExceptionInspection */
+        $actionSettings = $arrayHelper->getArray()->getArrayCopy();
+        $fieldSettings = $arrayHelper->parseArrayPath(['fields', $fieldName]);
+        return $this->highLowSettingCheck($actionSettings, $fieldSettings, 'fastMode');
+    }
     /**
      * Makes event args to use
      * @param array $params

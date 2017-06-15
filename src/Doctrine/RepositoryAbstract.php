@@ -155,8 +155,21 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     protected function checkBatchMax(array $values) {
         $configArrayHelper = $this->getConfigArrayHelper();
         $maxBatch = $configArrayHelper->parseArrayPath(['batchMax']);
-        if ($maxBatch !== NULL && count($values) > $maxBatch) {
-            throw new \RuntimeException($this->getErrorFromConstant('moreRowsRequestedThanBatchMax'));
+        if ($maxBatch !== NULL) {
+            $count = count($values) > $maxBatch;
+            $maxBatchIncludesChains = $configArrayHelper->parseArrayPath(['batchMaxIncludesChains']);
+            if ($maxBatchIncludesChains === true) {
+
+                $newCount = count(array_filter($values, function($element) {
+                    return isset($element['chainType']);
+                }));
+
+                $count += $newCount;
+            }
+            if ($count > $maxBatch) {
+                throw new \RuntimeException($this->getErrorFromConstant('moreRowsRequestedThanBatchMax'));
+            }
+
         }
     }
 
