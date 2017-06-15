@@ -26,10 +26,13 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
             'message'=>'Error: No array helper on entity.'
         ],
         'chainTypeNotAllow'=>[
-            'message'=>'Error: Requested chain type not permitted'
+            'message'=>'Error: Requested chain type not permitted.'
         ],
         'assignTypeNotAllow'=>[
-            'message'=>'Error: Requested assign type not permitted'
+            'message'=>'Error: Requested assign type not permitted.'
+        ],
+        'assignTypeMustBe'=>[
+            'message'=>'Error: Assign type must be set, add or remove'
         ]
     ];
 
@@ -130,18 +133,7 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
         $this->$setName($value);
     }
 
-    /**
-     * @param \ArrayObject $actionSettings
-     * @param array $fieldSettings
-     * @return array
-     */
-    protected function getPermissiveSettings(\ArrayObject $actionSettings, array $fieldSettings = NULL):array
-    {
-        $actionPermissive = isset($actionSettings['permissive']) ?? $actionSettings['permissive'];
-        $fieldPermissive = $fieldSettings !== NULL && isset($fieldSettings['permissive']) ?? $actionSettings['permissive'];
 
-        return [$actionPermissive, $fieldPermissive];
-    }
 
     /**
      * @param string $associationName
@@ -211,15 +203,11 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
      */
     public function canChain (string $associationName, string $chainType, bool $nosey = true):bool {
         $arrayHelper = $this->getConfigArrayHelper();
-        $actionSettings = $arrayHelper->getArray();
+        /** @noinspection NullPointerExceptionInspection */
+        $actionSettings = $arrayHelper->getArray()->getArrayCopy();
         $fieldSettings = $arrayHelper->parseArrayPath(['fields', $associationName]);
 
-        list($actionPermissive, $fieldPermissive) = $this->getPermissiveSettings($actionSettings, $fieldSettings);
-        // Check permission to set
-        $allowed = true;
-        $allowed = $actionPermissive === false && $fieldSettings === NULL?false:$allowed;
-        $allowed = $fieldPermissive === false && (!isset($fieldSettings['chain']) || !isset($fieldSettings['chain'][$chainType]) || $fieldSettings['chain'][$chainType] === false) ?false:$allowed;
-        $allowed = $fieldPermissive === true && isset($fieldSettings['chain']) && isset($fieldSettings['chain'][$chainType]) && $fieldSettings['chain'][$chainType] === false ?false:$allowed;
+        $allowed = $this->permissivePermissionCheck($actionSettings, $fieldSettings, 'chain', $chainType);
 
         if ($nosey === true && $allowed === false) {
             throw new \RuntimeException($this->getErrorFromConstant('chainTypeNotAllow')['message']);
@@ -228,26 +216,40 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
         return $allowed;
     }
 
+    /** @noinspection MoreThanThreeArgumentsInspection */
+
+    /**
+     * @param string $assignType
+     * @param string $associationName
+     * @param EntityAbstract $entity
+     * @param bool $force
+     * @throws \RuntimeException
+     */
+    public function bindAssociation(string $assignType, string $associationName, EntityAbstract $entity, $force = false){
+        if ($force === false) {
+            $this->canAssign($assignType, $associationName);
+        }
+        if (!in_array($assignType, ['set', 'add', 'remove'], true)){
+            throw new \RuntimeException($this->getErrorFromConstant('assignTypeMustBe')['message']);
+        }
+        $methodName = $assignType . ucfirst($associationName);
+        $this->$methodName($entity);
+    }
 
     /**
      * @param string $associationName
-     * @param string $chainType
+     * @param string $assignType
      * @param bool $nosey
      * @return bool
      * @throws \RuntimeException
      */
-    public function canAssign (string $associationName, string $chainType, bool $nosey = true):bool {
+    public function canAssign (string $associationName, string $assignType, bool $nosey = true):bool {
         $arrayHelper = $this->getConfigArrayHelper();
-        $actionSettings = $arrayHelper->getArray();
+        /** @noinspection NullPointerExceptionInspection */
+        $actionSettings = $arrayHelper->getArray()->getArrayCopy();
         $fieldSettings = $arrayHelper->parseArrayPath(['fields', $associationName]);
 
-        list($actionPermissive, $fieldPermissive) = $this->getPermissiveSettings($actionSettings, $fieldSettings);
-
-        // Check permission to set
-        $allowed = true;
-        $allowed = $actionPermissive === false && $fieldSettings === NULL?false:$allowed;
-        $allowed = $fieldPermissive === false && (!isset($fieldSettings['assign']) || !isset($fieldSettings['assign'][$chainType]) || $fieldSettings['assign'][$chainType] === false) ?false:$allowed;
-        $allowed = $fieldPermissive === true && isset($fieldSettings['assign']) && isset($fieldSettings['assign'][$chainType]) && $fieldSettings['assign'][$chainType] === false ?false:$allowed;
+        $allowed = $this->permissivePermissionCheck($actionSettings, $fieldSettings, 'assign', $assignType);
 
         if ($nosey === true && $allowed === false) {
             throw new \RuntimeException($this->getErrorFromConstant('assignTypeNotAllow')['message']);

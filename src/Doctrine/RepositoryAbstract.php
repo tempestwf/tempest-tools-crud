@@ -260,7 +260,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         }
         // TODO: Add a pre bind event
         if ($foundEntity === NULL) {
-            $entity->bindAssociation($assignType, $foundEntity);
+            $entity->bindAssociation($assignType, $associationName, $foundEntity, true);
         } else {
             throw new \RuntimeException($this->getErrorFromConstant('entityToBindNotFound')['message']);
         }
