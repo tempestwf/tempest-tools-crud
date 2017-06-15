@@ -24,6 +24,12 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
         ],
         'noArrayHelper'=>[
             'message'=>'Error: No array helper on entity.'
+        ],
+        'chainTypeNotAllow'=>[
+            'message'=>'Error: Requested chain type not permitted'
+        ],
+        'assignTypeNotAllow'=>[
+            'message'=>'Error: Requested assign type not permitted'
         ]
     ];
 
@@ -32,7 +38,8 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
      *
      * @throws RuntimeException
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->setEvm(new EventManager());
         /** @noinspection NullPointerExceptionInspection */
         $this->getEvm()->addEventSubscriber($this);
@@ -46,7 +53,8 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
      * @param array|null $fallBack
      * @throws \RuntimeException
      */
-    public function init(string $mode, ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL) {
+    public function init(string $mode, ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL)
+    {
         if ($arrayHelper !== NULL) {
             $this->setArrayHelper($arrayHelper);
         }
@@ -61,7 +69,6 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
             throw new \RuntimeException($this->getErrorFromConstant('noArrayHelper'));
         }
 
-
         $path[] = $mode;
         $this->setTTPath($path);
         $this->parseTTConfig();
@@ -72,7 +79,8 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
      * @param string $keyName
      * @return mixed
      */
-    public function getConfigForField(string $fieldName, string $keyName) {
+    public function getConfigForField(string $fieldName, string $keyName)
+    {
         $arrayHelper = $this->getConfigArrayHelper();
         return $arrayHelper->parseArrayPath(['fields', $fieldName, $keyName]);
     }
@@ -82,13 +90,14 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
      * @param $value
      * @throws RuntimeException
      */
-    public function setField(string $fieldName, $value){
+    public function setField(string $fieldName, $value)
+    {
         $baseArrayHelper = $this->getArrayHelper();
-        $arrayHelper = $this->getConfigArrayHelper();
-        $params = ['fieldName'=>$fieldName, 'value'=>$value, 'configArrayHelper'=>$arrayHelper];
+        $configArrayHelper = $this->getConfigArrayHelper();
+        $params = ['fieldName'=>$fieldName, 'value'=>$value, 'configArrayHelper'=>$configArrayHelper];
         $eventArgs = $this->makeEventArgs($params);
 
-        // Give event listeners a chance to do something
+        // Give event listeners a chance to do something then pull out the args again
         /** @noinspection NullPointerExceptionInspection */
         $this->getEvm()->dispatchEvent(EntityEvents::PRE_SET_FIELD, $eventArgs);
 
@@ -96,19 +105,16 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
         $fieldName = $processedParams['params']['fieldName'];
         $value = $processedParams['params']['value'];
 
-        $actionSettings = $arrayHelper->getArray();
-        $fieldSettings = $arrayHelper->parseArrayPath(['fields', $fieldName]);
-        list($actionPermissive, $fieldPermissive) = $this->getPermissiveSettings($actionSettings, $fieldSettings);
+        // Get the settings for the field so we can do quick comparisons
+        $fieldSettings = $configArrayHelper->parseArrayPath(['fields', $fieldName]);
+        $fieldSettings = $fieldSettings??[];
 
         // Check permission to set
-        $allowed = true;
-        $allowed = $actionPermissive === false && $fieldSettings === NULL?false:$allowed;
-        $allowed = $fieldPermissive === false && (!isset($fieldSettings['assign']) || !isset($fieldSettings['assign']['set']) || $fieldSettings['assign']['set'] === false) ?false:$allowed;
-        $allowed = $fieldPermissive === true && isset($fieldSettings['assign']) && isset($fieldSettings['assign']['set']) && $fieldSettings['assign']['set'] === false ?false:$allowed;
+        $allowed = $this->canAssign($fieldName, 'set');
 
         // Additional validation
-        $allowed = isset($fieldSettings['enforce']) && $baseArrayHelper->parse($value) !== $fieldSettings['enforce']?false:$allowed;
-        $allowed = isset($fieldSettings['closure']) && $baseArrayHelper->parse($fieldSettings['closure'], ['value'=>$value]) === false?false:$allowed;
+        $allowed = isset($fieldSettings['enforce']) && $baseArrayHelper->parse($value) !== $baseArrayHelper->parse($fieldSettings['enforce'])?false:$allowed;
+        $allowed = isset($fieldSettings['closure']) && $baseArrayHelper->parse($fieldSettings['closure'], ['fieldName'=>$fieldName, 'value'=>$value, 'self'=>$this]) === false?false:$allowed;
 
         // Any validation failure error out
         if ($allowed === false) {
@@ -117,7 +123,7 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
 
         // setTo or mutate value
         $value = isset($fieldSettings['setTo'])?$baseArrayHelper->parse($fieldSettings['setTo']):$value;
-        $value = isset($fieldSettings['mutate']) === false?$baseArrayHelper->parse($fieldSettings['mutate'], ['fieldName'=>$fieldName, 'value'=>$value, 'self'=>$this]):$value;
+        $value = isset($fieldSettings['mutate'])?$baseArrayHelper->parse($fieldSettings['mutate'], ['fieldName'=>$fieldName, 'value'=>$value, 'self'=>$this]):$value;
 
         // All is ok so set it
         $setName = 'set' . ucfirst($fieldName);
@@ -129,7 +135,8 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
      * @param array $fieldSettings
      * @return array
      */
-    protected function getPermissiveSettings(\ArrayObject $actionSettings, array $fieldSettings):array {
+    protected function getPermissiveSettings(\ArrayObject $actionSettings, array $fieldSettings = NULL):array
+    {
         $actionPermissive = isset($actionSettings['permissive']) ?? $actionSettings['permissive'];
         $fieldPermissive = $fieldSettings !== NULL && isset($fieldSettings['permissive']) ?? $actionSettings['permissive'];
 
@@ -138,10 +145,71 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
 
     /**
      * @param string $associationName
-     * @param string $chainType
-     * @return bool
+     * @param array $values
+     * @return array
+     * @throws \RuntimeException
      */
-    public function canChain (string $associationName, string $chainType):bool {
+    public function processAssociationParams(string $associationName, array $values):array
+    {
+        $baseArrayHelper = $this->getArrayHelper();
+        $configArrayHelper = $this->getConfigArrayHelper();
+
+        $params = ['associationName'=>$associationName, 'values'=>$values, 'configArrayHelper'=>$configArrayHelper];
+        $eventArgs = $this->makeEventArgs($params);
+        // Give event listeners a chance to do something and pull the args out again after wards
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getEvm()->dispatchEvent(EntityEvents::PRE_PROCESS_ASSOCIATION_PARAMS, $eventArgs);
+
+        $processedParams = $eventArgs->getArgs()['params'];
+        $associationName = $processedParams['params']['associationName'];
+        $values = $processedParams['params']['values'];
+
+        // Get the settings for the field so we can do quick comparisons
+        $fieldSettings = $configArrayHelper->parseArrayPath(['fields', $associationName]);
+        $fieldSettings = $fieldSettings??[];
+
+        // Check if assignment and chaining settings are allowed
+        $assignType = $values['assignType'] ?? 'set';
+        $chainType = $values['chainType'] ?? NULL;
+        if ($chainType!==NULL) {
+            $this->canChain($associationName, $chainType);
+        }
+        $this->canAssign($associationName, $assignType);
+
+        // Check if fields that are needed to be enforced as enforced
+        $enforce = isset($fieldSettings['enforce'])?$baseArrayHelper->parse($fieldSettings['enforce']):[];
+        $allowed = !array_diff($enforce, $values);
+
+        // Run it through closure validation if there is a closure
+        $allowed = isset($fieldSettings['closure']) && $baseArrayHelper->parse($fieldSettings['closure'],['associationName'=>$associationName, 'values'=>$values, 'self'=>$this]) === false?false:$allowed;
+
+        // Any validation failure error out
+        if ($allowed === false) {
+            throw new RuntimeException($this->getErrorFromConstant('fieldNotAllow'));
+        }
+
+        // Figure out if there are values that need to be set to, and set it to those values if any found
+        $setTo = isset($fieldSettings['setTo'])?$baseArrayHelper->parse($fieldSettings['setTo']):[];
+
+        if ($setTo !== NULL) {
+            $values = array_replace_recursive($values, $setTo);
+        }
+
+        // Run mutation closure if one is present
+        /** @noinspection CallableParameterUseCaseInTypeContextInspection */
+        $values = isset($fieldSettings['mutate'])?$baseArrayHelper->parse($fieldSettings['mutate'], ['associationName'=>$associationName, 'values'=>$values, 'self'=>$this]):$values;
+        return $values;
+
+    }
+
+    /**
+     * @param string $associationName
+     * @param string $chainType
+     * @param bool $nosey
+     * @return bool
+     * @throws \RuntimeException
+     */
+    public function canChain (string $associationName, string $chainType, bool $nosey = true):bool {
         $arrayHelper = $this->getConfigArrayHelper();
         $actionSettings = $arrayHelper->getArray();
         $fieldSettings = $arrayHelper->parseArrayPath(['fields', $associationName]);
@@ -153,6 +221,37 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
         $allowed = $fieldPermissive === false && (!isset($fieldSettings['chain']) || !isset($fieldSettings['chain'][$chainType]) || $fieldSettings['chain'][$chainType] === false) ?false:$allowed;
         $allowed = $fieldPermissive === true && isset($fieldSettings['chain']) && isset($fieldSettings['chain'][$chainType]) && $fieldSettings['chain'][$chainType] === false ?false:$allowed;
 
+        if ($nosey === true && $allowed === false) {
+            throw new \RuntimeException($this->getErrorFromConstant('chainTypeNotAllow')['message']);
+        }
+
+        return $allowed;
+    }
+
+
+    /**
+     * @param string $associationName
+     * @param string $chainType
+     * @param bool $nosey
+     * @return bool
+     * @throws \RuntimeException
+     */
+    public function canAssign (string $associationName, string $chainType, bool $nosey = true):bool {
+        $arrayHelper = $this->getConfigArrayHelper();
+        $actionSettings = $arrayHelper->getArray();
+        $fieldSettings = $arrayHelper->parseArrayPath(['fields', $associationName]);
+
+        list($actionPermissive, $fieldPermissive) = $this->getPermissiveSettings($actionSettings, $fieldSettings);
+
+        // Check permission to set
+        $allowed = true;
+        $allowed = $actionPermissive === false && $fieldSettings === NULL?false:$allowed;
+        $allowed = $fieldPermissive === false && (!isset($fieldSettings['assign']) || !isset($fieldSettings['assign'][$chainType]) || $fieldSettings['assign'][$chainType] === false) ?false:$allowed;
+        $allowed = $fieldPermissive === true && isset($fieldSettings['assign']) && isset($fieldSettings['assign'][$chainType]) && $fieldSettings['assign'][$chainType] === false ?false:$allowed;
+
+        if ($nosey === true && $allowed === false) {
+            throw new \RuntimeException($this->getErrorFromConstant('assignTypeNotAllow')['message']);
+        }
         return $allowed;
     }
 

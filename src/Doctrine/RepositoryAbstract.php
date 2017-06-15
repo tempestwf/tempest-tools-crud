@@ -146,6 +146,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @param GenericEventArgs $eventArgs
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
+     * @throws \Doctrine\DBAL\ConnectionException
+     * @throws \Mockery\Exception
      */
     protected function doCreate (GenericEventArgs $eventArgs) {
         $evm = $this->getEvm();
@@ -173,24 +175,22 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         /** @var EntityAbstract $entity */
         $entity = new $className();
         $entity->init($eventArgs->getArgs()['action'] , $this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
-        $this->bind($entity,  $eventArgs);
+        $this->bind($entity,  $eventArgs->getArgs()['params']);
         return $entity;
     }
 
     /**
      * @param EntityAbstract $entity
-     * @param GenericEventArgs $eventArgs
+     * @param array $params
      * @return EntityAbstract
      * @throws \Mockery\Exception
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
      */
-    public function bind(EntityAbstract $entity, GenericEventArgs $eventArgs): EntityAbstract
+    public function bind(EntityAbstract $entity, array $params): EntityAbstract
     {
         $entity->setArrayHelper($this->getArrayHelper());
-        /** @var array $params */
-        $params = $eventArgs->getArgs()['params'];
         $metadata = $this->getEntityManager()->getClassMetadata($entity);
         $associateNames = $metadata->getAssociationNames();
         foreach ($params as $fieldName => $value) {
@@ -205,6 +205,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
                     $this->bindAssociation($entity, $fieldName, $value, $targetClass);
                 }
             } else {
+                //TODO: Maybe add pre bind event
                 $entity->setField($fieldName, $value);
             }
         }
@@ -215,38 +216,24 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     /**
      * @param EntityAbstract $entity
      * @param string $associationName
-     * @param array $info
+     * @param array $params
      * @param string $targetClass
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \InvalidArgumentException
      * @throws \Mockery\Exception
      * @throws \RuntimeException
      */
-    public function bindAssociation(EntityAbstract $entity, string $associationName, array $info, string $targetClass) {
-        $baseArrayHelper = $this->getArrayHelper();
-        $setToForField = $entity->getConfigForField($associationName, 'setTo');
-        $mutateForField = $entity->getConfigForField($associationName, 'mutate');
+    public function bindAssociation(EntityAbstract $entity, string $associationName, array $params, string $targetClass) {
+        $params = $entity->processAssociationParams($associationName, $params);
+        $assignType = $params['assignType'] ?? 'set';
+        $chainType = $params['chainType'] ?? NULL;
 
-        // setTo or mutate value
-        $setTo = $setToForField !== NULL ?$baseArrayHelper->parse($setToForField):NULL;
-
-        if ($setTo !== NULL) {
-            $info = array_replace_recursive($info, $setTo);
+        if (isset($params['assignType'])) {
+            unset($params['assignType']);
         }
 
-        /** @noinspection CallableParameterUseCaseInTypeContextInspection */
-        $info = $mutateForField !== NULL?$baseArrayHelper->parse($mutateForField, ['fieldName'=>$associationName, 'value'=>$info, 'self'=>$this]):$info;
-
-
-        $bindType = $info['bindType'] ?? 'set';
-        $chainType = $info['chainType'] ?? NULL;
-
-        if (isset($info['bindType'])) {
-            unset($info['bindType']);
-        }
-
-        if (isset($info['chainType'])) {
-            unset($info['chainType']);
+        if (isset($params['chainType'])) {
+            unset($params['chainType']);
         }
         /** @var RepositoryAbstract $repo */
         $repo = $this->getEntityManager()->getRepository($targetClass);
@@ -259,7 +246,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
             //TODO: Use constants instead of strings
             switch ($chainType) {
                 case 'create':
-                    $foundEntity = $repo->create($info)[0];
+                    $foundEntity = $repo->create($params)[0];
                     break;
                 /*case 'update':
                     $foundEntity = $repo->update($info)[0];
@@ -269,11 +256,11 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
                     break;*/
             }
         } else {
-            $foundEntity = $repo->findOneBy($info['id']);
+            $foundEntity = $repo->findOneBy($params['id']);
         }
         // TODO: Add a pre bind event
         if ($foundEntity === NULL) {
-            $entity->bindAssociation($bindType, $foundEntity);
+            $entity->bindAssociation($assignType, $foundEntity);
         } else {
             throw new \RuntimeException($this->getErrorFromConstant('entityToBindNotFound')['message']);
         }
