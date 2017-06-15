@@ -51,20 +51,19 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
             $this->setArrayHelper($arrayHelper);
         }
 
-        if ($path !== NULL) {
-            $this->setTTPath($path);
-        }
+        $path = $path ?? $this->getTTPath();
 
         if ($fallBack !== NULL) {
-            $this->setTTFallBack($path);
+            $this->setTTFallBack($fallBack);
         }
 
         if (!$this->getArrayHelper() instanceof ArrayHelperContract) {
             throw new \RuntimeException($this->getErrorFromConstant('noArrayHelper'));
         }
 
-        $path = $this->getTTPath();
+
         $path[] = $mode;
+        $this->setTTPath($path);
         $this->parseTTConfig();
     }
 
@@ -99,8 +98,7 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
 
         $actionSettings = $arrayHelper->getArray();
         $fieldSettings = $arrayHelper->parseArrayPath(['fields', $fieldName]);
-        $actionPermissive = isset($actionSettings['permissive']) ?? $actionSettings['permissive'];
-        $fieldPermissive = $fieldSettings !== NULL && isset($fieldSettings['permissive']) ?? $actionSettings['permissive'];
+        list($actionPermissive, $fieldPermissive) = $this->getPermissiveSettings($actionSettings, $fieldSettings);
 
         // Check permission to set
         $allowed = true;
@@ -124,6 +122,38 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
         // All is ok so set it
         $setName = 'set' . ucfirst($fieldName);
         $this->$setName($value);
+    }
+
+    /**
+     * @param \ArrayObject $actionSettings
+     * @param array $fieldSettings
+     * @return array
+     */
+    protected function getPermissiveSettings(\ArrayObject $actionSettings, array $fieldSettings):array {
+        $actionPermissive = isset($actionSettings['permissive']) ?? $actionSettings['permissive'];
+        $fieldPermissive = $fieldSettings !== NULL && isset($fieldSettings['permissive']) ?? $actionSettings['permissive'];
+
+        return [$actionPermissive, $fieldPermissive];
+    }
+
+    /**
+     * @param string $associationName
+     * @param string $chainType
+     * @return bool
+     */
+    public function canChain (string $associationName, string $chainType):bool {
+        $arrayHelper = $this->getConfigArrayHelper();
+        $actionSettings = $arrayHelper->getArray();
+        $fieldSettings = $arrayHelper->parseArrayPath(['fields', $associationName]);
+
+        list($actionPermissive, $fieldPermissive) = $this->getPermissiveSettings($actionSettings, $fieldSettings);
+        // Check permission to set
+        $allowed = true;
+        $allowed = $actionPermissive === false && $fieldSettings === NULL?false:$allowed;
+        $allowed = $fieldPermissive === false && (!isset($fieldSettings['chain']) || !isset($fieldSettings['chain'][$chainType]) || $fieldSettings['chain'][$chainType] === false) ?false:$allowed;
+        $allowed = $fieldPermissive === true && isset($fieldSettings['chain']) && isset($fieldSettings['chain'][$chainType]) && $fieldSettings['chain'][$chainType] === false ?false:$allowed;
+
+        return $allowed;
     }
 
     /**

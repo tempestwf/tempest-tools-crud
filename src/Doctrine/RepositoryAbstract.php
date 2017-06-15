@@ -38,7 +38,6 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \RuntimeException
      */
     protected function start() {
-        $this->init();
         /** @noinspection NullPointerExceptionInspection */
         if (
             !isset($this->getArrayHelper()->getArray()['backend']['options']['transaction']) ||
@@ -46,8 +45,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         ) {
             $this->getEntityManager()->getConnection()->beginTransaction();
         }
-        /** @noinspection NullPointerExceptionInspection */
-        $this->getEvm()->addEventSubscriber($this);
+
     }
 
     /**
@@ -66,7 +64,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         }
 
         if ($fallBack !== NULL) {
-            $this->setTTFallBack($path);
+            $this->setTTFallBack($fallBack);
         }
 
         if (!$this->getArrayHelper() instanceof ArrayHelperContract) {
@@ -164,6 +162,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     /**
      * @param GenericEventArgs $eventArgs
      * @return EntityAbstract
+     * @throws \Mockery\Exception
+     * @throws \Doctrine\DBAL\ConnectionException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
@@ -181,6 +181,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @param EntityAbstract $entity
      * @param GenericEventArgs $eventArgs
      * @return EntityAbstract
+     * @throws \Mockery\Exception
+     * @throws \Doctrine\DBAL\ConnectionException
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
      */
@@ -251,8 +253,6 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         $repo->setArrayHelper($this->getArrayHelper());
 
         $foundEntity = NULL;
-
-
         // TODO: Add a pre chain event
         if ($chainType !== NULL && $entity->canChain($associationName, $chainType)) {
             //TODO: Throw error if wrong type of repo
@@ -261,12 +261,12 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
                 case 'create':
                     $foundEntity = $repo->create($info)[0];
                     break;
-                case 'update':
+                /*case 'update':
                     $foundEntity = $repo->update($info)[0];
                     break;
                 case 'delete':
                     $foundEntity = $repo->delete($info)[0];
-                    break;
+                    break;*/
             }
         } else {
             $foundEntity = $repo->findOneBy($info['id']);
@@ -284,6 +284,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         parent::__construct($em, $class);
         $this->setEvm(new EventManager());
         $this->setQueryHelper(new QueryHelper());
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getEvm()->addEventSubscriber($this);
     }
 
 
