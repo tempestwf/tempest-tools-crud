@@ -138,6 +138,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
                 }
                 $evm->dispatchEvent(RepositoryEvents::POST_CREATE_BATCH, $eventArgs);
             } else {
+                $this->checkBatchMax($eventArgs->getArgs()['params']);
                 $this->doCreate($eventArgs);
             }
         } catch (Exception $e) {
