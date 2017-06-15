@@ -2,6 +2,7 @@
 $readInfo = [
     'batchMax' => '<the max we can do in one batch>',
     'batchMaxIncludesChains' => '<whether or not to include chains when caculating batch max>',
+    'batchMaxIncludesAssigns' => '<whether or not to include assigns when caculating batch max>',
     'query'=>[
         'select'=>[
             '<keyName>'=>'<string>'

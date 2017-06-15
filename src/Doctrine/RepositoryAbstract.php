@@ -158,10 +158,11 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         if ($maxBatch !== NULL) {
             $count = count($values) > $maxBatch;
             $maxBatchIncludesChains = $configArrayHelper->parseArrayPath(['batchMaxIncludesChains']);
-            if ($maxBatchIncludesChains === true) {
+            $maxBatchIncludesAssigns = $configArrayHelper->parseArrayPath(['batchMaxIncludesAssigns']);
+            if ($maxBatchIncludesChains === true || $maxBatchIncludesAssigns === true) {
 
-                $newCount = count(array_filter($values, function($element) {
-                    return isset($element['chainType']);
+                $newCount = count(array_filter($values, function($element) use ($maxBatchIncludesAssigns, $maxBatchIncludesAssigns){
+                    return ($maxBatchIncludesAssigns && isset($element['chainType'])) || ($maxBatchIncludesAssigns && isset($element['assignType']));
                 }));
 
                 $count += $newCount;
