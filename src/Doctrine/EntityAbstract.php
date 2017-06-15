@@ -208,7 +208,7 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
     public function canChain (string $associationName, string $chainType, bool $nosey = true):bool {
         $arrayHelper = $this->getConfigArrayHelper();
         /** @noinspection NullPointerExceptionInspection */
-        $actionSettings = $arrayHelper->getArray()->getArrayCopy();
+        $actionSettings = $arrayHelper->getArray();
         $fieldSettings = $arrayHelper->parseArrayPath(['fields', $associationName]);
 
         $allowed = $this->permissivePermissionCheck($actionSettings, $fieldSettings, 'chain', $chainType);
@@ -250,7 +250,7 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
     public function canAssign (string $associationName, string $assignType, bool $nosey = true):bool {
         $arrayHelper = $this->getConfigArrayHelper();
         /** @noinspection NullPointerExceptionInspection */
-        $actionSettings = $arrayHelper->getArray()->getArrayCopy();
+        $actionSettings = $arrayHelper->getArray();
         $fieldSettings = $arrayHelper->parseArrayPath(['fields', $associationName]);
 
         $allowed = $this->permissivePermissionCheck($actionSettings, $fieldSettings, 'assign', $assignType);
@@ -269,7 +269,7 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
         $arrayHelper = $this->getConfigArrayHelper();
 
         /** @noinspection NullPointerExceptionInspection */
-        $actionSettings = $arrayHelper->getArray()->getArrayCopy();
+        $actionSettings = $arrayHelper->getArray();
         $fieldSettings = $arrayHelper->parseArrayPath(['fields', $fieldName]);
         return $this->highLowSettingCheck($actionSettings, $fieldSettings, 'fastMode');
     }
