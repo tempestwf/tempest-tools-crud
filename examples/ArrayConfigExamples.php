@@ -1,5 +1,6 @@
 <?php
 $readInfo = [
+    'batchMax' => '<the max we can do in one batch>',
     'query'=>[
         'select'=>[
             '<keyName>'=>'<string>'
@@ -94,7 +95,9 @@ $readInfo = [
                 ]
             ]
         ],
-    ],
+    ]
+];
+$fromMasterAray = [
     'frontend'=>[
         'query'=>[
             'where'=>[
@@ -180,8 +183,7 @@ $entityInfo = [
         ],
         'options'=>[
             '<custom option name>'=>'<custom option value>',
-        ],
-        'batchLimit'=>'<how many can be added at once>'
+        ]
     ],
     'update'=>[
         'permissive'=>'<true or false>',
@@ -215,8 +217,7 @@ $entityInfo = [
         ],
         'options'=>[
             '<custom option name>'=>'<custom option value>',
-        ],
-        'batchLimit'=>'<how many can be added at once>'
+        ]
     ],
     'delete'=>[
         'permissive'=>'<true or false>',
@@ -250,7 +251,6 @@ $entityInfo = [
         ],
         'options'=>[
             '<custom option name>'=>'<custom option value>',
-        ],
-        'batchLimit'=>'<how many can be added at once>'
+        ]
     ]
 ];

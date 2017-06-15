@@ -26,6 +26,12 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         ],
         'entityToBindNotFound'=>[
             'message'=>'Error: Entity to bind not found.'
+        ],
+        'moreRowsRequestedThanBatchMax'=>[
+            'message'=>'Error: More rows requested than batch max allows.'
+        ],
+        'wrongTypeOfRepo'=>[
+            'message'=>'Error: Wrong type of repo used with chaining.'
         ]
     ];
 
@@ -115,16 +121,16 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     public function create(array $params){
         $this->start();
         $evm = $this->getEvm();
-
         $eventArgs = $this->makeEventArgs($params);
         $eventArgs->getArgs()['action'] = 'create';
+
         try {
             if (isset($params['batch'])) {
-                // TODO: Verify match max
                 $eventArgs->getArgs()['batchParams'] = $eventArgs->getArgs()['params'];
                 $evm->dispatchEvent(RepositoryEvents::PRE_CREATE_BATCH, $eventArgs);
                 /** @var array[] $batch */
                 $batch = $params['batch'];
+                $this->checkBatchMax($batch);
                 foreach ($batch as $batchParams) {
                     $eventArgs->getArgs()['params'] = $batchParams;
                     /** @noinspection DisconnectedForeachInstructionInspection */
@@ -140,6 +146,18 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         }
         $this->stop();
         return $eventArgs->getArgs()['results'];
+    }
+
+    /**
+     * @param array $values
+     * @throws \RuntimeException
+     */
+    protected function checkBatchMax(array $values) {
+        $configArrayHelper = $this->getConfigArrayHelper();
+        $maxBatch = $configArrayHelper->parseArrayPath(['batchMax']);
+        if ($maxBatch !== NULL && count($values) > $maxBatch) {
+            throw new \RuntimeException($this->getErrorFromConstant('moreRowsRequestedThanBatchMax'));
+        }
     }
 
     /**
@@ -175,7 +193,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         /** @var EntityAbstract $entity */
         $entity = new $className();
         $entity->init($eventArgs->getArgs()['action'] , $this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
-        $this->bind($entity,  $eventArgs->getArgs()['params']);
+        $this->bind($entity, $eventArgs->getArgs()['params']);
         return $entity;
     }
 
@@ -205,7 +223,6 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
                     $this->bindAssociation($entity, $fieldName, $value, $targetClass);
                 }
             } else {
-                //TODO: Maybe add pre bind event
                 $entity->setField($fieldName, $value);
             }
         }
@@ -240,10 +257,12 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         $repo->setArrayHelper($this->getArrayHelper());
 
         $foundEntity = NULL;
-        // TODO: Add a pre chain event
-        if ($chainType !== NULL && $entity->canChain($associationName, $chainType)) {
-            //TODO: Throw error if wrong type of repo
-            //TODO: Use constants instead of strings
+        if ($chainType !== NULL) {
+            // TODO: Use a contract here instead
+            if (!$repo instanceof RepositoryAbstract) {
+                throw new \RuntimeException($this->getErrorFromConstant('wrongTypeOfRepo'));
+            }
+
             switch ($chainType) {
                 case 'create':
                     $foundEntity = $repo->create($params)[0];
@@ -258,7 +277,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         } else {
             $foundEntity = $repo->findOneBy($params['id']);
         }
-        // TODO: Add a pre bind event
+
         if ($foundEntity === NULL) {
             $entity->bindAssociation($assignType, $associationName, $foundEntity, true);
         } else {
@@ -267,6 +286,12 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
 
     }
 
+    /**
+     * RepositoryAbstract constructor.
+     *
+     * @param \Doctrine\ORM\EntityManager $em
+     * @param ClassMetadata $class
+     */
     public function __construct($em, ClassMetadata $class){
         parent::__construct($em, $class);
         $this->setEvm(new EventManager());
