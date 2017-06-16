@@ -97,59 +97,107 @@ $readInfo = [
         ],
     ]
 ];
-$fromMasterAray = [
-    'frontend'=>[
-        'query'=>[
-            'where'=>[
-                '<field name>'=>[
-                    'type'=>'<null, and, or>',
-                    'operator'=>'<operator name>', // make sure here that only the safe ones are even used
-                    'arguments'=>['<arguments that get passed to that query builder operator>']
-                ]
-            ],
-            'having'=>[
-                '<field name>'=>[
-                    'type'=>'<null, and, or>',
-                    'operator'=>'<operator name>', // make sure here that only the safe ones are even used
-                    'arguments'=>['<arguments that get passed to that query builder operator>']
-                ]
-            ],
-            'orderBy'=>[
-                '<field name>'=>[
-                    'direction'=>'<ASC or DESC>'
-                ]
-            ],
-            'groupBy'=>[
-                '<field name>'
-            ],
-            'placeholders'=>[
-                '<placeholder name>'=>'<value>'
-            ],
+$frontEndQuery = [
+    'query'=>[
+        'where'=>[
+            '<field name>'=>[
+                'type'=>'<null, and, or>',
+                'operator'=>'<operator name>', // make sure here that only the safe ones are even used
+                'arguments'=>['<arguments that get passed to that query builder operator>']
+            ]
         ],
-        'options'=>[
-            'returnCount'=>'<true or false>',
-            'resultsPerPage'=>'<resutls per page>',
-            'limit'=>'<limit>',
-            'offset'=>'<offset>',
-            'page'=>'<used instead of limit and offset>'
-        ]
+        'having'=>[
+            '<field name>'=>[
+                'type'=>'<null, and, or>',
+                'operator'=>'<operator name>', // make sure here that only the safe ones are even used
+                'arguments'=>['<arguments that get passed to that query builder operator>']
+            ]
+        ],
+        'orderBy'=>[
+            '<field name>'=>[
+                'direction'=>'<ASC or DESC>'
+            ]
+        ],
+        'groupBy'=>[
+            '<field name>'
+        ],
+        'placeholders'=>[
+            '<placeholder name>'=>'<value>'
+        ],
     ],
-    'backend'=>[
-        'options'=>[
-            'paginate'=>'<true or false>',
-            'hydrate'=>'<if false qb or paginator is returned>',
-            'hydrationType'=>'doctrine hydration type',
-            'placeholders'=>[
-                '<placeholder name>'=>'<value>'
-            ],
-            'queryCache'=>'<driver for query cache>',
-            'allowQueryCache'=>'<whether or not to allow the query cache, true or false>',
-            'transaction'=>'<true or false to wrap everythign in a transations>',
-            'entitiesShareConfigs'=>'<if true then to optimize the process configs during batches the same config is used for each entity processed, to save reprocessing time>',
-            'flush' => '<whether or not to automatically flush>'
+    'options'=>[
+        'returnCount'=>'<true or false>',
+        'resultsPerPage'=>'<resutls per page>',
+        'limit'=>'<limit>',
+        'offset'=>'<offset>',
+        'page'=>'<used instead of limit and offset>'
+    ]
+];
+
+$createSingleParams = [
+    '<fieldName>'=>'<fieldValue>',
+    '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically retrieve and assign an entity with that id to the association.
+        '<chainType>'=>[ // chainType can be: create, update, delete, retrieve
+            '<fieldName>'=>'<fieldValue>',
+            'assignType'=>'<set, add, or remove>'
         ]
     ]
+];
 
+$createBatchParams = [
+    'create'=> [
+        [
+            '<fieldName>'=>'<fieldValue>',
+            '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically retrieve and assign an entity with that id to the association.
+                '<chainType>'=>[ // chainType can be: create, update, delete, retrieve
+                    '<fieldName>'=>'<fieldValue>',
+                    'assignType'=>'<set, add, or remove>'
+                ]
+            ]
+        ]
+    ]
+];
+
+$singleParams = [ // id will be passed as a separate argument
+    '<fieldName>'=>'<fieldValue>',
+    '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically retrieve and assign an entity with that id to the association.
+        '<chainType>'=>[ // chainType can be: create, update, delete, retrieve
+            '<fieldName>'=>'<fieldValue>',
+            'assignType'=>'<set, add, or remove>'
+        ]
+    ]
+];
+
+$batchParams = [
+    '<update or delete>'=> [
+        [
+            '<id of entity>' => [
+                '<fieldName>'=>'<fieldValue>',
+                '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically retrieve and assign an entity with that id to the association.
+                    '<chainType>'=>[ // chainType can be: create, update, delete, retrieve
+                        '<fieldName>'=>'<fieldValue>',
+                        'assignType'=>'<set, add, or remove>'
+                    ]
+                ]
+            ]
+        ]
+    ]
+];
+
+$backendOptions = [
+    'options'=>[
+        'paginate'=>'<true or false>',
+        'hydrate'=>'<if false qb or paginator is returned>',
+        'hydrationType'=>'doctrine hydration type',
+        'placeholders'=>[
+            '<placeholder name>'=>'<value>'
+        ],
+        'queryCache'=>'<driver for query cache>',
+        'allowQueryCache'=>'<whether or not to allow the query cache, true or false>',
+        'transaction'=>'<true or false to wrap everythign in a transations>',
+        'entitiesShareConfigs'=>'<if true then to optimize the process configs during batches the same config is used for each entity processed, to save reprocessing time>',
+        'flush' => '<whether or not to automatically flush>'
+    ]
 ];
 
 $entityInfo = [
