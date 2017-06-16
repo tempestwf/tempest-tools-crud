@@ -6,6 +6,7 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Mockery\Exception;
 use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
@@ -13,7 +14,9 @@ use TempestTools\Common\Utility\EvmTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
 use TempestTools\Crud\Constants\RepositoryEvents;
 use TempestTools\Crud\Contracts\QueryHelper as QueryHelperContract;
+use TempestTools\Crud\Contracts\DataBindHelper as DataBindHelperContract;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
+use TempestTools\Crud\Doctrine\Helper\DataBindHelper;
 use TempestTools\Crud\Doctrine\Helper\QueryHelper;
 use TempestTools\Common\Contracts\ArrayHelper as ArrayHelperContract;
 
@@ -39,6 +42,9 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     /** @var  QueryHelperContract|null  */
     protected $queryHelper;
 
+    /** @var  DataBindHelperContract|null  */
+    protected $dataBindHelper;
+
     /**
      * @var array|NULL $defaultOptions;
      */
@@ -50,6 +56,23 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         'entitiesShareConfigs'=>true,
         'flush'=>true
     ];
+
+
+    /**
+     * RepositoryAbstract constructor.
+     *
+     * @param \Doctrine\ORM\EntityManager $em
+     * @param ClassMetadata $class
+     */
+    public function __construct($em, ClassMetadata $class){
+        parent::__construct($em, $class);
+        $this->setEvm(new EventManager());
+        $this->setQueryHelper(new QueryHelper());
+        $this->setDataBindHelper(new DataBindHelper($this->getEntityManager()));
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getEvm()->addEventSubscriber($this);
+    }
+
 
     /**
      * Makes sure the repo is ready to run
@@ -80,16 +103,17 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function init( ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL, bool $force= true) {
-        if ($arrayHelper !== NULL && ($force === true || $this->getArrayHelper() === NULL)) {
+    public function init( ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL, bool $force= true)
+    {
+        if ($arrayHelper !== null && ($force === true || $this->getArrayHelper() === null)) {
             $this->setArrayHelper($arrayHelper);
         }
 
-        if ($path !== NULL && ($force === true || $this->getTTPath() === NULL)) {
+        if ($path !== null && ($force === true || $this->getTTPath() === null)) {
             $this->setTTPath($path);
         }
 
-        if ($fallBack !== NULL && ($force === true || $this->getTTFallBack() === NULL)) {
+        if ($fallBack !== null && ($force === true || $this->getTTFallBack() === null)) {
             $this->setTTFallBack($fallBack);
         }
 
@@ -97,12 +121,12 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
             throw new \RuntimeException($this->getErrorFromConstant('noArrayHelper'));
         }
 
-        if ($force !== true || $this->getConfigArrayHelper() === NULL) {
+        if ($force !== true || $this->getConfigArrayHelper() === null) {
             $this->parseTTConfig();
         }
-
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getDataBindHelper()->init($arrayHelper, $path, $fallBack, $force);
     }
-
     /**
      * @param array $overrides
      * @param string $key
@@ -117,6 +141,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
             $overrides
         ], $key);
     }
+
     /**
      * Makes sure every wraps up
      *
@@ -125,6 +150,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @internal param array $optionOverrides
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \RuntimeException
      */
     protected function stop($failure = false, GenericEventArgs $eventArgs) {
         $evm = $this->getEvm();
@@ -167,6 +193,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @param array $params
      * @param array $optionOverrides
      * @return mixed
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
@@ -181,11 +208,11 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         $this->start($eventArgs);
 
         try {
-            if (isset($params['batch'])) {
+            if (isset($params['create'])) {
                 $eventArgs->getArgs()['batchParams'] = $eventArgs->getArgs()['params'];
                 $evm->dispatchEvent(RepositoryEvents::PRE_CREATE_BATCH, $eventArgs);
                 /** @var array[] $batch */
-                $batch = $params['batch'];
+                $batch = $params['create'];
                 $this->checkBatchMax($batch);
                 foreach ($batch as $batchParams) {
                     $eventArgs->getArgs()['params'] = $batchParams;
@@ -213,17 +240,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         $configArrayHelper = $this->getConfigArrayHelper();
         $maxBatch = $configArrayHelper->parseArrayPath(['batchMax']);
         if ($maxBatch !== NULL) {
-            $count = count($values) > $maxBatch;
-            $maxBatchIncludesChains = $configArrayHelper->parseArrayPath(['batchMaxIncludesChains']);
-            $maxBatchIncludesAssigns = $configArrayHelper->parseArrayPath(['batchMaxIncludesAssigns']);
-            if ($maxBatchIncludesChains === true || $maxBatchIncludesAssigns === true) {
+            $count = count($values, COUNT_RECURSIVE);
 
-                $newCount = count(array_filter($values, function($element) use ($maxBatchIncludesAssigns, $maxBatchIncludesAssigns){
-                    return ($maxBatchIncludesAssigns && isset($element['chainType'])) || ($maxBatchIncludesAssigns && isset($element['assignType']));
-                }));
-
-                $count += $newCount;
-            }
             if ($count > $maxBatch) {
                 throw new \RuntimeException($this->getErrorFromConstant('moreRowsRequestedThanBatchMax'));
             }
@@ -277,117 +295,25 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         if ($entitiesShareConfigs === true) {
             $eventArgs->getArgs()['sharedConfig'] = $entity->getConfigArrayHelper();
         }
-        $this->bind($entity, $eventArgs->getArgs()['params']);
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getDataBindHelper()->bind($entity, $eventArgs->getArgs()['params']);
         $this->getEntityManager()->persist($entity);
         return $entity;
     }
 
     /**
-     * @param EntityAbstract $entity
-     * @param array $params
-     * @return EntityAbstract
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Mockery\Exception
-     * @throws \Doctrine\DBAL\ConnectionException
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
+     * @param string $fieldName
+     * @param array $values
+     * @return QueryBuilder
      */
-    public function bind(EntityAbstract $entity, array $params): EntityAbstract
+    public function findIn(string $fieldName, array $values): QueryBuilder
     {
-        $entity->setArrayHelper($this->getArrayHelper());
-        $metadata = $this->getEntityManager()->getClassMetadata($entity);
-        $associateNames = $metadata->getAssociationNames();
-        foreach ($params as $fieldName => $value) {
-            if (in_array($fieldName, $associateNames, true)) {
-                $targetClass = $metadata->getAssociationTargetClass($fieldName);
-                $this->bindAssociation($entity, $fieldName, $value, $targetClass);
-            } else {
-                $entity->setField($fieldName, $value);
-            }
-        }
-        return $entity;
-    }
-    /** @noinspection MoreThanThreeArgumentsInspection */
-
-    /**
-     * @param EntityAbstract $entity
-     * @param string $associationName
-     * @param array $params
-     * @param string $targetClass
-     * @throws \Doctrine\DBAL\ConnectionException
-     * @throws \InvalidArgumentException
-     * @throws \Mockery\Exception
-     * @throws \RuntimeException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     */
-    public function bindAssociation(EntityAbstract $entity, string $associationName, array $params, string $targetClass)
-    {
-        //TODO: Consider using batches in future, the array of sub elements would need to be chunked up, and then passed to the repos on chain
-        // Then it would need to be restitched with params, so we can check the assign type, and then bound to the entity. A pain in the arse.
-
-        /** @var RepositoryAbstract $repo */
-        $repo = $this->getEntityManager()->getRepository($targetClass);
-        $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack(), false);
-        $chainOverrides = ['transaction'=>false, 'flush'=>false];
-        // TODO: Use a contract here instead
-        if (!$repo instanceof RepositoryAbstract) {
-            throw new \RuntimeException($this->getErrorFromConstant('wrongTypeOfRepo'));
-        }
-
-        $params = !isset($params[0]) ? [$params] : $params;
-        foreach ($params as $values) {
-            $values = $entity->processAssociationParams($associationName, $values);
-            $assignType = $values['assignType'] ?? NULL;
-            $chainType = $values['chainType'] ?? null;
-
-            if (isset($values['assignType'])) {
-                unset($values['assignType']);
-            }
-
-            if (isset($values['chainType'])) {
-                unset($values['chainType']);
-            }
-
-            $foundEntity = null;
-            /** @var EntityAbstract $foundEntity */
-            if ($chainType !== null) {
-                switch ($chainType) {
-                    case 'create':
-                        $foundEntity = $repo->create($values, $chainOverrides)[0];
-                        break;
-                    /*case 'update':
-                        $foundEntity = $repo->update($info, $chainOverrides)[0];
-                        break;
-                    case 'delete':
-                        $foundEntity = $repo->delete($info, $chainOverrides)[0];
-                        break;*/
-                }
-            } else {
-                $foundEntity = $repo->findOneBy($values['id']);
-            }
-
-            if ($foundEntity !== NULL) {
-                if ($assignType !== NULL) {
-                    $entity->bindAssociation($assignType, $associationName, $foundEntity, true);
-                }
-            } else {
-                throw new \RuntimeException($this->getErrorFromConstant('entityToBindNotFound')['message']);
-            }
-        }
-    }
-
-    /**
-     * RepositoryAbstract constructor.
-     *
-     * @param \Doctrine\ORM\EntityManager $em
-     * @param ClassMetadata $class
-     */
-    public function __construct($em, ClassMetadata $class){
-        parent::__construct($em, $class);
-        $this->setEvm(new EventManager());
-        $this->setQueryHelper(new QueryHelper());
-        /** @noinspection NullPointerExceptionInspection */
-        $this->getEvm()->addEventSubscriber($this);
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('e')
+            ->from($this->getClassName(), 'e')
+            ->where($qb->expr()->in($fieldName, ':in'));
+        $qb->setParameter(':in', $values);
+        return $qb;
     }
 
 
@@ -445,6 +371,22 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     public function setDefaultOptions($defaultOptions)
     {
         $this->defaultOptions = $defaultOptions;
+    }
+
+    /**
+     * @return null|DataBindHelperContract
+     */
+    public function getDataBindHelper(): ?DataBindHelperContract
+    {
+        return $this->dataBindHelper;
+    }
+
+    /**
+     * @param DataBindHelperContract $dataBindHelper
+     */
+    public function setDataBindHelper(DataBindHelperContract $dataBindHelper)
+    {
+        $this->dataBindHelper = $dataBindHelper;
     }
 }
 ?>

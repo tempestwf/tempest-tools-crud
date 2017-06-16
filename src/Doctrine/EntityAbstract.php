@@ -1,10 +1,10 @@
 <?php
 namespace TempestTools\Crud\Doctrine;
 
-use App\Entities\Entity;
 use Doctrine\Common\EventManager;
 use Doctrine\Common\EventSubscriber;
 use RuntimeException;
+use TempestTools\AclMiddleware\Contracts\HasId;
 use TempestTools\Common\Contracts\ArrayHelper as ArrayHelperContract;
 use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\AccessorMethodNameTrait;
@@ -17,7 +17,7 @@ use Illuminate\Contracts\Validation\Factory;
 
 
 
-abstract class EntityAbstract extends Entity implements EventSubscriber {
+abstract class EntityAbstract implements EventSubscriber, HasId {
 
     use ArrayHelperTrait, ErrorConstantsTrait, TTConfigTrait, EvmTrait, AccessorMethodNameTrait;
 
@@ -50,6 +50,10 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
             'message'=>'Error: Validation failed on pre-persist.',
         ]
     ];
+    /**
+     * @var array $bindParams
+     */
+    protected $bindParams;
 
     /**
      * Makes sure the entity is ready to go
@@ -269,7 +273,7 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function bindAssociation(string $assignType, string $associationName, EntityAbstract $entity, $force = false){
+    public function bindAssociation(string $assignType, string $associationName, EntityAbstract $entity=NULL, $force = false){
         if ($force === false) {
             $this->canAssign($assignType, $associationName);
         }
@@ -474,6 +478,24 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
         }
         return $result;
     }
+
+    /**
+     * @return array
+     */
+    public function getBindParams(): array
+    {
+        return $this->bindParams;
+    }
+
+    /**
+     * @param array $bindParams
+     */
+    public function setBindParams(array $bindParams)
+    {
+        $this->bindParams = $bindParams;
+    }
+
+
 }
 
 

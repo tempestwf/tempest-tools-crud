@@ -1,8 +1,6 @@
 <?php
 $readInfo = [
     'batchMax' => '<the max we can do in one batch>',
-    'batchMaxIncludesChains' => '<whether or not to include chains when caculating batch max>',
-    'batchMaxIncludesAssigns' => '<whether or not to include assigns when caculating batch max>',
     'query'=>[
         'select'=>[
             '<keyName>'=>'<string>'
@@ -184,7 +182,8 @@ $entityInfo = [
                 'chain'=>[
                     'create'=>'<true or false>',
                     'update'=>'<true or false>',
-                    'delete'=>'<true or false>'
+                    'delete'=>'<true or false>',
+                    'retrieve'=>'<true or false>'
                 ]
             ]
         ],
@@ -221,7 +220,8 @@ $entityInfo = [
                 'chain'=>[
                     'create'=>'<true or false>',
                     'update'=>'<true or false>',
-                    'delete'=>'<true or false>'
+                    'delete'=>'<true or false>',
+                    'retrieve'=>'<true or false>'
                 ]
             ]
         ],
@@ -258,7 +258,8 @@ $entityInfo = [
                 'chain'=>[
                     'create'=>'<true or false>',
                     'update'=>'<true or false>',
-                    'delete'=>'<true or false>'
+                    'delete'=>'<true or false>',
+                    'retrieve'=>'<true or false>'
                 ]
             ]
         ],
