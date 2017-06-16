@@ -5,6 +5,7 @@ use Doctrine\Common\EventManager;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query;
 use Mockery\Exception;
 use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
@@ -39,37 +40,55 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     protected $queryHelper;
 
     /**
+     * @var array|NULL $defaultOptions;
+     */
+    protected $defaultOptions = [
+        'paginate'=>true,
+        'hydrate'=>true,
+        'hydrationType'=>Query::HYDRATE_ARRAY,
+        'transaction'=>true,
+        'entitiesShareConfigs'=>true,
+        'flush'=>true
+    ];
+
+    /**
      * Makes sure the repo is ready to run
      *
-     * @throws \RuntimeException
+     * @param $eventArgs
+     * @internal param array $optionOverrides
      */
-    protected function start() {
-        /** @noinspection NullPointerExceptionInspection */
-        if (
-            !isset($this->getArrayHelper()->getArray()['backend']['options']['transaction']) ||
-            $this->getArrayHelper()->getArray()['backend']['options']['transaction'] !== false
-        ) {
+    protected function start(GenericEventArgs $eventArgs) {
+        $evm = $this->getEvm();
+        $evm->dispatchEvent(RepositoryEvents::PRE_START, $eventArgs);
+        $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
+
+        $transaction = $this->findSetting($optionOverrides, 'transaction');
+
+        if ($transaction !== false) {
             $this->getEntityManager()->getConnection()->beginTransaction();
         }
-
     }
+
+
+    /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
      * @param ArrayHelperContract|null $arrayHelper
      * @param array|null $path
      * @param array|null $fallBack
+     * @param bool $force
      * @throws \RuntimeException
      */
-    public function init( ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL) {
-        if ($arrayHelper !== NULL) {
+    public function init( ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL, bool $force= true) {
+        if ($arrayHelper !== NULL && ($force === true || $this->getArrayHelper() === NULL)) {
             $this->setArrayHelper($arrayHelper);
         }
 
-        if ($path !== NULL) {
+        if ($path !== NULL && ($force === true || $this->getTTPath() === NULL)) {
             $this->setTTPath($path);
         }
 
-        if ($fallBack !== NULL) {
+        if ($fallBack !== NULL && ($force === true || $this->getTTFallBack() === NULL)) {
             $this->setTTFallBack($fallBack);
         }
 
@@ -77,20 +96,48 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
             throw new \RuntimeException($this->getErrorFromConstant('noArrayHelper'));
         }
 
-        $this->parseTTConfig();
+        if ($force !== true || $this->getConfigArrayHelper() === NULL) {
+            $this->parseTTConfig();
+        }
+
     }
 
+    /**
+     * @param array $overrides
+     * @param string $key
+     * @return mixed
+     */
+    protected function findSetting(array $overrides, string $key) {
+        /** @noinspection NullPointerExceptionInspection */
+        return $this->getArrayHelper()->findSetting([
+            $this->getDefaultOptions(),
+            $this->getArrayHelper()->getArray()['backend']['options'],
+            $overrides
+        ], $key);
+    }
     /**
      * Makes sure every wraps up
      *
      * @param bool $failure
+     * @param GenericEventArgs $eventArgs
+     * @internal param array $optionOverrides
      * @throws \Doctrine\DBAL\ConnectionException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
-    protected function stop($failure = false) {
-        /** @noinspection NullPointerExceptionInspection */
+    protected function stop($failure = false, GenericEventArgs $eventArgs) {
+        $evm = $this->getEvm();
+        $evm->dispatchEvent(RepositoryEvents::PRE_STOP, $eventArgs);
+        $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
+
+        $transaction = $this->findSetting($optionOverrides, 'transaction');
+        $flush = $this->findSetting($optionOverrides, 'flush');
+
+        if ($failure === false && $flush === true) {
+            $this->getEntityManager()->flush();
+        }
+
         if (
-            !isset($this->getArrayHelper()->getArray()['backend']['options']['transaction']) ||
-            $this->getArrayHelper()->getArray()['backend']['options']['transaction'] !== false
+            $transaction !== false
         ) {
             if ($failure === true) {
                 $this->getEntityManager()->getConnection()->rollBack();
@@ -102,27 +149,33 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
 
     /**
      * Makes event args to use
+     *
      * @param array $params
+     * @param array $optionOverrides
      * @return GenericEventArgs
      */
-    protected function makeEventArgs(array $params): Events\GenericEventArgs
+    protected function makeEventArgs(array $params, array $optionOverrides = []): Events\GenericEventArgs
     {
-        return new GenericEventArgs(new \ArrayObject(['params'=>$params,'arrayHelper'=>$this->getArrayHelper(), 'results'=>[], 'self'=>$this]));
+        $entitiesShareConfigs = $this->findSetting($optionOverrides, 'entitiesShareConfigs');
+        return new GenericEventArgs(new \ArrayObject(['params'=>$params,'arrayHelper'=>$this->getArrayHelper(), 'results'=>[], 'self'=>$this, 'optionOverrides'=>$optionOverrides, 'entitiesShareConfigs'=>$entitiesShareConfigs]));
     }
 
     /**
      * @param array $params
+     * @param array $optionOverrides
      * @return mixed
+     * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \Mockery\Exception
      */
-    public function create(array $params){
-        $this->start();
-        $evm = $this->getEvm();
-        $eventArgs = $this->makeEventArgs($params);
+    public function create(array $params, array $optionOverrides = []){
+        $eventArgs = $this->makeEventArgs($params, $optionOverrides);
         $eventArgs->getArgs()['action'] = 'create';
+        $evm = $this->getEvm();
+
+        $this->start($eventArgs);
 
         try {
             if (isset($params['batch'])) {
@@ -142,10 +195,10 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
                 $this->doCreate($eventArgs);
             }
         } catch (Exception $e) {
-            $this->stop(true);
+            $this->stop(true, $eventArgs);
             throw $e;
         }
-        $this->stop();
+        $this->stop(false, $eventArgs);
         return $eventArgs->getArgs()['results'];
     }
 
@@ -171,7 +224,6 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
             if ($count > $maxBatch) {
                 throw new \RuntimeException($this->getErrorFromConstant('moreRowsRequestedThanBatchMax'));
             }
-
         }
     }
 
@@ -197,6 +249,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     /**
      * @param GenericEventArgs $eventArgs
      * @return EntityAbstract
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Mockery\Exception
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \InvalidArgumentException
@@ -207,8 +261,19 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         $className = $this->getClassName();
         /** @var EntityAbstract $entity */
         $entity = new $className();
+        $entitiesShareConfigs = $eventArgs->getArgs()['entitiesShareConfigs'];
+        if ($entitiesShareConfigs === true) {
+            if (isset($eventArgs->getArgs()['sharedConfig'])) {
+                $sharedConfig = $eventArgs->getArgs()['sharedConfig'];
+                $entity->setConfigArrayHelper($sharedConfig);
+            }
+        }
         $entity->init($eventArgs->getArgs()['action'] , $this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
+        if ($entitiesShareConfigs === true) {
+            $eventArgs->getArgs()['sharedConfig'] = $entity->getConfigArrayHelper();
+        }
         $this->bind($entity, $eventArgs->getArgs()['params']);
+        $this->getEntityManager()->persist($entity);
         return $entity;
     }
 
@@ -216,6 +281,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @param EntityAbstract $entity
      * @param array $params
      * @return EntityAbstract
+     * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Mockery\Exception
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \RuntimeException
@@ -229,14 +295,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         foreach ($params as $fieldName => $value) {
             if (in_array($fieldName, $associateNames, true)) {
                 $targetClass = $metadata->getAssociationTargetClass($fieldName);
-                if (isset($value[0]) && is_array($value[0])) {
-                    /** @var array $value */
-                    foreach ($value as $info) {
-                        $this->bindAssociation($entity, $fieldName, $info, $targetClass);
-                    }
-                } else {
-                    $this->bindAssociation($entity, $fieldName, $value, $targetClass);
-                }
+                $this->bindAssociation($entity, $fieldName, $value, $targetClass);
             } else {
                 $entity->setField($fieldName, $value);
             }
@@ -254,51 +313,62 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \InvalidArgumentException
      * @throws \Mockery\Exception
      * @throws \RuntimeException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function bindAssociation(EntityAbstract $entity, string $associationName, array $params, string $targetClass) {
-        $params = $entity->processAssociationParams($associationName, $params);
-        $assignType = $params['assignType'] ?? 'set';
-        $chainType = $params['chainType'] ?? NULL;
+    public function bindAssociation(EntityAbstract $entity, string $associationName, array $params, string $targetClass)
+    {
+        //TODO: Consider using batches in future, the array of sub elements would need to be chunked up, and then passed to the repos on chain
+        // Then it would need to be restitched with params, so we can check the assign type, and then bound to the entity. A pain in the arse.
 
-        if (isset($params['assignType'])) {
-            unset($params['assignType']);
-        }
-
-        if (isset($params['chainType'])) {
-            unset($params['chainType']);
-        }
         /** @var RepositoryAbstract $repo */
         $repo = $this->getEntityManager()->getRepository($targetClass);
-        $repo->setArrayHelper($this->getArrayHelper());
-
-        $foundEntity = NULL;
-        if ($chainType !== NULL) {
-            // TODO: Use a contract here instead
-            if (!$repo instanceof RepositoryAbstract) {
-                throw new \RuntimeException($this->getErrorFromConstant('wrongTypeOfRepo'));
-            }
-
-            switch ($chainType) {
-                case 'create':
-                    $foundEntity = $repo->create($params)[0];
-                    break;
-                /*case 'update':
-                    $foundEntity = $repo->update($info)[0];
-                    break;
-                case 'delete':
-                    $foundEntity = $repo->delete($info)[0];
-                    break;*/
-            }
-        } else {
-            $foundEntity = $repo->findOneBy($params['id']);
+        $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack(), false);
+        $chainOverrides = ['transaction'=>false, 'flush'=>false];
+        // TODO: Use a contract here instead
+        if (!$repo instanceof RepositoryAbstract) {
+            throw new \RuntimeException($this->getErrorFromConstant('wrongTypeOfRepo'));
         }
 
-        if ($foundEntity === NULL) {
-            $entity->bindAssociation($assignType, $associationName, $foundEntity, true);
-        } else {
-            throw new \RuntimeException($this->getErrorFromConstant('entityToBindNotFound')['message']);
-        }
+        $params = !isset($params[0]) ? [$params] : $params;
+        foreach ($params as $values) {
+            $values = $entity->processAssociationParams($associationName, $values);
+            $assignType = $values['assignType'] ?? NULL;
+            $chainType = $values['chainType'] ?? null;
 
+            if (isset($values['assignType'])) {
+                unset($values['assignType']);
+            }
+
+            if (isset($values['chainType'])) {
+                unset($values['chainType']);
+            }
+
+            $foundEntity = null;
+            /** @var EntityAbstract $foundEntity */
+            if ($chainType !== null) {
+                switch ($chainType) {
+                    case 'create':
+                        $foundEntity = $repo->create($values, $chainOverrides)[0];
+                        break;
+                    /*case 'update':
+                        $foundEntity = $repo->update($info, $chainOverrides)[0];
+                        break;
+                    case 'delete':
+                        $foundEntity = $repo->delete($info, $chainOverrides)[0];
+                        break;*/
+                }
+            } else {
+                $foundEntity = $repo->findOneBy($values['id']);
+            }
+
+            if ($foundEntity !== NULL) {
+                if ($assignType !== NULL) {
+                    $entity->bindAssociation($assignType, $associationName, $foundEntity, true);
+                }
+            } else {
+                throw new \RuntimeException($this->getErrorFromConstant('entityToBindNotFound')['message']);
+            }
+        }
     }
 
     /**
@@ -354,6 +424,22 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     public function getTTConfig(): array
     {
         return [];
+    }
+
+    /**
+     * @return array|NULL
+     */
+    public function getDefaultOptions()
+    {
+        return $this->defaultOptions;
+    }
+
+    /**
+     * @param array|NULL $defaultOptions
+     */
+    public function setDefaultOptions($defaultOptions)
+    {
+        $this->defaultOptions = $defaultOptions;
     }
 }
 ?>

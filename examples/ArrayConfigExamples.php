@@ -146,7 +146,9 @@ $fromMasterAray = [
             ],
             'queryCache'=>'<driver for query cache>',
             'allowQueryCache'=>'<whether or not to allow the query cache, true or false>',
-            'transaction'=>'<true or false to wrap everythign in a transations>'
+            'transaction'=>'<true or false to wrap everythign in a transations>',
+            'entitiesShareConfigs'=>'<if true then to optimize the process configs during batches the same config is used for each entity processed, to save reprocessing time>',
+            'flush' => '<whether or not to automatically flush>'
         ]
     ]
 

@@ -11,6 +11,10 @@ namespace TempestTools\Crud\Constants;
 
 
 class RepositoryEvents{
+
+    const PRE_START = 'preStart';
+    const PRE_STOP = 'preStop';
+
     const PRE_CREATE_BATCH = 'preCreateBatch';
     const PRE_CREATE = 'preCreate';
     const VALIDATE_CREATE = 'validateCreate';
@@ -50,6 +54,9 @@ class RepositoryEvents{
      */
     static public function getAll():array {
         return [
+            static::PRE_START,
+            static::PRE_STOP,
+
             static::PRE_CREATE_BATCH,
             static::PRE_CREATE,
             static::VALIDATE_CREATE,

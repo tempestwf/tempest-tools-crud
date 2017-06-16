@@ -54,17 +54,24 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
      * @param ArrayHelperContract|null $arrayHelper
      * @param array|null $path
      * @param array|null $fallBack
+     * @param bool $force
      * @throws \RuntimeException
      */
-    public function init(string $mode, ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL)
+    public function init(string $mode, ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL, bool $force = true)
     {
-        if ($arrayHelper !== NULL) {
+        if ($arrayHelper !== NULL && ($force === true || $this->getArrayHelper() === NULL)) {
             $this->setArrayHelper($arrayHelper);
         }
 
-        $path = $path ?? $this->getTTPath();
+        if ($path !== NULL && ($force === true || $this->getTTPath() === NULL)) {
+            $this->setTTPath($path);
+            $path = $this->getTTPath();
+            $path[] = $mode;
+            $this->setTTPath($path);
+        }
 
-        if ($fallBack !== NULL) {
+
+        if ($fallBack !== NULL && ($force === true || $this->getTTFallBack() === NULL)) {
             $this->setTTFallBack($fallBack);
         }
 
@@ -72,9 +79,9 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
             throw new \RuntimeException($this->getErrorFromConstant('noArrayHelper'));
         }
 
-        $path[] = $mode;
-        $this->setTTPath($path);
-        $this->parseTTConfig();
+        if ($force !== true || $this->getConfigArrayHelper() === NULL) {
+            $this->parseTTConfig();
+        }
     }
 
     /**
