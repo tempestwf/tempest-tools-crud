@@ -165,6 +165,8 @@ $entityInfo = [
             'messages'=>['<messages>'],
             'customAttributes'=>['<customAttributes>'],
         ],
+        'setTo'=>'<array of field names with values to set them to, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>',
+        'enforce'=>'<array of field names with values to make sure they match, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>',
         'closure'=>'<validation closure>',
         'mutate'=>'<mutate closure>',
         'fields'=>[
@@ -201,6 +203,8 @@ $entityInfo = [
             'messages'=>['<messages>'],
             'customAttributes'=>['<customAttributes>'],
         ],
+        'setTo'=>'<array of field names with values to set them to, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>',
+        'enforce'=>'<array of field names with values to make sure they match, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>',
         'closure'=>'<validation closure>',
         'mutate'=>'<mutate closure>',
         'fields'=>[
@@ -237,6 +241,8 @@ $entityInfo = [
             'messages'=>['<messages>'],
             'customAttributes'=>['<customAttributes>'],
         ],
+        'setTo'=>'<array of field names with values to set them to, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>',
+        'enforce'=>'<array of field names with values to make sure they match, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>',
         'closure'=>'<validation closure>',
         'mutate'=>'<mutate closure>',
         'fields'=>[

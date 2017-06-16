@@ -12,6 +12,7 @@ use TempestTools\Common\Utility\EvmTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
 use TempestTools\Crud\Constants\EntityEvents;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
+use \Illuminate\Contracts\Validation\Factory;
 
 
 abstract class EntityAbstract extends Entity implements EventSubscriber {
@@ -20,19 +21,31 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
 
     const ERRORS = [
         'fieldNotAllow'=>[
-            'message'=>'Error: Access to field not allowed.'
+            'message'=>'Error: Access to field not allowed.',
         ],
         'noArrayHelper'=>[
-            'message'=>'Error: No array helper on entity.'
+            'message'=>'Error: No array helper on entity.',
         ],
         'chainTypeNotAllow'=>[
-            'message'=>'Error: Requested chain type not permitted.'
+            'message'=>'Error: Requested chain type not permitted.',
         ],
         'assignTypeNotAllow'=>[
-            'message'=>'Error: Requested assign type not permitted.'
+            'message'=>'Error: Requested assign type not permitted.',
         ],
         'assignTypeMustBe'=>[
-            'message'=>'Error: Assign type must be set, add or remove'
+            'message'=>'Error: Assign type must be set, add or remove.',
+        ],
+        'enforcementFails'=>[
+            'message'=>'Error: A field is not set to it\'s enforced value.',
+        ],
+        'closureFails'=>[
+            'message'=>'Error: A validation closure did not pass.',
+        ],
+        'validateFactoryNotIncluded'=>[
+            'message'=>'Error: Validation factory is not included on this class.',
+        ],
+        'prePersistValidatorFails'=>[
+            'message'=>'Error: Validation failed on pre-persist.',
         ]
     ];
 
@@ -126,12 +139,17 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
 
             // Additional validation
             $allowed = isset($fieldSettings['enforce']) && $baseArrayHelper->parse($value) !== $baseArrayHelper->parse($fieldSettings['enforce'])?false:$allowed;
-            $allowed = isset($fieldSettings['closure']) && $baseArrayHelper->parse($fieldSettings['closure'], ['fieldName'=>$fieldName, 'value'=>$value, 'self'=>$this]) === false?false:$allowed;
-
             // Any validation failure error out
             if ($allowed === false) {
-                throw new RuntimeException($this->getErrorFromConstant('fieldNotAllow'));
+                throw new RuntimeException($this->getErrorFromConstant('enforcementFails'));
             }
+
+            $allowed = isset($fieldSettings['closure']) && $baseArrayHelper->parse($fieldSettings['closure'], ['fieldName'=>$fieldName, 'value'=>$value, 'self'=>$this]) === false?false:$allowed;
+
+            if ($allowed === false) {
+                throw new RuntimeException($this->getErrorFromConstant('closureFails'));
+            }
+
 
             // setTo or mutate value
             $value = isset($fieldSettings['setTo'])?$baseArrayHelper->parse($fieldSettings['setTo']):$value;
@@ -180,15 +198,28 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
 
             // Check if fields that are needed to be enforced as enforced
             $enforce = isset($fieldSettings['enforce']) ? $baseArrayHelper->parse($fieldSettings['enforce']) : [];
-            $allowed = !array_diff($enforce, $values);
+
+            $allowed = true;
+            foreach ($enforce as $key => $value) {
+                /** @noinspection NullPointerExceptionInspection */
+                if ($values[$key] !== $this->getArrayHelper()->parse($value)) {
+                    $allowed = false;
+                    break;
+                }
+            }
+
+            if ($allowed === false) {
+                throw new RuntimeException($this->getErrorFromConstant('enforcementFails'));
+            }
 
             // Run it through closure validation if there is a closure
             $allowed = isset($fieldSettings['closure']) && $baseArrayHelper->parse($fieldSettings['closure'], ['associationName' => $associationName, 'values' => $values, 'self' => $this]) === false ? false : $allowed;
 
-            // Any validation failure error out
             if ($allowed === false) {
-                throw new RuntimeException($this->getErrorFromConstant('fieldNotAllow'));
+                throw new RuntimeException($this->getErrorFromConstant('closureFails'));
             }
+
+
 
             // Figure out if there are values that need to be set to, and set it to those values if any found
             $setTo = isset($fieldSettings['setTo']) ? $baseArrayHelper->parse($fieldSettings['setTo']) : [];
@@ -304,6 +335,142 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
             }
         }
         return $subscribe;
+    }
+
+    /**
+     * On an entity with HasLifecycleCallbacks it will run the special features of tt entities before persist
+     *
+     * @ORM\PrePersist
+     * @throws \RuntimeException
+     */
+    public function ttPrePersist()
+    {
+        $eventArgs = $this->makeEventArgs([]);
+
+        // Give event listeners a chance to do something then pull out the args again
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getEvm()->dispatchEvent(EntityEvents::PRE_PERSIST, $eventArgs);
+
+        $arrayHelper = $this->getConfigArrayHelper();
+        $array = $arrayHelper->getArray();
+        if (isset($array['setTo'])) {
+            $this->ttPrePersistSetTo($array['setTo']);
+        }
+
+        if (isset($array['enforce'])) {
+            $this->ttPrePersistEnforce($array['enforce']);
+        }
+
+        if (isset($array['closure'])) {
+            $this->ttPrePersistClosure($array['closure']);
+        }
+
+        if (isset($array['mutate'])) {
+            $this->ttPrePersistMutate($array['mutate']);
+        }
+
+        if (isset($array['validate'])) {
+            $this->ttPrePersistValidate($array['validate']);
+        }
+
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getEvm()->dispatchEvent(EntityEvents::POST_PERSIST, $eventArgs);
+    }
+
+    /**
+     * @param array $validate
+     * @throws \RuntimeException
+     */
+    protected function ttPrePersistValidate(array $validate) {
+        /** @var Factory $factory */
+        $factory = $this->getValidationFactory();
+        $fields = $validate['fields'] ?? [];
+        $rules = $validate['rules'] ?? [];
+        $messages = $validate['messages'] ?? [];
+        $customAttributes = $validate['customAttributes'] ?? [];
+        $values = $this->getValuesOfFields($fields);
+        $validator = $factory->make($values, $rules, $messages, $customAttributes);
+        if($validator->fails())
+        {
+            throw new RuntimeException($this->getErrorFromConstant('prePersistValidatorFails'));
+        }
+    }
+
+    /**
+     * Needs extending in a child class to get a validation factory to use
+     *
+     * @throws \RuntimeException
+     */
+    public function getValidationFactory() {
+        throw new RuntimeException($this->getErrorFromConstant('validateFactoryNotIncluded'));
+    }
+
+    /**
+     * @param callable $closure
+     * @throws \RuntimeException
+     */
+    protected function ttPrePersistMutate (Callable $closure) {
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getArrayHelper()->parseClosure($closure, ['self'=>$this]);
+    }
+
+    /**
+     * @param callable $closure
+     * @throws \RuntimeException
+     */
+    protected function ttPrePersistClosure (Callable $closure) {
+        /** @noinspection NullPointerExceptionInspection */
+        $allowed = $this->getArrayHelper()->parseClosure($closure, ['self'=>$this]);
+        if ($allowed === false) {
+            throw new RuntimeException($this->getErrorFromConstant('closureFails'));
+        }
+    }
+
+    /**
+     * @param array $values
+     */
+    protected function ttPrePersistSetTo (array $values) {
+        foreach ($values as $key => $value) {
+            $methodName = 'set' . ucfirst($key);
+            $this->$methodName($value);
+        }
+    }
+
+    /**
+     * @param array $values
+     * @throws \RuntimeException
+     */
+    protected function ttPrePersistEnforce (array $values) {
+        foreach ($values as $key => $value) {
+            $methodName = 'get' . ucfirst($key);
+            $result = $this->$methodName();
+            if (!is_scalar ($result)) {
+                /** @var array $value */
+                foreach ($value as $key2 => $value2) {
+                    $methodName = 'get' . ucfirst($key2);
+                    $result2 = $result->$methodName();
+                    if ($result2 !== $value2) {
+                        throw new RuntimeException($this->getErrorFromConstant('enforcementFails'));
+                    }
+                }
+            } else if ($result !== $value) {
+                throw new RuntimeException($this->getErrorFromConstant('enforcementFails'));
+            }
+        }
+    }
+
+    /**
+     * @param array $fields
+     * @return array
+     */
+    public function getValuesOfFields (array $fields = []):array {
+        $result = [];
+        foreach ($fields as $key => $value) {
+            $methodName = 'get' . ucfirst($key);
+            $value = $this->$methodName($value);
+            $result[$key] = $value;
+        }
+        return $result;
     }
 }
 
