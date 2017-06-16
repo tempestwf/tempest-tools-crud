@@ -56,6 +56,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      *
      * @param $eventArgs
      * @internal param array $optionOverrides
+     * @throws \RuntimeException
      */
     protected function start(GenericEventArgs $eventArgs) {
         $evm = $this->getEvm();
@@ -106,6 +107,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @param array $overrides
      * @param string $key
      * @return mixed
+     * @throws \RuntimeException
      */
     protected function findSetting(array $overrides, string $key) {
         /** @noinspection NullPointerExceptionInspection */
@@ -153,6 +155,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @param array $params
      * @param array $optionOverrides
      * @return GenericEventArgs
+     * @throws \RuntimeException
      */
     protected function makeEventArgs(array $params, array $optionOverrides = []): Events\GenericEventArgs
     {
@@ -233,6 +236,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \RuntimeException
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \Mockery\Exception
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     protected function doCreate (GenericEventArgs $eventArgs) {
         $evm = $this->getEvm();

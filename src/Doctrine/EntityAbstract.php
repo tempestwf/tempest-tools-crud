@@ -7,17 +7,19 @@ use Doctrine\Common\EventSubscriber;
 use RuntimeException;
 use TempestTools\Common\Contracts\ArrayHelper as ArrayHelperContract;
 use TempestTools\Common\Helper\ArrayHelperTrait;
+use TempestTools\Common\Utility\AccessorMethodNameTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\EvmTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
 use TempestTools\Crud\Constants\EntityEvents;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
-use \Illuminate\Contracts\Validation\Factory;
+use Illuminate\Contracts\Validation\Factory;
+
 
 
 abstract class EntityAbstract extends Entity implements EventSubscriber {
 
-    use ArrayHelperTrait, ErrorConstantsTrait, TTConfigTrait, EvmTrait;
+    use ArrayHelperTrait, ErrorConstantsTrait, TTConfigTrait, EvmTrait, AccessorMethodNameTrait;
 
     const ERRORS = [
         'fieldNotAllow'=>[
@@ -156,7 +158,7 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
             $value = isset($fieldSettings['mutate'])?$baseArrayHelper->parse($fieldSettings['mutate'], ['fieldName'=>$fieldName, 'value'=>$value, 'self'=>$this]):$value;
         }
         // All is ok so set it
-        $setName = 'set' . ucfirst($fieldName);
+        $setName = $this->accessorMethodName('set', $fieldName);
         $this->$setName($value);
     }
 
@@ -274,7 +276,7 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
         if (!in_array($assignType, ['set', 'add', 'remove'], true)){
             throw new \RuntimeException($this->getErrorFromConstant('assignTypeMustBe')['message']);
         }
-        $methodName = $assignType . ucfirst($associationName);
+        $methodName = $this->accessorMethodName($assignType, $associationName);
         $this->$methodName($entity);
     }
 
@@ -431,7 +433,7 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
      */
     protected function ttPrePersistSetTo (array $values) {
         foreach ($values as $key => $value) {
-            $methodName = 'set' . ucfirst($key);
+            $methodName = $this->accessorMethodName('set', $key);
             $this->$methodName($value);
         }
     }
@@ -442,12 +444,12 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
      */
     protected function ttPrePersistEnforce (array $values) {
         foreach ($values as $key => $value) {
-            $methodName = 'get' . ucfirst($key);
+            $methodName = $this->accessorMethodName('get', $key);
             $result = $this->$methodName();
             if (!is_scalar ($result)) {
                 /** @var array $value */
                 foreach ($value as $key2 => $value2) {
-                    $methodName = 'get' . ucfirst($key2);
+                    $methodName = $this->accessorMethodName('get', $key2);
                     $result2 = $result->$methodName();
                     if ($result2 !== $value2) {
                         throw new RuntimeException($this->getErrorFromConstant('enforcementFails'));
@@ -466,7 +468,7 @@ abstract class EntityAbstract extends Entity implements EventSubscriber {
     public function getValuesOfFields (array $fields = []):array {
         $result = [];
         foreach ($fields as $key => $value) {
-            $methodName = 'get' . ucfirst($key);
+            $methodName = $this->accessorMethodName('get', $key);
             $value = $this->$methodName($value);
             $result[$key] = $value;
         }
