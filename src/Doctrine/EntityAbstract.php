@@ -205,14 +205,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
             // Check if fields that are needed to be enforced as enforced
             $enforce = isset($fieldSettings['enforce']) ? $baseArrayHelper->parse($fieldSettings['enforce']) : [];
 
-            $allowed = true;
-            foreach ($enforce as $key => $value) {
-                /** @noinspection NullPointerExceptionInspection */
-                if ($values[$key] !== $this->getArrayHelper()->parse($value)) {
-                    $allowed = false;
-                    break;
-                }
-            }
+            $allowed = $this->testEnforceValues($values, $enforce);
 
             if ($allowed === false) {
                 throw new RuntimeException($this->getErrorFromConstant('enforcementFails'));
@@ -224,8 +217,6 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
             if ($allowed === false) {
                 throw new RuntimeException($this->getErrorFromConstant('closureFails'));
             }
-
-
 
             // Figure out if there are values that need to be set to, and set it to those values if any found
             $setTo = isset($fieldSettings['setTo']) ? $baseArrayHelper->parse($fieldSettings['setTo']) : [];
@@ -240,6 +231,24 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
         }
         return $values;
 
+    }
+
+    /**
+     * @param array $values
+     * @param array $enforce
+     * @return bool
+     * @throws \RuntimeException
+     */
+    public function testEnforceValues (array $values, array $enforce):bool {
+        $allowed = true;
+        foreach ($enforce as $key => $value) {
+            /** @noinspection NullPointerExceptionInspection */
+            if ($values[$key] !== $this->getArrayHelper()->parse($value)) {
+                $allowed = false;
+                break;
+            }
+        }
+        return $allowed;
     }
 
     /**
