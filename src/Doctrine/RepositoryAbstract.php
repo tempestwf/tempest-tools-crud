@@ -46,9 +46,9 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     protected $dataBindHelper;
 
     /**
-     * @var array|NULL $defaultOptions;
+     * @var array|NULL $options;
      */
-    protected $defaultOptions = [
+    protected $options = [
         'paginate'=>true,
         'hydrate'=>true,
         'hydrationType'=>Query::HYDRATE_ARRAY,
@@ -136,8 +136,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     protected function findSetting(array $overrides, string $key) {
         /** @noinspection NullPointerExceptionInspection */
         return $this->getArrayHelper()->findSetting([
-            $this->getDefaultOptions(),
-            $this->getArrayHelper()->getArray()['backend']['options'],
+            $this->getOptions(),
             $overrides
         ], $key);
     }
@@ -360,17 +359,17 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     /**
      * @return array|NULL
      */
-    public function getDefaultOptions()
+    public function getOptions()
     {
-        return $this->defaultOptions;
+        return $this->options;
     }
 
     /**
-     * @param array|NULL $defaultOptions
+     * @param array|NULL $options
      */
-    public function setDefaultOptions($defaultOptions)
+    public function setOptions($options)
     {
-        $this->defaultOptions = $defaultOptions;
+        $this->options = $options;
     }
 
     /**
