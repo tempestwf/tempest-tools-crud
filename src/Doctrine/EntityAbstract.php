@@ -504,7 +504,6 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
         $this->bindParams = $bindParams;
     }
 
-
 }
 
 

@@ -212,7 +212,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
                 $evm->dispatchEvent(RepositoryEvents::PRE_CREATE_BATCH, $eventArgs);
                 /** @var array[] $batch */
                 $batch = $params['create'];
-                $this->checkBatchMax($batch);
+                $this->checkBatchMax($batch, $optionOverrides);
                 foreach ($batch as $batchParams) {
                     $eventArgs->getArgs()['params'] = $batchParams;
                     /** @noinspection DisconnectedForeachInstructionInspection */
@@ -220,7 +220,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
                 }
                 $evm->dispatchEvent(RepositoryEvents::POST_CREATE_BATCH, $eventArgs);
             } else {
-                $this->checkBatchMax($eventArgs->getArgs()['params']);
+                $this->checkBatchMax($eventArgs->getArgs()['params'], $optionOverrides);
                 $this->doCreate($eventArgs);
             }
         } catch (Exception $e) {
@@ -233,11 +233,11 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
 
     /**
      * @param array $values
+     * @param array $optionOverrides
      * @throws \RuntimeException
      */
-    protected function checkBatchMax(array $values) {
-        $configArrayHelper = $this->getConfigArrayHelper();
-        $maxBatch = $configArrayHelper->parseArrayPath(['batchMax']);
+    protected function checkBatchMax(array $values, array $optionOverrides) {
+        $maxBatch = $this->findSetting($optionOverrides, 'batchMax');
         if ($maxBatch !== NULL) {
             $count = count($values, COUNT_RECURSIVE);
 
@@ -346,7 +346,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     /**
      * @return null|QueryHelperContract
      */
-    public function getQueryHelper()
+    public function getQueryHelper():?QueryHelperContract
     {
         return $this->queryHelper;
     }
@@ -359,7 +359,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     /**
      * @return array|NULL
      */
-    public function getOptions()
+    public function getOptions(): ?array
     {
         return $this->options;
     }
