@@ -1,6 +1,6 @@
 <?php
 $readInfo = [
-    'query'=>[
+    'read'=>[
         'select'=>[
             '<keyName>'=>'<string>'
         ],
@@ -20,6 +20,12 @@ $readInfo = [
             '<keyName>'=>'<string>'
         ],
         'groupBy'=>[
+            '<keyName>'=>'<string>'
+        ],
+        'leftJoin'=>[
+            '<keyName>'=>'<string>'
+        ],
+        'innerJoin'=>[
             '<keyName>'=>'<string>'
         ],
         'cache'=>[
@@ -99,17 +105,21 @@ $readInfo = [
 $frontEndQuery = [
     'query'=>[
         'where'=>[
-            '<field name>'=>[
+            [
+                'field'=>'<fieldName>',
                 'type'=>'<null, and, or>',
-                'operator'=>'<operator name>', // make sure here that only the safe ones are even used
-                'arguments'=>['<arguments that get passed to that query builder operator>']
+                'operator'=>'<operator name>', // make sure here that only the safe ones are even used. If operator is 'andX' or 'orX' then conditions with a nested list of conditions is used instead
+                'arguments'=>['<arguments that get passed to that query builder operator>'],  // If operator is 'andX' or 'orX' this is omitted. Conditions appears in instead.
+                'conditions'=>['<array of just like any other filter>'] // If operator is not 'andX' or 'orX' this is omitted. This allows condition nesting.
             ]
         ],
         'having'=>[
-            '<field name>'=>[
+            [
+                'field'=>'<fieldName>',
                 'type'=>'<null, and, or>',
-                'operator'=>'<operator name>', // make sure here that only the safe ones are even used
-                'arguments'=>['<arguments that get passed to that query builder operator>']
+                'operator'=>'<operator name>', // make sure here that only the safe ones are even used. If operator is 'andX' or 'orX' then conditions with a nested list of conditions is used instead
+                'arguments'=>['<arguments that get passed to that query builder operator>'],  // If operator is 'andX' or 'orX' this is omitted. Conditions appears in instead.
+                'conditions'=>['<array of just like any other filter>'] // If operator is not 'andX' or 'orX' this is omitted. This allows condition nesting.
             ]
         ],
         'orderBy'=>[
@@ -135,8 +145,8 @@ $frontEndQuery = [
 
 $createSingleParams = [
     '<fieldName>'=>'<fieldValue>',
-    '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically retrieve and assign an entity with that id to the association.
-        '<chainType>'=>[ // chainType can be: create, update, delete, retrieve
+    '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association.
+        '<chainType>'=>[ // chainType can be: create, update, delete, read
             '<fieldName>'=>'<fieldValue>',
             'assignType'=>'<set, add, or remove>'
         ]
@@ -144,14 +154,12 @@ $createSingleParams = [
 ];
 
 $createBatchParams = [
-    'create'=> [
-        [
-            '<fieldName>'=>'<fieldValue>',
-            '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically retrieve and assign an entity with that id to the association.
-                '<chainType>'=>[ // chainType can be: create, update, delete, retrieve
-                    '<fieldName>'=>'<fieldValue>',
-                    'assignType'=>'<set, add, or remove>'
-                ]
+    [
+        '<fieldName>'=>'<fieldValue>',
+        '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association.
+            '<chainType>'=>[ // chainType can be: create, update, delete, read
+                '<fieldName>'=>'<fieldValue>',
+                'assignType'=>'<set, add, or remove>'
             ]
         ]
     ]
@@ -159,8 +167,8 @@ $createBatchParams = [
 
 $singleParams = [ // id will be passed as a separate argument
     '<fieldName>'=>'<fieldValue>',
-    '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically retrieve and assign an entity with that id to the association.
-        '<chainType>'=>[ // chainType can be: create, update, delete, retrieve
+    '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association.
+        '<chainType>'=>[ // chainType can be: create, update, delete, read
             '<fieldName>'=>'<fieldValue>',
             'assignType'=>'<set, add, or remove>'
         ]
@@ -168,12 +176,12 @@ $singleParams = [ // id will be passed as a separate argument
 ];
 
 $batchParams = [
-    '<update or delete>'=> [
+    [
         [
             '<id of entity>' => [
                 '<fieldName>'=>'<fieldValue>',
-                '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically retrieve and assign an entity with that id to the association.
-                    '<chainType>'=>[ // chainType can be: create, update, delete, retrieve
+                '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association.
+                    '<chainType>'=>[ // chainType can be: create, update, delete, read
                         '<fieldName>'=>'<fieldValue>',
                         'assignType'=>'<set, add, or remove>'
                     ]
@@ -202,6 +210,7 @@ $backendOptions = [
 
 $entityInfo = [
     'create'=>[
+        'allowed'=>'<true or false>',
         'permissive'=>'<true or false>',
         'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>',
         'validator'=>[
@@ -231,7 +240,7 @@ $entityInfo = [
                     'create'=>'<true or false>',
                     'update'=>'<true or false>',
                     'delete'=>'<true or false>',
-                    'retrieve'=>'<true or false>'
+                    'read'=>'<true or false>'
                 ]
             ]
         ],
@@ -240,6 +249,7 @@ $entityInfo = [
         ]
     ],
     'update'=>[
+        'allowed'=>'<true or false>',
         'permissive'=>'<true or false>',
         'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>',
         'validator'=>[
@@ -269,7 +279,7 @@ $entityInfo = [
                     'create'=>'<true or false>',
                     'update'=>'<true or false>',
                     'delete'=>'<true or false>',
-                    'retrieve'=>'<true or false>'
+                    'read'=>'<true or false>'
                 ]
             ]
         ],
@@ -278,6 +288,7 @@ $entityInfo = [
         ]
     ],
     'delete'=>[
+        'allowed'=>'<true or false>',
         'permissive'=>'<true or false>',
         'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>',
         'validator'=>[
@@ -307,7 +318,7 @@ $entityInfo = [
                     'create'=>'<true or false>',
                     'update'=>'<true or false>',
                     'delete'=>'<true or false>',
-                    'retrieve'=>'<true or false>'
+                    'read'=>'<true or false>'
                 ]
             ]
         ],

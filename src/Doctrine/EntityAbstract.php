@@ -48,6 +48,9 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
         ],
         'prePersistValidatorFails'=>[
             'message'=>'Error: Validation failed on pre-persist.',
+        ],
+        'actionNotAllow'=>[
+            'message'=>'Error: the requested action is not allowed on this entity for this request.'
         ]
     ];
     /**
@@ -125,7 +128,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
         if ($fastMode !== true) {
             $baseArrayHelper = $this->getArrayHelper();
             $configArrayHelper = $this->getConfigArrayHelper();
-            $params = ['fieldName'=>$fieldName, 'value'=>$value, 'configArrayHelper'=>$configArrayHelper];
+            $params = ['fieldName'=>$fieldName, 'value'=>$value, 'configArrayHelper'=>$configArrayHelper, 'self'=>$this];
             $eventArgs = $this->makeEventArgs($params);
 
             // Give event listeners a chance to do something then pull out the args again
@@ -137,20 +140,21 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
             $value = $processedParams['params']['value'];
 
             // Get the settings for the field so we can do quick comparisons
-            $fieldSettings = $configArrayHelper->parseArrayPath(['fields', $fieldName]);
+            $fieldSettings = $configArrayHelper->parseArrayPath(['fields', $fieldName], $processedParams);
             $fieldSettings = $fieldSettings??[];
 
             // Check permission to set
             $allowed = $this->canAssign($fieldName, 'set');
 
             // Additional validation
-            $allowed = isset($fieldSettings['enforce']) && $baseArrayHelper->parse($value) !== $baseArrayHelper->parse($fieldSettings['enforce'])?false:$allowed;
+            $allowed = isset($fieldSettings['enforce']) && $baseArrayHelper->parse($value, $processedParams) !== $baseArrayHelper->parse($fieldSettings['enforce'], $processedParams)?false:$allowed;
+
             // Any validation failure error out
             if ($allowed === false) {
                 throw new RuntimeException($this->getErrorFromConstant('enforcementFails'));
             }
 
-            $allowed = isset($fieldSettings['closure']) && $baseArrayHelper->parse($fieldSettings['closure'], ['fieldName'=>$fieldName, 'value'=>$value, 'self'=>$this]) === false?false:$allowed;
+            $allowed = isset($fieldSettings['closure']) && $baseArrayHelper->parse($fieldSettings['closure'], $processedParams) === false?false:$allowed;
 
             if ($allowed === false) {
                 throw new RuntimeException($this->getErrorFromConstant('closureFails'));
@@ -158,8 +162,8 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
 
 
             // setTo or mutate value
-            $value = isset($fieldSettings['setTo'])?$baseArrayHelper->parse($fieldSettings['setTo']):$value;
-            $value = isset($fieldSettings['mutate'])?$baseArrayHelper->parse($fieldSettings['mutate'], ['fieldName'=>$fieldName, 'value'=>$value, 'self'=>$this]):$value;
+            $value = isset($fieldSettings['setTo'])?$baseArrayHelper->parse($fieldSettings['setTo'], $processedParams):$value;
+            $value = isset($fieldSettings['mutate'])?$baseArrayHelper->parse($fieldSettings['mutate'], $processedParams):$value;
         }
         // All is ok so set it
         $setName = $this->accessorMethodName('set', $fieldName);
@@ -180,7 +184,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
             $baseArrayHelper = $this->getArrayHelper();
             $configArrayHelper = $this->getConfigArrayHelper();
 
-            $params = ['associationName' => $associationName, 'values' => $values, 'configArrayHelper' => $configArrayHelper];
+            $params = ['associationName' => $associationName, 'values' => $values, 'configArrayHelper' => $configArrayHelper, 'self'=>$this];
             $eventArgs = $this->makeEventArgs($params);
             // Give event listeners a chance to do something and pull the args out again after wards
             /** @noinspection NullPointerExceptionInspection */
@@ -191,7 +195,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
             $values = $processedParams['params']['values'];
 
             // Get the settings for the field so we can do quick comparisons
-            $fieldSettings = $configArrayHelper->parseArrayPath(['fields', $associationName]);
+            $fieldSettings = $configArrayHelper->parseArrayPath(['fields', $associationName], $processedParams);
             $fieldSettings = $fieldSettings??[];
 
             // Check if assignment and chaining settings are allowed
@@ -203,23 +207,23 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
             $this->canAssign($associationName, $assignType);
 
             // Check if fields that are needed to be enforced as enforced
-            $enforce = isset($fieldSettings['enforce']) ? $baseArrayHelper->parse($fieldSettings['enforce']) : [];
+            $enforce = isset($fieldSettings['enforce']) ? $baseArrayHelper->parse($fieldSettings['enforce'], $processedParams) : [];
 
-            $allowed = $this->testEnforceValues($values, $enforce);
+            $allowed = $this->testEnforceValues($values, $enforce, $processedParams);
 
             if ($allowed === false) {
                 throw new RuntimeException($this->getErrorFromConstant('enforcementFails'));
             }
 
             // Run it through closure validation if there is a closure
-            $allowed = isset($fieldSettings['closure']) && $baseArrayHelper->parse($fieldSettings['closure'], ['associationName' => $associationName, 'values' => $values, 'self' => $this]) === false ? false : $allowed;
+            $allowed = isset($fieldSettings['closure']) && $baseArrayHelper->parse($fieldSettings['closure'], $processedParams) === false ? false : $allowed;
 
             if ($allowed === false) {
                 throw new RuntimeException($this->getErrorFromConstant('closureFails'));
             }
 
             // Figure out if there are values that need to be set to, and set it to those values if any found
-            $setTo = isset($fieldSettings['setTo']) ? $baseArrayHelper->parse($fieldSettings['setTo']) : [];
+            $setTo = isset($fieldSettings['setTo']) ? $baseArrayHelper->parse($fieldSettings['setTo'], $processedParams) : [];
 
             if ($setTo !== null) {
                 $values = array_replace_recursive($values, $setTo);
@@ -227,7 +231,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
 
             // Run mutation closure if one is present
             /** @noinspection CallableParameterUseCaseInTypeContextInspection */
-            $values = isset($fieldSettings['mutate']) ? $baseArrayHelper->parse($fieldSettings['mutate'], ['associationName' => $associationName, 'values' => $values, 'self' => $this]) : $values;
+            $values = isset($fieldSettings['mutate']) ? $baseArrayHelper->parse($fieldSettings['mutate'], $processedParams) : $values;
         }
         return $values;
 
@@ -236,14 +240,14 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
     /**
      * @param array $values
      * @param array $enforce
+     * @param array $extra
      * @return bool
-     * @throws \RuntimeException
      */
-    public function testEnforceValues (array $values, array $enforce):bool {
+    public function testEnforceValues (array $values, array $enforce, array $extra=[]):bool {
         $allowed = true;
         foreach ($enforce as $key => $value) {
             /** @noinspection NullPointerExceptionInspection */
-            if ($values[$key] !== $this->getArrayHelper()->parse($value)) {
+            if ($values[$key] !== $this->getArrayHelper()->parse($value, $extra)) {
                 $allowed = false;
                 break;
             }
@@ -310,6 +314,23 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
 
         if ($nosey === true && $allowed === false) {
             throw new \RuntimeException($this->getErrorFromConstant('assignTypeNotAllow')['message']);
+        }
+        return $allowed;
+    }
+
+    /**
+     * @param bool $nosey
+     * @return bool
+     * @throws \RuntimeException
+     */
+    public function allowed ($nosey = true):bool {
+
+        /** @noinspection NullPointerExceptionInspection */
+        $array = $this->getConfigArrayHelper()->getArray();
+        $allowed = $array['allowed'] ?? true;
+
+        if ($nosey === true && $allowed === false) {
+            throw new \RuntimeException($this->getErrorFromConstant('actionNotAllow')['message']);
         }
         return $allowed;
     }
@@ -445,7 +466,10 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
      * @param array $values
      */
     protected function ttPrePersistSetTo (array $values) {
+        $extra = ['self'=>$this];
         foreach ($values as $key => $value) {
+            /** @noinspection NullPointerExceptionInspection */
+            $value = $this->getArrayHelper()->parse($value, $extra);
             $methodName = $this->accessorMethodName('set', $key);
             $this->$methodName($value);
         }
@@ -456,12 +480,17 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
      * @throws \RuntimeException
      */
     protected function ttPrePersistEnforce (array $values) {
+        $extra = ['self'=>$this];
         foreach ($values as $key => $value) {
+            /** @noinspection NullPointerExceptionInspection */
+            $value = $this->getArrayHelper()->parse($value, $extra);
             $methodName = $this->accessorMethodName('get', $key);
             $result = $this->$methodName();
             if (!is_scalar ($result)) {
                 /** @var array $value */
                 foreach ($value as $key2 => $value2) {
+                    /** @noinspection NullPointerExceptionInspection */
+                    $value2 = $this->getArrayHelper()->parse($value2, $extra);
                     $methodName = $this->accessorMethodName('get', $key2);
                     $result2 = $result->$methodName();
                     if ($result2 !== $value2) {

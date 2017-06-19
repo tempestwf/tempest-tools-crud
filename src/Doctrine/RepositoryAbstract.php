@@ -179,18 +179,28 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      *
      * @param array $params
      * @param array $optionOverrides
+     * @param array $frontEndOptions
      * @return GenericEventArgs
      * @throws \RuntimeException
      */
-    protected function makeEventArgs(array $params, array $optionOverrides = []): Events\GenericEventArgs
+    protected function makeEventArgs(array $params, array $optionOverrides = [], array $frontEndOptions=[]): Events\GenericEventArgs
     {
         $entitiesShareConfigs = $this->findSetting($optionOverrides, 'entitiesShareConfigs');
-        return new GenericEventArgs(new \ArrayObject(['params'=>$params,'arrayHelper'=>$this->getArrayHelper(), 'results'=>[], 'self'=>$this, 'optionOverrides'=>$optionOverrides, 'entitiesShareConfigs'=>$entitiesShareConfigs]));
+        return new GenericEventArgs(new \ArrayObject([
+            'params'=>$params,
+            'arrayHelper'=>$this->getArrayHelper(),
+            'results'=>[],
+            'self'=>$this,
+            'optionOverrides'=>$optionOverrides,
+            'entitiesShareConfigs'=>$entitiesShareConfigs,
+            'frontEndOptions'=>$frontEndOptions
+        ]));
     }
 
     /**
      * @param array $params
      * @param array $optionOverrides
+     * @param array $frontEndOption
      * @return mixed
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -199,30 +209,27 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \Mockery\Exception
      */
-    public function create(array $params, array $optionOverrides = []){
-        $eventArgs = $this->makeEventArgs($params, $optionOverrides);
+    public function create(array $params, array $optionOverrides = [], array $frontEndOption=[]){
+
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getArrayHelper()->wrapArray($params);
+        $this->getArrayHelper();
+        $eventArgs = $this->makeEventArgs($params, $optionOverrides, $frontEndOption);
         $eventArgs->getArgs()['action'] = 'create';
         $evm = $this->getEvm();
 
         $this->start($eventArgs);
 
         try {
-            if (isset($params['create'])) {
-                $eventArgs->getArgs()['batchParams'] = $eventArgs->getArgs()['params'];
-                $evm->dispatchEvent(RepositoryEvents::PRE_CREATE_BATCH, $eventArgs);
-                /** @var array[] $batch */
-                $batch = $params['create'];
-                $this->checkBatchMax($batch, $optionOverrides);
-                foreach ($batch as $batchParams) {
-                    $eventArgs->getArgs()['params'] = $batchParams;
-                    /** @noinspection DisconnectedForeachInstructionInspection */
-                    $this->doCreate($eventArgs);
-                }
-                $evm->dispatchEvent(RepositoryEvents::POST_CREATE_BATCH, $eventArgs);
-            } else {
-                $this->checkBatchMax($eventArgs->getArgs()['params'], $optionOverrides);
+            $eventArgs->getArgs()['batchParams'] = $eventArgs->getArgs()['params'];
+            $evm->dispatchEvent(RepositoryEvents::PRE_CREATE_BATCH, $eventArgs);
+            $this->checkBatchMax($params, $optionOverrides);
+            foreach ($params as $batchParams) {
+                $eventArgs->getArgs()['params'] = $batchParams;
+                /** @noinspection DisconnectedForeachInstructionInspection */
                 $this->doCreate($eventArgs);
             }
+            $evm->dispatchEvent(RepositoryEvents::POST_CREATE_BATCH, $eventArgs);
         } catch (Exception $e) {
             $this->stop(true, $eventArgs);
             throw $e;

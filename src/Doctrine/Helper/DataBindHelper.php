@@ -65,6 +65,7 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
      */
     public function bind(EntityAbstract $entity, array $params): EntityAbstract
     {
+        $entity->allowed();
         $entity->setArrayHelper($this->getArrayHelper());
         $entity->setBindParams($params);
         /** @noinspection NullPointerExceptionInspection */
@@ -88,7 +89,7 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
      */
     protected function fixScalarAssociationValue($value):array {
         $return = $value !== null && is_scalar($value) ? [
-            'retrieve' => [
+            'read' => [
                 $value => [
                     'assignType' => 'set'
                 ]
@@ -164,9 +165,9 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
         if ($chainType !== null) {
             switch ($chainType) {
                 case 'create':
-                    $foundEntities = $repo->create([$chainType=>$params], $chainOverrides);
+                    $foundEntities = $repo->create($params, $chainOverrides);
                     break;
-                case 'retrieve':
+                case 'read':
                     $foundEntities = $this->findEntitiesFromArrayKeys($params, $repo);
                     break;
                 /*case 'update':
