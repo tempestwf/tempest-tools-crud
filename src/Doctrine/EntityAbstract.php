@@ -109,7 +109,6 @@ abstract class EntityAbstract implements EventSubscriber, HasId
         /** @noinspection NullPointerExceptionInspection */
         $fastMode = $this->getConfigArrayHelper()->checkFastMode($fieldName);
         if ($fastMode !== true) {
-            $baseArrayHelper = $this->getArrayHelper();
             $configArrayHelper = $this->getConfigArrayHelper();
             $params = ['fieldName' => $fieldName, 'value' => $value, 'configArrayHelper' => $configArrayHelper, 'self' => $this];
             $eventArgs = $this->makeEventArgs($params);
@@ -119,35 +118,8 @@ abstract class EntityAbstract implements EventSubscriber, HasId
             $this->getEvm()->dispatchEvent(EntityEvents::PRE_SET_FIELD, $eventArgs);
 
             $processedParams = $eventArgs->getArgs()['params'];
-            $fieldName = $processedParams['params']['fieldName'];
-            $value = $processedParams['params']['value'];
+            $value = $configArrayHelper->processSetField($processedParams);
 
-            // Get the settings for the field so we can do quick comparisons
-            $fieldSettings = $configArrayHelper->parseArrayPath(['fields', $fieldName], $processedParams);
-            $fieldSettings = $fieldSettings??[];
-
-            // Check permission to set
-            /** @noinspection NullPointerExceptionInspection */
-            $allowed = $this->getConfigArrayHelper()->canAssign($fieldName, 'set');
-
-            // Additional validation
-            $allowed = isset($fieldSettings['enforce']) && $baseArrayHelper->parse($value, $processedParams) !== $baseArrayHelper->parse($fieldSettings['enforce'], $processedParams) ? false : $allowed;
-
-            // Any validation failure error out
-            if ($allowed === false) {
-                throw new RuntimeException($this->getErrorFromConstant('enforcementFails'));
-            }
-
-            $allowed = isset($fieldSettings['closure']) && $baseArrayHelper->parse($fieldSettings['closure'], $processedParams) === false ? false : $allowed;
-
-            if ($allowed === false) {
-                throw new RuntimeException($this->getErrorFromConstant('closureFails'));
-            }
-
-
-            // setTo or mutate value
-            $value = isset($fieldSettings['setTo']) ? $baseArrayHelper->parse($fieldSettings['setTo'], $processedParams) : $value;
-            $value = isset($fieldSettings['mutate']) ? $baseArrayHelper->parse($fieldSettings['mutate'], $processedParams) : $value;
         }
         // All is ok so set it
         $setName = $this->accessorMethodName('set', $fieldName);
@@ -166,7 +138,6 @@ abstract class EntityAbstract implements EventSubscriber, HasId
         /** @noinspection NullPointerExceptionInspection */
         $fastMode = $this->getConfigArrayHelper()->checkFastMode($associationName);
         if ($fastMode !== true) {
-            $baseArrayHelper = $this->getArrayHelper();
             $configArrayHelper = $this->getConfigArrayHelper();
 
             $params = ['associationName' => $associationName, 'values' => $values, 'configArrayHelper' => $configArrayHelper, 'self' => $this];
@@ -176,50 +147,9 @@ abstract class EntityAbstract implements EventSubscriber, HasId
             $this->getEvm()->dispatchEvent(EntityEvents::PRE_PROCESS_ASSOCIATION_PARAMS, $eventArgs);
 
             $processedParams = $eventArgs->getArgs()['params'];
-            $associationName = $processedParams['params']['associationName'];
-            $values = $processedParams['params']['values'];
-
-            // Get the settings for the field so we can do quick comparisons
-            $fieldSettings = $configArrayHelper->parseArrayPath(['fields', $associationName], $processedParams);
-            $fieldSettings = $fieldSettings??[];
-
-            // Check if assignment and chaining settings are allowed
-            $assignType = $values['assignType'] ?? 'set';
-            $chainType = $values['chainType'] ?? null;
-            if ($chainType !== null) {
-                /** @noinspection NullPointerExceptionInspection */
-                $this->getConfigArrayHelper()->canChain($associationName, $chainType);
-            }
             /** @noinspection NullPointerExceptionInspection */
-            $this->getConfigArrayHelper()->canAssign($associationName, $assignType);
+            $values = $this->getConfigArrayHelper()->processAssociationParams($processedParams);
 
-            // Check if fields that are needed to be enforced as enforced
-            $enforce = isset($fieldSettings['enforce']) ? $baseArrayHelper->parse($fieldSettings['enforce'], $processedParams) : [];
-
-            /** @noinspection NullPointerExceptionInspection */
-            $allowed = $this->getArrayHelper()->testEnforceValues($values, $enforce, $processedParams);
-
-            if ($allowed === false) {
-                throw new RuntimeException($this->getErrorFromConstant('enforcementFails'));
-            }
-
-            // Run it through closure validation if there is a closure
-            $allowed = isset($fieldSettings['closure']) && $baseArrayHelper->parse($fieldSettings['closure'], $processedParams) === false ? false : $allowed;
-
-            if ($allowed === false) {
-                throw new RuntimeException($this->getErrorFromConstant('closureFails'));
-            }
-
-            // Figure out if there are values that need to be set to, and set it to those values if any found
-            $setTo = isset($fieldSettings['setTo']) ? $baseArrayHelper->parse($fieldSettings['setTo'], $processedParams) : [];
-
-            if ($setTo !== null) {
-                $values = array_replace_recursive($values, $setTo);
-            }
-
-            // Run mutation closure if one is present
-            /** @noinspection CallableParameterUseCaseInTypeContextInspection */
-            $values = isset($fieldSettings['mutate']) ? $baseArrayHelper->parse($fieldSettings['mutate'], $processedParams) : $values;
         }
         return $values;
 

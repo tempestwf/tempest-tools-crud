@@ -20,7 +20,13 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         ],
         'actionNotAllow'=>[
             'message'=>'Error: the requested action is not allowed on this entity for this request.'
-        ]
+        ],
+        'enforcementFails' => [
+            'message' => 'Error: A field is not set to it\'s enforced value.',
+        ],
+        'closureFails' => [
+            'message' => 'Error: A validation closure did not pass.',
+        ],
     ];
 
     /**
@@ -56,17 +62,20 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         return $allowed;
     }
 
+    /** @noinspection MoreThanThreeArgumentsInspection */
+
     /**
      * @param string $associationName
      * @param string $assignType
+     * @param array $fieldSettings
      * @param bool $nosey
      * @return bool
      * @throws \RuntimeException
      */
-    public function canAssign (string $associationName, string $assignType, bool $nosey = true):bool {
+    public function canAssign (string $associationName, string $assignType, array $fieldSettings = NULL, bool $nosey = true):bool {
         /** @noinspection NullPointerExceptionInspection */
         $actionSettings = $this->getArray();
-        $fieldSettings = $this->parseArrayPath(['fields', $associationName]);
+        $fieldSettings = $fieldSettings ?? $this->getFieldSettings($associationName);
 
         $allowed = $this->permissivePermissionCheck($actionSettings, $fieldSettings, 'assign', $assignType);
         /** @noinspection NullPointerExceptionInspection */
@@ -110,6 +119,188 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         /** @noinspection NullPointerExceptionInspection */
         $fastMode = $this->getArrayHelper()->parse($fastMode, ['fieldName'=>$fieldName, 'self'=>$this]);
         return $fastMode;
+    }
+
+    /**
+     * @param string $fieldName
+     * @param $params
+     * @return array
+     * @throws \RuntimeException
+     */
+    public function getFieldSettings (string $fieldName, array $params = []):array {
+        $fieldSettings = $this->parseArrayPath(['fields', $fieldName], $params);
+        $fieldSettings = $fieldSettings??[];
+        return $fieldSettings;
+    }
+
+    /**
+     * @param array $params
+     * @return mixed
+     * @throws \RuntimeException
+     */
+    public function processSetField (array $params) {
+        $fieldName = $params['fieldName'];
+        $value = $params['value'];
+
+        $fieldSettings = $this->getFieldSettings($fieldName, $params);
+
+        /** @noinspection NullPointerExceptionInspection */
+        $this->canAssign($fieldName, 'set', $fieldSettings);
+        $this->enforceField($fieldName, $value, $params, $fieldSettings);
+        $this->closureOnField($fieldName, $params, $fieldSettings);
+        $value = $this->setToOnField($fieldName, $params, $value, $fieldSettings);
+        $value = $this->mutateOnField($fieldName, $params, $value, $fieldSettings);
+        return $value;
+    }
+
+
+    /** @noinspection MoreThanThreeArgumentsInspection
+     * @param string $fieldName
+     * @param array $values
+     * @param array $params
+     * @param array|null $fieldSettings
+     * @param bool $nosey
+     * @throws \RuntimeException
+     */
+    public function enforceRelation(string $fieldName, array $values, array $params = [], array $fieldSettings=NULL, bool $nosey = true) {
+        // Get the settings for the field so we can do quick comparisons
+        $fieldSettings = $fieldSettings ?? $this->getFieldSettings($fieldName);
+
+        // Check if fields that are needed to be enforced as enforced
+        /** @noinspection NullPointerExceptionInspection */
+        $enforce = isset($fieldSettings['enforce']) ? $this->getArrayHelper()->parse($fieldSettings['enforce'], $params) : [];
+
+        /** @noinspection NullPointerExceptionInspection */
+        $allowed = $this->getArrayHelper()->testEnforceValues($values, $enforce, $params);
+
+        if ($allowed === false && $nosey === true) {
+            throw new \RuntimeException($this->getErrorFromConstant('enforcementFails')['message']);
+        }
+    }
+
+    /** @noinspection MoreThanThreeArgumentsInspection
+     * @param string $associationName
+     * @param array $values
+     * @param array $params
+     * @param array|null $fieldSettings
+     * @throws \RuntimeException
+     * @return array
+     */
+    public function setToOnAssociation(string $associationName, array $values, array $params = [], array $fieldSettings=NULL):array {
+        $fieldSettings = $fieldSettings ?? $this->getFieldSettings($associationName);
+        // Figure out if there are values that need to be set to, and set it to those values if any found
+        /** @noinspection NullPointerExceptionInspection */
+        $setTo = isset($fieldSettings['setTo']) ? $this->getArrayHelper()->parse($fieldSettings['setTo'], $params) : [];
+
+        if ($setTo !== null) {
+            $values = array_replace_recursive($values, $setTo);
+        }
+        return $values;
+    }
+
+    /**
+     * @param array $params
+     * @throws \RuntimeException
+     * @return array
+     */
+    public function processAssociationParams(array $params):array {
+        $associationName = $params['associationName'];
+        $values = $params['values'];
+
+        $fieldSettings = $this->getFieldSettings($associationName, $params);
+
+        // Check if assignment and chaining settings are allowed
+        $assignType = $values['assignType'] ?? 'set';
+        $chainType = $values['chainType'] ?? null;
+        if ($chainType !== null) {
+            /** @noinspection NullPointerExceptionInspection */
+            $this->canChain($associationName, $chainType);
+        }
+        /** @noinspection NullPointerExceptionInspection */
+        $this->canAssign($associationName, $assignType);
+        $this->enforceRelation($associationName, $values, $params, $fieldSettings);
+        $this->closureOnField($associationName, $params, $fieldSettings);
+        $values = $this->setToOnAssociation($associationName, $values, $params, $fieldSettings);
+        $values = $this->mutateOnField($associationName, $params, $values, $fieldSettings);
+        return $values;
+    }
+
+    /** @noinspection MoreThanThreeArgumentsInspection
+     * @param string $fieldName
+     * @param $params
+     * @param $value
+     * @param array|null $fieldSettings
+     * @return
+     * @throws \RuntimeException
+     */
+    public function mutateOnField (string $fieldName, $params, $value, array $fieldSettings = NULL) {
+        // Get the settings for the field so we can do quick comparisons
+        $fieldSettings = $fieldSettings ?? $this->getFieldSettings($fieldName);
+        /** @noinspection NullPointerExceptionInspection */
+        $value = isset($fieldSettings['mutate']) ? $this->getArrayHelper()->parse($fieldSettings['mutate'], $params) : $value;
+        return $value;
+    }
+
+    /** @noinspection MoreThanThreeArgumentsInspection
+     * @param string $fieldName
+     * @param $params
+     * @param $value
+     * @param array|null $fieldSettings
+     * @return
+     * @throws \RuntimeException
+     */
+    public function setToOnField (string $fieldName, $params, $value, array $fieldSettings = NULL) {
+        // Get the settings for the field so we can do quick comparisons
+        $fieldSettings = $fieldSettings ?? $this->getFieldSettings($fieldName);
+        /** @noinspection NullPointerExceptionInspection */
+        $value = isset($fieldSettings['setTo']) ? $this->getArrayHelper()->parse($fieldSettings['setTo'], $params) : $value;
+        return $value;
+    }
+
+
+    /** @noinspection MoreThanThreeArgumentsInspection
+     * @param string $fieldName
+     * @param array $params
+     * @param array|null $fieldSettings
+     * @param bool $noisy
+     * @return bool
+     * @throws \RuntimeException
+     */
+    public function closureOnField (string $fieldName, array $params, array $fieldSettings = NULL, bool $noisy = true):bool {
+        // Get the settings for the field so we can do quick comparisons
+        $fieldSettings = $fieldSettings ?? $this->getFieldSettings($fieldName);
+        /** @noinspection NullPointerExceptionInspection */
+        $allowed = !(isset($fieldSettings['closure']) && $this->getArrayHelper()->parse($fieldSettings['closure'], $params) === false);
+
+        if ($allowed === false && $noisy === true) {
+            throw new \RuntimeException($this->getErrorFromConstant('closureFails')['message']);
+        }
+        return $allowed;
+    }
+
+
+    /** @noinspection MoreThanThreeArgumentsInspection
+     * @param string $fieldName
+     * @param $value
+     * @param array $params
+     * @param array|null $fieldSettings
+     * @param bool $noisy
+     * @return bool
+     * @throws \RuntimeException
+     */
+    public function enforceField (string $fieldName, $value, array $params, array $fieldSettings = NULL, bool $noisy = true):bool {
+        // Get the settings for the field so we can do quick comparisons
+        $fieldSettings = $fieldSettings ?? $this->getFieldSettings($fieldName);
+        // Additional validation
+        /** @noinspection NullPointerExceptionInspection */
+        $allowed = !(isset($fieldSettings['enforce']) && $this->getArrayHelper()->parse($value, $params) !== $this->getArrayHelper()->parse($fieldSettings['enforce'], $params));
+
+        // Any validation failure error out
+        if ($allowed === false && $noisy === true) {
+            throw new \RuntimeException($this->getErrorFromConstant('enforcementFails')['message']);
+        }
+
+        return $allowed;
     }
 }
 ?>
