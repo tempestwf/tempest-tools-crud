@@ -12,7 +12,7 @@ use TempestTools\Common\Laravel\Validation\ValidationFactoryHelper;
 use TempestTools\Common\Utility\ValidationFactoryTrait;
 use \Illuminate\Contracts\Validation\Factory;
 
-class EntityAbstract extends \TempestTools\Crud\Doctrine\EntityAbstract
+abstract class EntityAbstract extends \TempestTools\Crud\Doctrine\EntityAbstract
 {
     use ValidationFactoryTrait;
 
