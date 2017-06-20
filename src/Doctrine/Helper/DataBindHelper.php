@@ -65,7 +65,8 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
      */
     public function bind(EntityAbstract $entity, array $params): EntityAbstract
     {
-        $entity->allowed();
+        /** @noinspection NullPointerExceptionInspection */
+        $entity->getConfigArrayHelper()->allowed();
         $entity->setArrayHelper($this->getArrayHelper());
         $entity->setBindParams($params);
         /** @noinspection NullPointerExceptionInspection */

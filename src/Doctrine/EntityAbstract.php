@@ -14,7 +14,7 @@ use TempestTools\Common\Utility\TTConfigTrait;
 use TempestTools\Crud\Constants\EntityEvents;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
 use Illuminate\Contracts\Validation\Factory;
-
+use TempestTools\Crud\Doctrine\Helper\EntityArrayHelper;
 
 
 abstract class EntityAbstract implements EventSubscriber, HasId {
@@ -22,17 +22,8 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
     use ArrayHelperTrait, ErrorConstantsTrait, TTConfigTrait, EvmTrait, AccessorMethodNameTrait;
 
     const ERRORS = [
-        'fieldNotAllow'=>[
-            'message'=>'Error: Access to field not allowed.',
-        ],
         'noArrayHelper'=>[
             'message'=>'Error: No array helper on entity.',
-        ],
-        'chainTypeNotAllow'=>[
-            'message'=>'Error: Requested chain type not permitted.',
-        ],
-        'assignTypeNotAllow'=>[
-            'message'=>'Error: Requested assign type not permitted.',
         ],
         'assignTypeMustBe'=>[
             'message'=>'Error: Assign type must be set, add or remove.',
@@ -48,9 +39,6 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
         ],
         'prePersistValidatorFails'=>[
             'message'=>'Error: Validation failed on pre-persist.',
-        ],
-        'actionNotAllow'=>[
-            'message'=>'Error: the requested action is not allowed on this entity for this request.'
         ]
     ];
     /**
@@ -102,20 +90,11 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
         }
 
         if ($force !== true || $this->getConfigArrayHelper() === NULL) {
-            $this->parseTTConfig();
+            $this->parseTTConfig(new EntityArrayHelper());
         }
     }
 
-    /**
-     * @param string $fieldName
-     * @param string $keyName
-     * @return mixed
-     */
-    public function getConfigForField(string $fieldName, string $keyName)
-    {
-        $arrayHelper = $this->getConfigArrayHelper();
-        return $arrayHelper->parseArrayPath(['fields', $fieldName, $keyName]);
-    }
+
 
     /**
      * @param string $fieldName
@@ -124,7 +103,8 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
      */
     public function setField(string $fieldName, $value)
     {
-        $fastMode = $this->checkFastMode($fieldName);
+        /** @noinspection NullPointerExceptionInspection */
+        $fastMode = $this->getConfigArrayHelper()->checkFastMode($fieldName);
         if ($fastMode !== true) {
             $baseArrayHelper = $this->getArrayHelper();
             $configArrayHelper = $this->getConfigArrayHelper();
@@ -144,7 +124,8 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
             $fieldSettings = $fieldSettings??[];
 
             // Check permission to set
-            $allowed = $this->canAssign($fieldName, 'set');
+            /** @noinspection NullPointerExceptionInspection */
+            $allowed = $this->getConfigArrayHelper()->canAssign($fieldName, 'set');
 
             // Additional validation
             $allowed = isset($fieldSettings['enforce']) && $baseArrayHelper->parse($value, $processedParams) !== $baseArrayHelper->parse($fieldSettings['enforce'], $processedParams)?false:$allowed;
@@ -179,7 +160,8 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
      */
     public function processAssociationParams(string $associationName, array $values):array
     {
-        $fastMode = $this->checkFastMode($associationName);
+        /** @noinspection NullPointerExceptionInspection */
+        $fastMode = $this->getConfigArrayHelper()->checkFastMode($associationName);
         if ($fastMode !== true) {
             $baseArrayHelper = $this->getArrayHelper();
             $configArrayHelper = $this->getConfigArrayHelper();
@@ -202,14 +184,17 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
             $assignType = $values['assignType'] ?? 'set';
             $chainType = $values['chainType'] ?? null;
             if ($chainType !== null) {
-                $this->canChain($associationName, $chainType);
+                /** @noinspection NullPointerExceptionInspection */
+                $this->getConfigArrayHelper()->canChain($associationName, $chainType);
             }
-            $this->canAssign($associationName, $assignType);
+            /** @noinspection NullPointerExceptionInspection */
+            $this->getConfigArrayHelper()->canAssign($associationName, $assignType);
 
             // Check if fields that are needed to be enforced as enforced
             $enforce = isset($fieldSettings['enforce']) ? $baseArrayHelper->parse($fieldSettings['enforce'], $processedParams) : [];
 
-            $allowed = $this->testEnforceValues($values, $enforce, $processedParams);
+            /** @noinspection NullPointerExceptionInspection */
+            $allowed = $this->getArrayHelper()->testEnforceValues($values, $enforce, $processedParams);
 
             if ($allowed === false) {
                 throw new RuntimeException($this->getErrorFromConstant('enforcementFails'));
@@ -237,46 +222,6 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
 
     }
 
-    /**
-     * @param array $values
-     * @param array $enforce
-     * @param array $extra
-     * @return bool
-     */
-    public function testEnforceValues (array $values, array $enforce, array $extra=[]):bool {
-        $allowed = true;
-        foreach ($enforce as $key => $value) {
-            /** @noinspection NullPointerExceptionInspection */
-            if ($values[$key] !== $this->getArrayHelper()->parse($value, $extra)) {
-                $allowed = false;
-                break;
-            }
-        }
-        return $allowed;
-    }
-
-    /**
-     * @param string $associationName
-     * @param string $chainType
-     * @param bool $nosey
-     * @return bool
-     * @throws \RuntimeException
-     */
-    public function canChain (string $associationName, string $chainType, bool $nosey = true):bool {
-        $arrayHelper = $this->getConfigArrayHelper();
-        /** @noinspection NullPointerExceptionInspection */
-        $actionSettings = $arrayHelper->getArray();
-        $fieldSettings = $arrayHelper->parseArrayPath(['fields', $associationName]);
-
-        $allowed = $this->permissivePermissionCheck($actionSettings, $fieldSettings, 'chain', $chainType);
-
-        if ($nosey === true && $allowed === false) {
-            throw new \RuntimeException($this->getErrorFromConstant('chainTypeNotAllow')['message']);
-        }
-
-        return $allowed;
-    }
-
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
@@ -288,7 +233,8 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
      */
     public function bindAssociation(string $assignType, string $associationName, EntityAbstract $entity=NULL, $force = false){
         if ($force === false) {
-            $this->canAssign($assignType, $associationName);
+            /** @noinspection NullPointerExceptionInspection */
+            $this->getConfigArrayHelper()->canAssign($assignType, $associationName);
         }
         if (!in_array($assignType, ['set', 'add', 'remove'], true)){
             throw new \RuntimeException($this->getErrorFromConstant('assignTypeMustBe')['message']);
@@ -298,63 +244,13 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
     }
 
     /**
-     * @param string $associationName
-     * @param string $assignType
-     * @param bool $nosey
-     * @return bool
-     * @throws \RuntimeException
-     */
-    public function canAssign (string $associationName, string $assignType, bool $nosey = true):bool {
-        $arrayHelper = $this->getConfigArrayHelper();
-        /** @noinspection NullPointerExceptionInspection */
-        $actionSettings = $arrayHelper->getArray();
-        $fieldSettings = $arrayHelper->parseArrayPath(['fields', $associationName]);
-
-        $allowed = $this->permissivePermissionCheck($actionSettings, $fieldSettings, 'assign', $assignType);
-
-        if ($nosey === true && $allowed === false) {
-            throw new \RuntimeException($this->getErrorFromConstant('assignTypeNotAllow')['message']);
-        }
-        return $allowed;
-    }
-
-    /**
-     * @param bool $nosey
-     * @return bool
-     * @throws \RuntimeException
-     */
-    public function allowed ($nosey = true):bool {
-
-        /** @noinspection NullPointerExceptionInspection */
-        $array = $this->getConfigArrayHelper()->getArray();
-        $allowed = $array['allowed'] ?? true;
-
-        if ($nosey === true && $allowed === false) {
-            throw new \RuntimeException($this->getErrorFromConstant('actionNotAllow')['message']);
-        }
-        return $allowed;
-    }
-
-    /**
-     * @param string $fieldName
-     * @return bool
-     */
-    public function checkFastMode(string $fieldName):bool {
-        $arrayHelper = $this->getConfigArrayHelper();
-
-        /** @noinspection NullPointerExceptionInspection */
-        $actionSettings = $arrayHelper->getArray();
-        $fieldSettings = $arrayHelper->parseArrayPath(['fields', $fieldName]);
-        return $this->highLowSettingCheck($actionSettings, $fieldSettings, 'fastMode');
-    }
-    /**
      * Makes event args to use
      * @param array $params
      * @return GenericEventArgs
      */
     protected function makeEventArgs(array $params): Events\GenericEventArgs
     {
-        return new GenericEventArgs(new \ArrayObject(['params'=>$params,'arrayHelper'=>$this->getArrayHelper(), 'self'=>$this]));
+        return new GenericEventArgs(new \ArrayObject(['params'=>$params, 'configArrayHelper'=>$this->getConfigArrayHelper(), 'arrayHelper'=>$this->getArrayHelper(), 'self'=>$this]));
     }
 
     /**
