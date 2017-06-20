@@ -15,30 +15,32 @@ use TempestTools\Crud\Constants\EntityEvents;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
 use Illuminate\Contracts\Validation\Factory;
 use TempestTools\Crud\Doctrine\Helper\EntityArrayHelper;
+use TempestTools\Crud\Contracts\EntityArrayHelper as EntityArrayHelperContract;
 
 
-abstract class EntityAbstract implements EventSubscriber, HasId {
+abstract class EntityAbstract implements EventSubscriber, HasId
+{
 
     use ArrayHelperTrait, ErrorConstantsTrait, TTConfigTrait, EvmTrait, AccessorMethodNameTrait;
 
     const ERRORS = [
-        'noArrayHelper'=>[
-            'message'=>'Error: No array helper on entity.',
+        'noArrayHelper' => [
+            'message' => 'Error: No array helper on entity.',
         ],
-        'assignTypeMustBe'=>[
-            'message'=>'Error: Assign type must be set, add or remove.',
+        'assignTypeMustBe' => [
+            'message' => 'Error: Assign type must be set, add or remove.',
         ],
-        'enforcementFails'=>[
-            'message'=>'Error: A field is not set to it\'s enforced value.',
+        'enforcementFails' => [
+            'message' => 'Error: A field is not set to it\'s enforced value.',
         ],
-        'closureFails'=>[
-            'message'=>'Error: A validation closure did not pass.',
+        'closureFails' => [
+            'message' => 'Error: A validation closure did not pass.',
         ],
-        'validateFactoryNotIncluded'=>[
-            'message'=>'Error: Validation factory is not included on this class.',
+        'validateFactoryNotIncluded' => [
+            'message' => 'Error: Validation factory is not included on this class.',
         ],
-        'prePersistValidatorFails'=>[
-            'message'=>'Error: Validation failed on pre-persist.',
+        'prePersistValidatorFails' => [
+            'message' => 'Error: Validation failed on pre-persist.',
         ]
     ];
     /**
@@ -67,13 +69,13 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function init(string $mode, ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL, bool $force = true)
+    public function init(string $mode, ArrayHelperContract $arrayHelper = null, array $path = null, array $fallBack = null, bool $force = true)
     {
-        if ($arrayHelper !== NULL && ($force === true || $this->getArrayHelper() === NULL)) {
+        if ($arrayHelper !== null && ($force === true || $this->getArrayHelper() === null)) {
             $this->setArrayHelper($arrayHelper);
         }
 
-        if ($path !== NULL && ($force === true || $this->getTTPath() === NULL)) {
+        if ($path !== null && ($force === true || $this->getTTPath() === null)) {
             $this->setTTPath($path);
             $path = $this->getTTPath();
             $path[] = $mode;
@@ -81,7 +83,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
         }
 
 
-        if ($fallBack !== NULL && ($force === true || $this->getTTFallBack() === NULL)) {
+        if ($fallBack !== null && ($force === true || $this->getTTFallBack() === null)) {
             $this->setTTFallBack($fallBack);
         }
 
@@ -89,11 +91,12 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
             throw new \RuntimeException($this->getErrorFromConstant('noArrayHelper'));
         }
 
-        if ($force !== true || $this->getConfigArrayHelper() === NULL) {
-            $this->parseTTConfig(new EntityArrayHelper());
+        if ($force !== true || $this->getConfigArrayHelper() === null) {
+            $entityArrayHelper = new EntityArrayHelper();
+            $entityArrayHelper->setArrayHelper($this->getArrayHelper());
+            $this->parseTTConfig($entityArrayHelper);
         }
     }
-
 
 
     /**
@@ -108,7 +111,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
         if ($fastMode !== true) {
             $baseArrayHelper = $this->getArrayHelper();
             $configArrayHelper = $this->getConfigArrayHelper();
-            $params = ['fieldName'=>$fieldName, 'value'=>$value, 'configArrayHelper'=>$configArrayHelper, 'self'=>$this];
+            $params = ['fieldName' => $fieldName, 'value' => $value, 'configArrayHelper' => $configArrayHelper, 'self' => $this];
             $eventArgs = $this->makeEventArgs($params);
 
             // Give event listeners a chance to do something then pull out the args again
@@ -128,14 +131,14 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
             $allowed = $this->getConfigArrayHelper()->canAssign($fieldName, 'set');
 
             // Additional validation
-            $allowed = isset($fieldSettings['enforce']) && $baseArrayHelper->parse($value, $processedParams) !== $baseArrayHelper->parse($fieldSettings['enforce'], $processedParams)?false:$allowed;
+            $allowed = isset($fieldSettings['enforce']) && $baseArrayHelper->parse($value, $processedParams) !== $baseArrayHelper->parse($fieldSettings['enforce'], $processedParams) ? false : $allowed;
 
             // Any validation failure error out
             if ($allowed === false) {
                 throw new RuntimeException($this->getErrorFromConstant('enforcementFails'));
             }
 
-            $allowed = isset($fieldSettings['closure']) && $baseArrayHelper->parse($fieldSettings['closure'], $processedParams) === false?false:$allowed;
+            $allowed = isset($fieldSettings['closure']) && $baseArrayHelper->parse($fieldSettings['closure'], $processedParams) === false ? false : $allowed;
 
             if ($allowed === false) {
                 throw new RuntimeException($this->getErrorFromConstant('closureFails'));
@@ -143,8 +146,8 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
 
 
             // setTo or mutate value
-            $value = isset($fieldSettings['setTo'])?$baseArrayHelper->parse($fieldSettings['setTo'], $processedParams):$value;
-            $value = isset($fieldSettings['mutate'])?$baseArrayHelper->parse($fieldSettings['mutate'], $processedParams):$value;
+            $value = isset($fieldSettings['setTo']) ? $baseArrayHelper->parse($fieldSettings['setTo'], $processedParams) : $value;
+            $value = isset($fieldSettings['mutate']) ? $baseArrayHelper->parse($fieldSettings['mutate'], $processedParams) : $value;
         }
         // All is ok so set it
         $setName = $this->accessorMethodName('set', $fieldName);
@@ -158,7 +161,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
      * @return array
      * @throws \RuntimeException
      */
-    public function processAssociationParams(string $associationName, array $values):array
+    public function processAssociationParams(string $associationName, array $values): array
     {
         /** @noinspection NullPointerExceptionInspection */
         $fastMode = $this->getConfigArrayHelper()->checkFastMode($associationName);
@@ -166,7 +169,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
             $baseArrayHelper = $this->getArrayHelper();
             $configArrayHelper = $this->getConfigArrayHelper();
 
-            $params = ['associationName' => $associationName, 'values' => $values, 'configArrayHelper' => $configArrayHelper, 'self'=>$this];
+            $params = ['associationName' => $associationName, 'values' => $values, 'configArrayHelper' => $configArrayHelper, 'self' => $this];
             $eventArgs = $this->makeEventArgs($params);
             // Give event listeners a chance to do something and pull the args out again after wards
             /** @noinspection NullPointerExceptionInspection */
@@ -231,12 +234,13 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function bindAssociation(string $assignType, string $associationName, EntityAbstract $entity=NULL, $force = false){
+    public function bindAssociation(string $assignType, string $associationName, EntityAbstract $entity = null, $force = false)
+    {
         if ($force === false) {
             /** @noinspection NullPointerExceptionInspection */
             $this->getConfigArrayHelper()->canAssign($assignType, $associationName);
         }
-        if (!in_array($assignType, ['set', 'add', 'remove'], true)){
+        if (!in_array($assignType, ['set', 'add', 'remove'], true)) {
             throw new \RuntimeException($this->getErrorFromConstant('assignTypeMustBe')['message']);
         }
         $methodName = $this->accessorMethodName($assignType, $associationName);
@@ -245,24 +249,26 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
 
     /**
      * Makes event args to use
+     *
      * @param array $params
      * @return GenericEventArgs
      */
     protected function makeEventArgs(array $params): Events\GenericEventArgs
     {
-        return new GenericEventArgs(new \ArrayObject(['params'=>$params, 'configArrayHelper'=>$this->getConfigArrayHelper(), 'arrayHelper'=>$this->getArrayHelper(), 'self'=>$this]));
+        return new GenericEventArgs(new \ArrayObject(['params' => $params, 'configArrayHelper' => $this->getConfigArrayHelper(), 'arrayHelper' => $this->getArrayHelper(), 'self' => $this]));
     }
 
     /**
      * Subscribes to the available events that are present on the class
+     *
      * @return array
      */
-    public function getSubscribedEvents():array
+    public function getSubscribedEvents(): array
     {
         $all = EntityEvents::getAll();
         $subscribe = [];
         foreach ($all as $event) {
-            if (method_exists ($this, $event)) {
+            if (method_exists($this, $event)) {
                 $subscribe[] = $event;
             }
         }
@@ -313,7 +319,8 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
      * @param array $validate
      * @throws \RuntimeException
      */
-    protected function ttPrePersistValidate(array $validate) {
+    protected function ttPrePersistValidate(array $validate)
+    {
         /** @var Factory $factory */
         $factory = $this->getValidationFactory();
         $fields = $validate['fields'] ?? [];
@@ -322,8 +329,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
         $customAttributes = $validate['customAttributes'] ?? [];
         $values = $this->getValuesOfFields($fields);
         $validator = $factory->make($values, $rules, $messages, $customAttributes);
-        if($validator->fails())
-        {
+        if ($validator->fails()) {
             throw new RuntimeException($this->getErrorFromConstant('prePersistValidatorFails'));
         }
     }
@@ -333,7 +339,8 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
      *
      * @throws \RuntimeException
      */
-    public function getValidationFactory() {
+    public function getValidationFactory()
+    {
         throw new RuntimeException($this->getErrorFromConstant('validateFactoryNotIncluded'));
     }
 
@@ -341,18 +348,20 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
      * @param callable $closure
      * @throws \RuntimeException
      */
-    protected function ttPrePersistMutate (Callable $closure) {
+    protected function ttPrePersistMutate(Callable $closure)
+    {
         /** @noinspection NullPointerExceptionInspection */
-        $this->getArrayHelper()->parseClosure($closure, ['self'=>$this]);
+        $this->getArrayHelper()->parseClosure($closure, ['self' => $this]);
     }
 
     /**
      * @param callable $closure
      * @throws \RuntimeException
      */
-    protected function ttPrePersistClosure (Callable $closure) {
+    protected function ttPrePersistClosure(Callable $closure)
+    {
         /** @noinspection NullPointerExceptionInspection */
-        $allowed = $this->getArrayHelper()->parseClosure($closure, ['self'=>$this]);
+        $allowed = $this->getArrayHelper()->parseClosure($closure, ['self' => $this]);
         if ($allowed === false) {
             throw new RuntimeException($this->getErrorFromConstant('closureFails'));
         }
@@ -361,8 +370,9 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
     /**
      * @param array $values
      */
-    protected function ttPrePersistSetTo (array $values) {
-        $extra = ['self'=>$this];
+    protected function ttPrePersistSetTo(array $values)
+    {
+        $extra = ['self' => $this];
         foreach ($values as $key => $value) {
             /** @noinspection NullPointerExceptionInspection */
             $value = $this->getArrayHelper()->parse($value, $extra);
@@ -375,14 +385,15 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
      * @param array $values
      * @throws \RuntimeException
      */
-    protected function ttPrePersistEnforce (array $values) {
-        $extra = ['self'=>$this];
+    protected function ttPrePersistEnforce(array $values)
+    {
+        $extra = ['self' => $this];
         foreach ($values as $key => $value) {
             /** @noinspection NullPointerExceptionInspection */
             $value = $this->getArrayHelper()->parse($value, $extra);
             $methodName = $this->accessorMethodName('get', $key);
             $result = $this->$methodName();
-            if (!is_scalar ($result)) {
+            if (!is_scalar($result)) {
                 /** @var array $value */
                 foreach ($value as $key2 => $value2) {
                     /** @noinspection NullPointerExceptionInspection */
@@ -403,7 +414,8 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
      * @param array $fields
      * @return array
      */
-    public function getValuesOfFields (array $fields = []):array {
+    public function getValuesOfFields(array $fields = []): array
+    {
         $result = [];
         foreach ($fields as $key => $value) {
             $methodName = $this->accessorMethodName('get', $key);
@@ -429,7 +441,32 @@ abstract class EntityAbstract implements EventSubscriber, HasId {
         $this->bindParams = $bindParams;
     }
 
+    /**
+     * @param bool $nosey
+     * @return bool
+     * @throws \RuntimeException
+     */
+    public function allowed($nosey = true): bool
+    {
+        /** @noinspection NullPointerExceptionInspection */
+        return $this->getConfigArrayHelper()->allowed($nosey);
+    }
+
+    /**
+     * @return NULL|EntityArrayHelperContract
+     */
+    public function getConfigArrayHelper():?EntityArrayHelperContract
+    {
+        return $this->configArrayHelper;
+    }
+
+    /**
+     * @param EntityArrayHelperContract $configArrayHelper
+     */
+    public function setConfigArrayHelper(EntityArrayHelperContract $configArrayHelper)
+    {
+        $this->configArrayHelper = $configArrayHelper;
+    }
+
 }
-
-
 ?>

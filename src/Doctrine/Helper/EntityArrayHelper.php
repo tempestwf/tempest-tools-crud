@@ -3,11 +3,13 @@ namespace TempestTools\Crud\Doctrine\Helper;
 
 
 use TempestTools\Common\Helper\ArrayHelper;
+use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
+use TempestTools\Crud\Contracts\EntityArrayHelper as EntityArrayHelperContract;
 
-class EntityArrayHelper extends ArrayHelper {
-    use TTConfigTrait, ErrorConstantsTrait;
+class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract{
+    use TTConfigTrait, ErrorConstantsTrait, ArrayHelperTrait;
 
     const ERRORS = [
         'chainTypeNotAllow'=>[
@@ -45,7 +47,8 @@ class EntityArrayHelper extends ArrayHelper {
         $fieldSettings = $this->parseArrayPath(['fields', $associationName]);
 
         $allowed = $this->permissivePermissionCheck($actionSettings, $fieldSettings, 'chain', $chainType);
-
+        /** @noinspection NullPointerExceptionInspection */
+        $allowed = $this->getArrayHelper()->parse($allowed, ['associationName'=>$associationName, 'chainType'=> $chainType, 'self'=>$this]);
         if ($nosey === true && $allowed === false) {
             throw new \RuntimeException($this->getErrorFromConstant('chainTypeNotAllow')['message']);
         }
@@ -66,7 +69,8 @@ class EntityArrayHelper extends ArrayHelper {
         $fieldSettings = $this->parseArrayPath(['fields', $associationName]);
 
         $allowed = $this->permissivePermissionCheck($actionSettings, $fieldSettings, 'assign', $assignType);
-
+        /** @noinspection NullPointerExceptionInspection */
+        $allowed = $this->getArrayHelper()->parse($allowed, ['associationName'=>$associationName, 'assignType'=> $assignType, 'self'=>$this]);
         if ($nosey === true && $allowed === false) {
             throw new \RuntimeException($this->getErrorFromConstant('assignTypeNotAllow')['message']);
         }
@@ -84,6 +88,8 @@ class EntityArrayHelper extends ArrayHelper {
         $array = $this->getArray();
         $allowed = $array['allowed'] ?? true;
 
+        /** @noinspection NullPointerExceptionInspection */
+        $allowed = $this->getArrayHelper()->parse($allowed, ['self'=>$this]);
         if ($nosey === true && $allowed === false) {
             throw new \RuntimeException($this->getErrorFromConstant('actionNotAllow')['message']);
         }
@@ -100,7 +106,10 @@ class EntityArrayHelper extends ArrayHelper {
         /** @noinspection NullPointerExceptionInspection */
         $actionSettings = $this->getArray();
         $fieldSettings = $this->parseArrayPath(['fields', $fieldName]);
-        return $this->highLowSettingCheck($actionSettings, $fieldSettings, 'fastMode');
+        $fastMode = $this->highLowSettingCheck($actionSettings, $fieldSettings, 'fastMode');
+        /** @noinspection NullPointerExceptionInspection */
+        $fastMode = $this->getArrayHelper()->parse($fastMode, ['fieldName'=>$fieldName, 'self'=>$this]);
+        return $fastMode;
     }
 }
 ?>
