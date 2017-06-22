@@ -4,7 +4,6 @@ namespace TempestTools\Crud\Doctrine;
 use Doctrine\Common\EventManager;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Mockery\Exception;
@@ -59,22 +58,6 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
 
 
     /**
-     * RepositoryAbstract constructor.
-     *
-     * @param \Doctrine\ORM\EntityManager $em
-     * @param ClassMetadata $class
-     */
-    public function __construct($em, ClassMetadata $class){
-        parent::__construct($em, $class);
-        $this->setEvm(new EventManager());
-        $this->setQueryHelper(new QueryHelper());
-        $this->setDataBindHelper(new DataBindHelper($this->getEntityManager()));
-        /** @noinspection NullPointerExceptionInspection */
-        $this->getEvm()->addEventSubscriber($this);
-    }
-
-
-    /**
      * Makes sure the repo is ready to run
      *
      * @param $eventArgs
@@ -105,6 +88,20 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      */
     public function init( ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL, bool $force= true)
     {
+        if ($force === true || $this->getEvm() === null) {
+            $this->setEvm(new EventManager());
+            /** @noinspection NullPointerExceptionInspection */
+            $this->getEvm()->addEventSubscriber($this);
+        }
+
+
+        if ($force === true || $this->getQueryHelper() === null) {
+            $this->setQueryHelper(new QueryHelper());
+        }
+        if ($force === true || $this->getDataBindHelper() === null) {
+            $this->setDataBindHelper(new DataBindHelper($this->getEntityManager()));
+        }
+
         if ($arrayHelper !== null && ($force === true || $this->getArrayHelper() === null)) {
             $this->setArrayHelper($arrayHelper);
         }
