@@ -253,7 +253,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId
     {
         /** @var Factory $factory */
         $factory = $this->getValidationFactory();
-        $fields = $validate['fields'] ?? [];
+        $fields = $validate['fields'] ?? array_keys($validate['rules']);
         $rules = $validate['rules'] ?? [];
         $messages = $validate['messages'] ?? [];
         $customAttributes = $validate['customAttributes'] ?? [];
