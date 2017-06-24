@@ -70,7 +70,7 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
         $entity->setArrayHelper($this->getArrayHelper());
         $entity->setBindParams($params);
         /** @noinspection NullPointerExceptionInspection */
-        $metadata = $this->getEm()->getClassMetadata($entity);
+        $metadata = $this->getEm()->getClassMetadata(get_class($entity));
         $associateNames = $metadata->getAssociationNames();
         foreach ($params as $fieldName => $value) {
             if (in_array($fieldName, $associateNames, true)) {
