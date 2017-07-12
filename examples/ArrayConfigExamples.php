@@ -232,15 +232,18 @@ $entityInfo = [
                 'closure'=>'<validation closure>',
                 'mutate'=>'<mutate closure>',
                 'assign'=>[
-                    'set'=>'<true or false>',
+                    'set'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
                     'add'=>'<true or false>',
                     'remove'=>'<true or false>',
+                    'setSingle'=>'<true or false>',
+                    'addSingle'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
+                    'removeSingle'=>'<true or false>',
                 ],
                 'chain'=>[
-                    'create'=>'<true or false>',
+                    'create'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
                     'update'=>'<true or false>',
                     'delete'=>'<true or false>',
-                    'read'=>'<true or false>'
+                    'read'=>'<true or false>' //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
                 ]
             ]
         ],
@@ -248,6 +251,7 @@ $entityInfo = [
             '<custom option name>'=>'<custom option value>',
         ]
     ],
+    // TODO: move from above when tests are done
     'update'=>[
         'allowed'=>'<true or false>',
         'permissive'=>'<true or false>',
@@ -271,9 +275,12 @@ $entityInfo = [
                 'closure'=>'<validation closure>',
                 'mutate'=>'<mutate closure>',
                 'assign'=>[
-                    'set'=>'<true or false>',
+                    'set'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
                     'add'=>'<true or false>',
                     'remove'=>'<true or false>',
+                    'setSingle'=>'<true or false>',
+                    'addSingle'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
+                    'removeSingle'=>'<true or false>',
                 ],
                 'chain'=>[
                     'create'=>'<true or false>',
@@ -287,6 +294,7 @@ $entityInfo = [
             '<custom option name>'=>'<custom option value>',
         ]
     ],
+    // TODO: move from above when tests are done
     'delete'=>[
         'allowed'=>'<true or false>',
         'permissive'=>'<true or false>',
