@@ -170,9 +170,10 @@ abstract class EntityAbstract implements EventSubscriber, HasId
             /** @noinspection NullPointerExceptionInspection */
             $this->getConfigArrayHelper()->canAssign($assignType, $associationName);
         }
-        if (!in_array($assignType, ['set', 'add', 'remove'], true)) {
+        if (!in_array($assignType, ['set', 'add', 'remove', 'setSingle', 'addSingle', 'removeSingle'], true)) {
             throw new \RuntimeException($this->getErrorFromConstant('assignTypeMustBe')['message']);
         }
+
         $methodName = $this->accessorMethodName($assignType, $associationName);
         $this->$methodName($entity);
     }

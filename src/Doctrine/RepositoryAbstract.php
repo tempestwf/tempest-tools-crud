@@ -314,7 +314,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('e')
             ->from($this->getClassName(), 'e')
-            ->where($qb->expr()->in($fieldName, ':in'));
+            ->where($qb->expr()->in('e.'.$fieldName, ':in'));
         $qb->setParameter(':in', $values);
         return $qb;
     }

@@ -148,7 +148,7 @@ $createSingleParams = [
     '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association.
         '<chainType>'=>[ // chainType can be: create, update, delete, read
             '<fieldName>'=>'<fieldValue>',
-            'assignType'=>'<set, add, or remove>'
+            'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>' // any time single is at the end of the assign type, then we strip the s off the end of the assignation name before calling the method. For instance if you have a relation of users, but you have a method of addUser you need use an assignType of addSingle.
         ]
     ]
 ];
@@ -159,7 +159,7 @@ $createBatchParams = [
         '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association.
             '<chainType>'=>[ // chainType can be: create, update, delete, read
                 '<fieldName>'=>'<fieldValue>',
-                'assignType'=>'<set, add, or remove>'
+                'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>'
             ]
         ]
     ]
@@ -170,7 +170,7 @@ $singleParams = [ // id will be passed as a separate argument
     '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association.
         '<chainType>'=>[ // chainType can be: create, update, delete, read
             '<fieldName>'=>'<fieldValue>',
-            'assignType'=>'<set, add, or remove>'
+            'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>'
         ]
     ]
 ];
@@ -183,7 +183,7 @@ $batchParams = [
                 '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association.
                     '<chainType>'=>[ // chainType can be: create, update, delete, read
                         '<fieldName>'=>'<fieldValue>',
-                        'assignType'=>'<set, add, or remove>'
+                        'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>'
                     ]
                 ]
             ]

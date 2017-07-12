@@ -20,6 +20,8 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
         ],
     ];
 
+    const IGNORE_KEYS = ['assignType'];
+
     public function __construct(EntityManager $entityManager)
     {
         $this->setEm($entityManager);
@@ -77,7 +79,7 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
                 $targetClass = $metadata->getAssociationTargetClass($fieldName);
                 $value = $this->fixScalarAssociationValue($value);
                 $this->bindAssociation($entity, $fieldName, $value, $targetClass);
-            } else {
+            } else if (!in_array($fieldName, static::IGNORE_KEYS, true)) {
                 $entity->setField($fieldName, $value);
             }
         }
@@ -166,10 +168,10 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
         if ($chainType !== null) {
             switch ($chainType) {
                 case 'create':
-                    $foundEntities = $repo->create($params, $chainOverrides);
+                    $foundEntities = $repo->create($params[$chainType], $chainOverrides);
                     break;
                 case 'read':
-                    $foundEntities = $this->findEntitiesFromArrayKeys($params, $repo);
+                    $foundEntities = $this->findEntitiesFromArrayKeys($params[$chainType], $repo);
                     break;
                 /*case 'update':
                     $foundEntity = $repo->update($info, $chainOverrides)[0];
@@ -191,9 +193,9 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
     protected function prepareAssociationParams (EntityAbstract $entity, string $associationName, array $paramsForEntities):array {
         /** @var array $paramsForEntities */
         foreach ($paramsForEntities as $key=>$paramsForEntity) {
-            if (isset($paramsForEntity['assignType'])) {
+            /*if (isset($paramsForEntity['assignType'])) {
                 unset($paramsForEntity['assignType']);
-            }
+            }*/
             $paramsForEntities[$key] = $entity->processAssociationParams($associationName, $paramsForEntity);
         }
         return $paramsForEntities;
