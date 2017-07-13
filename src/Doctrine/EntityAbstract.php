@@ -16,6 +16,7 @@ use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
 use Illuminate\Contracts\Validation\Factory;
 use TempestTools\Crud\Doctrine\Helper\EntityArrayHelper;
 use TempestTools\Crud\Contracts\EntityArrayHelper as EntityArrayHelperContract;
+use Doctrine\ORM\Mapping as ORM;
 
 
 abstract class EntityAbstract implements EventSubscriber, HasId
@@ -88,7 +89,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId
         }
 
         if (!$this->getArrayHelper() instanceof ArrayHelperContract) {
-            throw new \RuntimeException($this->getErrorFromConstant('noArrayHelper'));
+            throw new \RuntimeException($this->getErrorFromConstant('noArrayHelper')['message']);
         }
 
         if ($force !== true || $this->getConfigArrayHelper() === null) {
@@ -222,6 +223,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId
 
         $arrayHelper = $this->getConfigArrayHelper();
         $array = $arrayHelper->getArray();
+
         if (isset($array['setTo'])) {
             $this->ttPrePersistSetTo($array['setTo']);
         }
@@ -261,7 +263,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId
         $values = $this->getValuesOfFields($fields);
         $validator = $factory->make($values, $rules, $messages, $customAttributes);
         if ($validator->fails()) {
-            throw new RuntimeException($this->getErrorFromConstant('prePersistValidatorFails'));
+            throw new RuntimeException($this->getErrorFromConstant('prePersistValidatorFails')['message']);
         }
     }
 
@@ -272,7 +274,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId
      */
     public function getValidationFactory()
     {
-        throw new RuntimeException($this->getErrorFromConstant('validateFactoryNotIncluded'));
+        throw new RuntimeException($this->getErrorFromConstant('validateFactoryNotIncluded')['message']);
     }
 
     /**
@@ -294,7 +296,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $this->getArrayHelper()->parseClosure($closure, ['self' => $this]);
         if ($allowed === false) {
-            throw new RuntimeException($this->getErrorFromConstant('closureFails'));
+            throw new RuntimeException($this->getErrorFromConstant('closureFails')['message']);
         }
     }
 
@@ -332,11 +334,11 @@ abstract class EntityAbstract implements EventSubscriber, HasId
                     $methodName = $this->accessorMethodName('get', $key2);
                     $result2 = $result->$methodName();
                     if ($result2 !== $value2) {
-                        throw new RuntimeException($this->getErrorFromConstant('enforcementFails'));
+                        throw new RuntimeException($this->getErrorFromConstant('enforcementFails')['message']);
                     }
                 }
             } else if ($result !== $value) {
-                throw new RuntimeException($this->getErrorFromConstant('enforcementFails'));
+                throw new RuntimeException($this->getErrorFromConstant('enforcementFails')['message']);
             }
         }
     }
@@ -348,10 +350,10 @@ abstract class EntityAbstract implements EventSubscriber, HasId
     public function getValuesOfFields(array $fields = []): array
     {
         $result = [];
-        foreach ($fields as $key => $value) {
-            $methodName = $this->accessorMethodName('get', $key);
-            $value = $this->$methodName($value);
-            $result[$key] = $value;
+        foreach ($fields as $field) {
+            $methodName = $this->accessorMethodName('get', $field);
+            $value = $this->$methodName();
+            $result[$field] = $value;
         }
         return $result;
     }
