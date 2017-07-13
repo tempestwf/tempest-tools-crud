@@ -86,6 +86,9 @@ abstract class EntityAbstract implements EventSubscriber, HasId
 
         if ($fallBack !== null && ($force === true || $this->getTTFallBack() === null)) {
             $this->setTTFallBack($fallBack);
+            $path = $this->getTTFallBack();
+            $path[] = $mode;
+            $this->setTTFallBack($path);
         }
 
         if (!$this->getArrayHelper() instanceof ArrayHelperContract) {
