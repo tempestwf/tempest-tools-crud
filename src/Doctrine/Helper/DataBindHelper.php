@@ -121,7 +121,7 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
         $chainOverrides = ['transaction'=>false, 'flush'=>false];
         if ($params !== NULL) {
             foreach ($params as $chainType => $paramsForEntities) {
-                $paramsForEntities = $this->prepareAssociationParams($entity, $associationName, $params);
+                $paramsForEntities = $this->prepareAssociationParams($entity, $associationName, $paramsForEntities);
                 $foundEntities = $this->processChaining($chainType, $paramsForEntities, $chainOverrides, $repo);
 
                 if ($foundEntities !== null) {
@@ -168,10 +168,10 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
         if ($chainType !== null) {
             switch ($chainType) {
                 case 'create':
-                    $foundEntities = $repo->create($params[$chainType], $chainOverrides);
+                    $foundEntities = $repo->create($params, $chainOverrides);
                     break;
                 case 'read':
-                    $foundEntities = $this->findEntitiesFromArrayKeys($params[$chainType], $repo);
+                    $foundEntities = $this->findEntitiesFromArrayKeys($params, $repo);
                     break;
                 /*case 'update':
                     $foundEntity = $repo->update($info, $chainOverrides)[0];
@@ -193,9 +193,6 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
     protected function prepareAssociationParams (EntityAbstract $entity, string $associationName, array $paramsForEntities):array {
         /** @var array $paramsForEntities */
         foreach ($paramsForEntities as $key=>$paramsForEntity) {
-            /*if (isset($paramsForEntity['assignType'])) {
-                unset($paramsForEntity['assignType']);
-            }*/
             $paramsForEntities[$key] = $entity->processAssociationParams($associationName, $paramsForEntity);
         }
         return $paramsForEntities;
