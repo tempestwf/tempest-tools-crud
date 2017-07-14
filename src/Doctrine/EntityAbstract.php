@@ -218,37 +218,40 @@ abstract class EntityAbstract implements EventSubscriber, HasId
      */
     public function ttPrePersist()
     {
-        $eventArgs = $this->makeEventArgs([]);
-
-        // Give event listeners a chance to do something then pull out the args again
-        /** @noinspection NullPointerExceptionInspection */
-        $this->getEvm()->dispatchEvent(EntityEvents::PRE_PERSIST, $eventArgs);
-
         $arrayHelper = $this->getConfigArrayHelper();
-        $array = $arrayHelper->getArray();
+        if ($arrayHelper !== NULL) {
 
-        if (isset($array['setTo'])) {
-            $this->ttPrePersistSetTo($array['setTo']);
+            $eventArgs = $this->makeEventArgs([]);
+
+            // Give event listeners a chance to do something then pull out the args again
+            /** @noinspection NullPointerExceptionInspection */
+            $this->getEvm()->dispatchEvent(EntityEvents::PRE_PERSIST, $eventArgs);
+
+            $array = $arrayHelper->getArray();
+
+            if (isset($array['setTo'])) {
+                $this->ttPrePersistSetTo($array['setTo']);
+            }
+
+            if (isset($array['enforce'])) {
+                $this->ttPrePersistEnforce($array['enforce']);
+            }
+
+            if (isset($array['closure'])) {
+                $this->ttPrePersistClosure($array['closure']);
+            }
+
+            if (isset($array['mutate'])) {
+                $this->ttPrePersistMutate($array['mutate']);
+            }
+
+            if (isset($array['validate'])) {
+                $this->ttPrePersistValidate($array['validate']);
+            }
+
+            /** @noinspection NullPointerExceptionInspection */
+            $this->getEvm()->dispatchEvent(EntityEvents::POST_PERSIST, $eventArgs);
         }
-
-        if (isset($array['enforce'])) {
-            $this->ttPrePersistEnforce($array['enforce']);
-        }
-
-        if (isset($array['closure'])) {
-            $this->ttPrePersistClosure($array['closure']);
-        }
-
-        if (isset($array['mutate'])) {
-            $this->ttPrePersistMutate($array['mutate']);
-        }
-
-        if (isset($array['validate'])) {
-            $this->ttPrePersistValidate($array['validate']);
-        }
-
-        /** @noinspection NullPointerExceptionInspection */
-        $this->getEvm()->dispatchEvent(EntityEvents::POST_PERSIST, $eventArgs);
     }
 
     /**

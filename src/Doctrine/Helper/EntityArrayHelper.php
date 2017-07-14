@@ -273,7 +273,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $allowed = !(isset($fieldSettings['closure']) && $this->getArrayHelper()->parse($fieldSettings['closure'], $params) === false);
 
         if ($allowed === false && $noisy === true) {
-            throw new \RuntimeException(sprintf($this->getErrorFromConstant('closureFails')['message']), $fieldName);
+            throw new \RuntimeException(sprintf($this->getErrorFromConstant('closureFails')['message'], $fieldName));
         }
         return $allowed;
     }
@@ -297,7 +297,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
 
         // Any validation failure error out
         if ($allowed === false && $noisy === true) {
-            throw new \RuntimeException(sprintf($this->getErrorFromConstant('enforcementFails')['message']), $fieldName);
+            throw new \RuntimeException(sprintf($this->getErrorFromConstant('enforcementFails')['message'], $fieldName));
         }
 
         return $allowed;
