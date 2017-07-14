@@ -29,10 +29,10 @@ abstract class EntityAbstract implements EventSubscriber, HasId
             'message' => 'Error: No array helper on entity.',
         ],
         'assignTypeMustBe' => [
-            'message' => 'Error: Assign type must be set, add or remove.',
+            'message' => 'Error: Assign type must be set, add or remove. assignType = %s',
         ],
         'enforcementFails' => [
-            'message' => 'Error: A field is not set to it\'s enforced value.',
+            'message' => 'Error: A field is not set to it\'s enforced value. Value is %s, value should be %s',
         ],
         'closureFails' => [
             'message' => 'Error: A validation closure did not pass.',
@@ -175,7 +175,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId
             $this->getConfigArrayHelper()->canAssign($assignType, $associationName);
         }
         if (!in_array($assignType, ['set', 'add', 'remove', 'setSingle', 'addSingle', 'removeSingle'], true)) {
-            throw new \RuntimeException($this->getErrorFromConstant('assignTypeMustBe')['message']);
+            throw new \RuntimeException(sprintf($this->getErrorFromConstant('assignTypeMustBe')['message'], $assignType));
         }
 
         $methodName = $this->accessorMethodName($assignType, $associationName);
@@ -266,7 +266,13 @@ abstract class EntityAbstract implements EventSubscriber, HasId
         $values = $this->getValuesOfFields($fields);
         $validator = $factory->make($values, $rules, $messages, $customAttributes);
         if ($validator->fails()) {
-            throw new RuntimeException($this->getErrorFromConstant('prePersistValidatorFails')['message']);
+            $messages = $validator->getMessageBag()->all();
+            $errorMessage = '';
+            foreach ($messages as $key => $value) {
+                $errorMessage .= $value . ' ';
+            }
+            $errorMessage = $errorMessage === ''?$this->getErrorFromConstant('prePersistValidatorFails')['message']:$errorMessage;
+            throw new RuntimeException($errorMessage);
         }
     }
 
@@ -337,11 +343,11 @@ abstract class EntityAbstract implements EventSubscriber, HasId
                     $methodName = $this->accessorMethodName('get', $key2);
                     $result2 = $result->$methodName();
                     if ($result2 !== $value2) {
-                        throw new RuntimeException($this->getErrorFromConstant('enforcementFails')['message']);
+                        throw new RuntimeException(sprintf($this->getErrorFromConstant('enforcementFails')['message'], $result2, $value2));
                     }
                 }
             } else if ($result !== $value) {
-                throw new RuntimeException($this->getErrorFromConstant('enforcementFails')['message']);
+                throw new RuntimeException(sprintf($this->getErrorFromConstant('enforcementFails')['message'], $result, $value));
             }
         }
     }

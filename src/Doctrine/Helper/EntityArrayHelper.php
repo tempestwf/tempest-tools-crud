@@ -13,19 +13,19 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
 
     const ERRORS = [
         'chainTypeNotAllow'=>[
-            'message'=>'Error: Requested chain type not permitted.',
+            'message'=>'Error: Requested chain type not permitted. chainType = %s, relationName = %s.',
         ],
         'assignTypeNotAllow'=>[
-            'message'=>'Error: Requested assign type not permitted.',
+            'message'=>'Error: Requested assign type not permitted. assignType = %s, fieldName = %s.',
         ],
         'actionNotAllow'=>[
             'message'=>'Error: the requested action is not allowed on this entity for this request.'
         ],
         'enforcementFails' => [
-            'message' => 'Error: A field is not set to it\'s enforced value.',
+            'message' => 'Error: A field is not set to it\'s enforced value. fieldName = %s.',
         ],
         'closureFails' => [
-            'message' => 'Error: A validation closure did not pass.',
+            'message' => 'Error: A validation closure did not pass. fieldName = %s.',
         ],
     ];
 
@@ -56,7 +56,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $this->getArrayHelper()->parse($allowed, ['associationName'=>$associationName, 'chainType'=> $chainType, 'self'=>$this]);
         if ($nosey === true && $allowed === false) {
-            throw new \RuntimeException($this->getErrorFromConstant('chainTypeNotAllow')['message']);
+            throw new \RuntimeException(sprintf($this->getErrorFromConstant('chainTypeNotAllow')['message'], $chainType, $associationName));
         }
 
         return $allowed;
@@ -81,7 +81,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $this->getArrayHelper()->parse($allowed, ['associationName'=>$associationName, 'assignType'=> $assignType, 'self'=>$this]);
         if ($nosey === true && $allowed === false) {
-            throw new \RuntimeException($this->getErrorFromConstant('assignTypeNotAllow')['message']);
+            throw new \RuntimeException(sprintf($this->getErrorFromConstant('assignTypeNotAllow')['message'], $assignType, $associationName));
         }
         return $allowed;
     }
@@ -174,7 +174,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $allowed = $this->getArrayHelper()->testEnforceValues($values, $enforce, $params);
 
         if ($allowed === false && $nosey === true) {
-            throw new \RuntimeException($this->getErrorFromConstant('enforcementFails')['message']);
+            throw new \RuntimeException(sprintf($this->getErrorFromConstant('enforcementFails')['message'], $fieldName));
         }
     }
 
@@ -273,7 +273,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $allowed = !(isset($fieldSettings['closure']) && $this->getArrayHelper()->parse($fieldSettings['closure'], $params) === false);
 
         if ($allowed === false && $noisy === true) {
-            throw new \RuntimeException($this->getErrorFromConstant('closureFails')['message']);
+            throw new \RuntimeException(sprintf($this->getErrorFromConstant('closureFails')['message']), $fieldName);
         }
         return $allowed;
     }
@@ -297,7 +297,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
 
         // Any validation failure error out
         if ($allowed === false && $noisy === true) {
-            throw new \RuntimeException($this->getErrorFromConstant('enforcementFails')['message']);
+            throw new \RuntimeException(sprintf($this->getErrorFromConstant('enforcementFails')['message']), $fieldName);
         }
 
         return $allowed;
