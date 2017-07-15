@@ -173,12 +173,12 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
                 case 'read':
                     $foundEntities = $this->findEntitiesFromArrayKeys($params, $repo);
                     break;
-                /*case 'update':
-                    $foundEntity = $repo->update($info, $chainOverrides)[0];
+                case 'update':
+                    $foundEntities = $repo->update($params, $chainOverrides)[0];
                     break;
                 case 'delete':
-                    $foundEntity = $repo->delete($info, $chainOverrides)[0];
-                    break;*/
+                    $foundEntities = $repo->delete($params, $chainOverrides)[0];
+                    break;
             }
         }
         return $foundEntities;
