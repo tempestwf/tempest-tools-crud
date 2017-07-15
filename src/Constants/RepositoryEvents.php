@@ -21,7 +21,6 @@ class RepositoryEvents{
     const VERIFY_CREATE = 'verifyCreate';
     const PROCESS_RESULTS_CREATE = 'processResultsCreate';
     const POST_CREATE = 'postCreate';
-    const POST_COMMIT_CREATE = 'postCommitCreate';
     const POST_CREATE_BATCH = 'postCreateBatch';
 
     const PRE_READ = 'preRead';
@@ -29,7 +28,6 @@ class RepositoryEvents{
     const VERIFY_READ = 'verifyRead';
     const PROCESS_RESULTS_READ = 'processResultsRead';
     const POST_READ = 'postRead';
-    const POST_COMMIT_READ = 'postCommitRead';
 
     const PRE_UPDATE_BATCH = 'preUpdateBatch';
     const PRE_UPDATE = 'preUpdate';
@@ -37,7 +35,6 @@ class RepositoryEvents{
     const VERIFY_UPDATE = 'verifyUpdate';
     const PROCESS_RESULTS_UPDATE = 'processResultsUpdate';
     const POST_UPDATE = 'postUpdate';
-    const POST_COMMIT_UPDATE = 'postCommitUpdate';
     const POST_UPDATE_BATCH = 'postUpdateBatch';
 
     const PRE_DELETE_BATCH = 'preDeleteBatch';
@@ -46,7 +43,6 @@ class RepositoryEvents{
     const VERIFY_DELETE = 'verifyDelete';
     const PROCESS_RESULTS_DELETE = 'processResultsDelete';
     const POST_DELETE = 'postDelete';
-    const POST_COMMIT_DELETE = 'postCommitDelete';
     const POST_DELETE_BATCH = 'postDeleteBatch';
 
     /**
@@ -63,7 +59,6 @@ class RepositoryEvents{
             static::VERIFY_CREATE,
             static::PROCESS_RESULTS_CREATE,
             static::POST_CREATE,
-            static::POST_COMMIT_CREATE,
             static::POST_CREATE_BATCH,
 
             static::PRE_READ,
@@ -71,7 +66,6 @@ class RepositoryEvents{
             static::VERIFY_READ,
             static::PROCESS_RESULTS_READ,
             static::POST_READ,
-            static::POST_COMMIT_READ,
 
             static::PRE_UPDATE_BATCH,
             static::PRE_UPDATE,
@@ -79,7 +73,6 @@ class RepositoryEvents{
             static::VERIFY_UPDATE,
             static::PROCESS_RESULTS_UPDATE,
             static::POST_UPDATE,
-            static::POST_COMMIT_UPDATE,
             static::POST_UPDATE_BATCH,
 
             static::PRE_DELETE_BATCH,
@@ -88,7 +81,6 @@ class RepositoryEvents{
             static::VERIFY_DELETE,
             static::PROCESS_RESULTS_DELETE,
             static::POST_DELETE,
-            static::POST_COMMIT_DELETE,
             static::POST_DELETE_BATCH,
         ];
     }
