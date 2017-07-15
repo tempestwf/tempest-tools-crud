@@ -246,7 +246,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
             $count = count($values, COUNT_RECURSIVE);
 
             if ($count > $maxBatch) {
-                throw new \RuntimeException($this->getErrorFromConstant('moreRowsRequestedThanBatchMax'));
+                throw new \RuntimeException($this->getErrorFromConstant('moreRowsRequestedThanBatchMax')['message']);
             }
         }
     }
