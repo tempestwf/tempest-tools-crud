@@ -2,7 +2,6 @@
 namespace TempestTools\Crud\Contracts;
 
 use Doctrine\ORM\EntityManager;
-use TempestTools\Crud\Doctrine\EntityAbstract;
 use TempestTools\Common\Contracts\ArrayHelper as ArrayHelperContract;
 use TempestTools\Crud\Doctrine\RepositoryAbstract;
 
@@ -20,28 +19,28 @@ interface DataBindHelper {
     public function init(ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL, bool $force= true);
 
     /**
-     * @param EntityAbstract $entity
+     * @param Entity $entity
      * @param array $params
-     * @return EntityAbstract
+     * @return Entity
      */
-    public function bind(EntityAbstract $entity, array $params): EntityAbstract;
+    public function bind(Entity $entity, array $params): Entity;
 
     /** @noinspection MoreThanThreeArgumentsInspection
-     * @param EntityAbstract $entity
+     * @param Entity $entity
      * @param string $associationName
      * @param array $params
      * @param string $targetClass
      * @return
      */
-    public function bindAssociation(EntityAbstract $entity, string $associationName, array $params, string $targetClass);
+    public function bindAssociation(Entity $entity, string $associationName, array $params, string $targetClass);
 
     /**
      * @param array $entities
-     * @param EntityAbstract $targetEntity
+     * @param Entity $targetEntity
      * @param string $associationName
      * @throws \RuntimeException
      */
-    public function bindEntities (array $entities, EntityAbstract $targetEntity, string $associationName);
+    public function bindEntities (array $entities, Entity $targetEntity, string $associationName);
 
     /**
      * @param array $array

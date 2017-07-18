@@ -12,14 +12,14 @@ use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\EvmTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
 use TempestTools\Crud\Constants\EntityEvents;
+use TempestTools\Crud\Contracts\Entity;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
-use Illuminate\Contracts\Validation\Factory;
 use TempestTools\Crud\Doctrine\Helper\EntityArrayHelper;
 use TempestTools\Crud\Contracts\EntityArrayHelper as EntityArrayHelperContract;
 use Doctrine\ORM\Mapping as ORM;
 
 
-abstract class EntityAbstract implements EventSubscriber, HasId
+abstract class EntityAbstract implements EventSubscriber, HasId, Entity
 {
 
     use ArrayHelperTrait, ErrorConstantsTrait, TTConfigTrait, EvmTrait, AccessorMethodNameTrait;
@@ -27,9 +27,6 @@ abstract class EntityAbstract implements EventSubscriber, HasId
     const ERRORS = [
         'noArrayHelper' => [
             'message' => 'Error: No array helper on entity.',
-        ],
-        'assignTypeMustBe' => [
-            'message' => 'Error: Assign type must be set, add or remove. assignType = %s',
         ],
         'enforcementFails' => [
             'message' => 'Error: A field is not set to it\'s enforced value. Value is %s, value should be %s',
@@ -39,9 +36,6 @@ abstract class EntityAbstract implements EventSubscriber, HasId
         ],
         'validateFactoryNotIncluded' => [
             'message' => 'Error: Validation factory is not included on this class.',
-        ],
-        'prePersistValidatorFails' => [
-            'message' => 'Error: Validation failed on pre-persist.',
         ]
     ];
     /**
@@ -164,18 +158,15 @@ abstract class EntityAbstract implements EventSubscriber, HasId
     /**
      * @param string $assignType
      * @param string $associationName
-     * @param EntityAbstract $entity
+     * @param Entity $entity
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function bindAssociation(string $assignType, string $associationName, EntityAbstract $entity = null, $force = false)
+    public function bindAssociation(string $assignType, string $associationName, Entity $entity = null, $force = false)
     {
         if ($force === false) {
             /** @noinspection NullPointerExceptionInspection */
             $this->getConfigArrayHelper()->canAssign($assignType, $associationName);
-        }
-        if (!in_array($assignType, ['set', 'add', 'remove', 'setSingle', 'addSingle', 'removeSingle'], true)) {
-            throw new \RuntimeException(sprintf($this->getErrorFromConstant('assignTypeMustBe')['message'], $assignType));
         }
 
         $methodName = $this->accessorMethodName($assignType, $associationName);
@@ -227,57 +218,14 @@ abstract class EntityAbstract implements EventSubscriber, HasId
             /** @noinspection NullPointerExceptionInspection */
             $this->getEvm()->dispatchEvent(EntityEvents::PRE_PERSIST, $eventArgs);
 
-            $array = $arrayHelper->getArray();
-
-            if (isset($array['setTo'])) {
-                $this->ttPrePersistSetTo($array['setTo']);
-            }
-
-            if (isset($array['enforce'])) {
-                $this->ttPrePersistEnforce($array['enforce']);
-            }
-
-            if (isset($array['closure'])) {
-                $this->ttPrePersistClosure($array['closure']);
-            }
-
-            if (isset($array['mutate'])) {
-                $this->ttPrePersistMutate($array['mutate']);
-            }
-
-            if (isset($array['validate'])) {
-                $this->ttPrePersistValidate($array['validate']);
-            }
+            $arrayHelper->processPrePersist($this);
 
             /** @noinspection NullPointerExceptionInspection */
             $this->getEvm()->dispatchEvent(EntityEvents::POST_PERSIST, $eventArgs);
         }
     }
 
-    /**
-     * @param array $validate
-     * @throws \RuntimeException
-     */
-    protected function ttPrePersistValidate(array $validate)
-    {
-        /** @var Factory $factory */
-        $factory = $this->getValidationFactory();
-        $fields = $validate['fields'] ?? array_keys($validate['rules']);
-        $rules = $validate['rules'] ?? [];
-        $messages = $validate['messages'] ?? [];
-        $customAttributes = $validate['customAttributes'] ?? [];
-        $values = $this->getValuesOfFields($fields);
-        $validator = $factory->make($values, $rules, $messages, $customAttributes);
-        if ($validator->fails()) {
-            $messages = $validator->getMessageBag()->all();
-            $errorMessage = '';
-            foreach ($messages as $key => $value) {
-                $errorMessage .= $value . ' ';
-            }
-            $errorMessage = $errorMessage === ''?$this->getErrorFromConstant('prePersistValidatorFails')['message']:$errorMessage;
-            throw new RuntimeException($errorMessage);
-        }
-    }
+
 
     /**
      * Needs extending in a child class to get a validation factory to use
@@ -289,71 +237,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId
         throw new RuntimeException($this->getErrorFromConstant('validateFactoryNotIncluded')['message']);
     }
 
-    /**
-     * @param callable $closure
-     * @throws \RuntimeException
-     */
-    protected function ttPrePersistMutate(Callable $closure)
-    {
-        /** @noinspection NullPointerExceptionInspection */
-        $this->getArrayHelper()->parseClosure($closure, ['self' => $this]);
-    }
 
-    /**
-     * @param callable $closure
-     * @throws \RuntimeException
-     */
-    protected function ttPrePersistClosure(Callable $closure)
-    {
-        /** @noinspection NullPointerExceptionInspection */
-        $allowed = $this->getArrayHelper()->parseClosure($closure, ['self' => $this]);
-        if ($allowed === false) {
-            throw new RuntimeException($this->getErrorFromConstant('closureFails')['message']);
-        }
-    }
-
-    /**
-     * @param array $values
-     */
-    protected function ttPrePersistSetTo(array $values)
-    {
-        $extra = ['self' => $this];
-        foreach ($values as $key => $value) {
-            /** @noinspection NullPointerExceptionInspection */
-            $value = $this->getArrayHelper()->parse($value, $extra);
-            $methodName = $this->accessorMethodName('set', $key);
-            $this->$methodName($value);
-        }
-    }
-
-    /**
-     * @param array $values
-     * @throws \RuntimeException
-     */
-    protected function ttPrePersistEnforce(array $values)
-    {
-        $extra = ['self' => $this];
-        foreach ($values as $key => $value) {
-            /** @noinspection NullPointerExceptionInspection */
-            $value = $this->getArrayHelper()->parse($value, $extra);
-            $methodName = $this->accessorMethodName('get', $key);
-            $result = $this->$methodName();
-            if (!is_scalar($result)) {
-                /** @var array $value */
-                foreach ($value as $key2 => $value2) {
-                    /** @noinspection NullPointerExceptionInspection */
-                    $value2 = $this->getArrayHelper()->parse($value2, $extra);
-                    $methodName = $this->accessorMethodName('get', $key2);
-                    $result2 = $result->$methodName();
-                    if ($result2 !== $value2) {
-                        throw new RuntimeException(sprintf($this->getErrorFromConstant('enforcementFails')['message'], $result2, $value2));
-                    }
-                }
-            } else if ($result !== $value) {
-                throw new RuntimeException(sprintf($this->getErrorFromConstant('enforcementFails')['message'], $result, $value));
-            }
-        }
-    }
 
     /**
      * @param array $fields

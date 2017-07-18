@@ -125,4 +125,10 @@ interface EntityArrayHelper extends ArrayHelper
      * @throws \RuntimeException
      */
     public function enforceField(string $fieldName, $value, array $params, array $fieldSettings = null, bool $noisy = true): bool;
+
+    /**
+     * @param Entity $entity
+     * @throws \RuntimeException
+     */
+    public function processPrePersist(Entity $entity);
 }

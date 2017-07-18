@@ -12,6 +12,7 @@ use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\EvmTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
 use TempestTools\Crud\Constants\RepositoryEvents;
+use TempestTools\Crud\Contracts\Entity;
 use TempestTools\Crud\Contracts\QueryHelper as QueryHelperContract;
 use TempestTools\Crud\Contracts\DataBindHelper as DataBindHelperContract;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
@@ -256,7 +257,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
 
     /**
      * @param GenericEventArgs $eventArgs
-     * @return EntityAbstract
+     * @return Entity
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Mockery\Exception
@@ -264,7 +265,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    protected function doCreateSingle(GenericEventArgs $eventArgs): EntityAbstract
+    protected function doCreateSingle(GenericEventArgs $eventArgs): Entity
     {
         $className = $this->getClassName();
         /** @var EntityAbstract $entity */
@@ -318,7 +319,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
 
     /**
      * @param GenericEventArgs $eventArgs
-     * @param EntityAbstract $entity
+     * @param Entity $entity
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Doctrine\DBAL\ConnectionException
@@ -326,7 +327,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    protected function doUpdate (GenericEventArgs $eventArgs, EntityAbstract $entity) {
+    protected function doUpdate (GenericEventArgs $eventArgs, Entity $entity) {
         $evm = $this->getEvm();
         $evm->dispatchEvent(RepositoryEvents::PRE_UPDATE, $eventArgs);
         $evm->dispatchEvent(RepositoryEvents::VALIDATE_UPDATE, $eventArgs);
@@ -383,7 +384,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
 
     /**
      * @param GenericEventArgs $eventArgs
-     * @param EntityAbstract $entity
+     * @param Entity $entity
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Doctrine\DBAL\ConnectionException
@@ -391,7 +392,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    protected function doDelete (GenericEventArgs $eventArgs, EntityAbstract $entity) {
+    protected function doDelete (GenericEventArgs $eventArgs, Entity $entity) {
         $evm = $this->getEvm();
         $evm->dispatchEvent(RepositoryEvents::PRE_DELETE, $eventArgs);
         $evm->dispatchEvent(RepositoryEvents::VALIDATE_DELETE, $eventArgs);
@@ -404,9 +405,9 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
 
     /**
      * @param GenericEventArgs $eventArgs
-     * @param EntityAbstract $entity
+     * @param Entity $entity
      * @param bool $remove
-     * @return EntityAbstract
+     * @return Entity
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Mockery\Exception
@@ -414,7 +415,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    protected function processSingleEntity (GenericEventArgs $eventArgs, EntityAbstract $entity, bool $remove=false): EntityAbstract
+    protected function processSingleEntity (GenericEventArgs $eventArgs, Entity $entity, bool $remove=false): Entity
     {
         $entitiesShareConfigs = $eventArgs->getArgs()['entitiesShareConfigs'];
         if ($entitiesShareConfigs === true) {

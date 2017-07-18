@@ -2,11 +2,14 @@
 namespace TempestTools\Crud\Doctrine\Helper;
 
 
+use RuntimeException;
 use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
+use TempestTools\Crud\Contracts\Entity;
 use TempestTools\Crud\Contracts\EntityArrayHelper as EntityArrayHelperContract;
+use Illuminate\Contracts\Validation\Factory;
 
 class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract{
     use TTConfigTrait, ErrorConstantsTrait, ArrayHelperTrait;
@@ -27,13 +30,19 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         'closureFails' => [
             'message' => 'Error: A validation closure did not pass. fieldName = %s.',
         ],
+        'assignTypeMustBe' => [
+            'message' => 'Error: Assign type must be set, add or remove. assignType = %s',
+        ],
+        'prePersistValidatorFails' => [
+            'message' => 'Error: Validation failed on pre-persist.',
+        ],
     ];
 
     /**
      * @param string $fieldName
      * @param string $keyName
      * @return mixed
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function getConfigForField(string $fieldName, string $keyName)
     {
@@ -45,7 +54,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param string $chainType
      * @param bool $nosey
      * @return bool
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function canChain (string $associationName, string $chainType, bool $nosey = true):bool {
         /** @noinspection NullPointerExceptionInspection */
@@ -56,7 +65,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $this->getArrayHelper()->parse($allowed, ['associationName'=>$associationName, 'chainType'=> $chainType, 'self'=>$this]);
         if ($nosey === true && $allowed === false) {
-            throw new \RuntimeException(sprintf($this->getErrorFromConstant('chainTypeNotAllow')['message'], $chainType, $associationName));
+            throw new RuntimeException(sprintf($this->getErrorFromConstant('chainTypeNotAllow')['message'], $chainType, $associationName));
         }
 
         return $allowed;
@@ -70,9 +79,14 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param array $fieldSettings
      * @param bool $nosey
      * @return bool
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function canAssign (string $associationName, string $assignType, array $fieldSettings = NULL, bool $nosey = true):bool {
+
+        if (!in_array($assignType, ['set', 'add', 'remove', 'setSingle', 'addSingle', 'removeSingle'], true)) {
+            throw new RuntimeException(sprintf($this->getErrorFromConstant('assignTypeMustBe')['message'], $assignType));
+        }
+
         /** @noinspection NullPointerExceptionInspection */
         $actionSettings = $this->getArray();
         $fieldSettings = $fieldSettings ?? $this->getFieldSettings($associationName);
@@ -81,7 +95,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $this->getArrayHelper()->parse($allowed, ['associationName'=>$associationName, 'assignType'=> $assignType, 'self'=>$this]);
         if ($nosey === true && $allowed === false) {
-            throw new \RuntimeException(sprintf($this->getErrorFromConstant('assignTypeNotAllow')['message'], $assignType, $associationName));
+            throw new RuntimeException(sprintf($this->getErrorFromConstant('assignTypeNotAllow')['message'], $assignType, $associationName));
         }
         return $allowed;
     }
@@ -89,7 +103,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     /**
      * @param bool $nosey
      * @return bool
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function allowed ($nosey = true):bool {
 
@@ -100,7 +114,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $this->getArrayHelper()->parse($allowed, ['self'=>$this]);
         if ($nosey === true && $allowed === false) {
-            throw new \RuntimeException($this->getErrorFromConstant('actionNotAllow')['message']);
+            throw new RuntimeException($this->getErrorFromConstant('actionNotAllow')['message']);
         }
         return $allowed;
     }
@@ -108,7 +122,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     /**
      * @param string $fieldName
      * @return bool
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function checkFastMode(string $fieldName):bool {
 
@@ -125,7 +139,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param string $fieldName
      * @param $params
      * @return array
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function getFieldSettings (string $fieldName, array $params = []):array {
         $fieldSettings = $this->parseArrayPath(['fields', $fieldName], $params);
@@ -136,7 +150,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     /**
      * @param array $params
      * @return mixed
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function processSetField (array $params) {
         $fieldName = $params['fieldName'];
@@ -160,7 +174,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param array $params
      * @param array|null $fieldSettings
      * @param bool $nosey
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function enforceRelation(string $fieldName, array $values, array $params = [], array $fieldSettings=NULL, bool $nosey = true) {
         // Get the settings for the field so we can do quick comparisons
@@ -174,7 +188,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $allowed = $this->getArrayHelper()->testEnforceValues($values, $enforce, $params);
 
         if ($allowed === false && $nosey === true) {
-            throw new \RuntimeException(sprintf($this->getErrorFromConstant('enforcementFails')['message'], $fieldName));
+            throw new RuntimeException(sprintf($this->getErrorFromConstant('enforcementFails')['message'], $fieldName));
         }
     }
 
@@ -183,7 +197,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param array $values
      * @param array $params
      * @param array|null $fieldSettings
-     * @throws \RuntimeException
+     * @throws RuntimeException
      * @return array
      */
     public function setToOnAssociation(string $associationName, array $values, array $params = [], array $fieldSettings=NULL):array {
@@ -200,7 +214,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
 
     /**
      * @param array $params
-     * @throws \RuntimeException
+     * @throws RuntimeException
      * @return array
      */
     public function processAssociationParams(array $params):array {
@@ -231,7 +245,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param $value
      * @param array|null $fieldSettings
      * @return
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function mutateOnField (string $fieldName, $params, $value, array $fieldSettings = NULL) {
         // Get the settings for the field so we can do quick comparisons
@@ -247,7 +261,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param $value
      * @param array|null $fieldSettings
      * @return
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function setToOnField (string $fieldName, $params, $value, array $fieldSettings = NULL) {
         // Get the settings for the field so we can do quick comparisons
@@ -264,7 +278,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param array|null $fieldSettings
      * @param bool $noisy
      * @return bool
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function closureOnField (string $fieldName, array $params, array $fieldSettings = NULL, bool $noisy = true):bool {
         // Get the settings for the field so we can do quick comparisons
@@ -273,7 +287,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $allowed = !(isset($fieldSettings['closure']) && $this->getArrayHelper()->parse($fieldSettings['closure'], $params) === false);
 
         if ($allowed === false && $noisy === true) {
-            throw new \RuntimeException(sprintf($this->getErrorFromConstant('closureFails')['message'], $fieldName));
+            throw new RuntimeException(sprintf($this->getErrorFromConstant('closureFails')['message'], $fieldName));
         }
         return $allowed;
     }
@@ -286,7 +300,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param array|null $fieldSettings
      * @param bool $noisy
      * @return bool
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function enforceField (string $fieldName, $value, array $params, array $fieldSettings = NULL, bool $noisy = true):bool {
         // Get the settings for the field so we can do quick comparisons
@@ -297,10 +311,130 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
 
         // Any validation failure error out
         if ($allowed === false && $noisy === true) {
-            throw new \RuntimeException(sprintf($this->getErrorFromConstant('enforcementFails')['message'], $fieldName));
+            throw new RuntimeException(sprintf($this->getErrorFromConstant('enforcementFails')['message'], $fieldName));
         }
 
         return $allowed;
+    }
+
+    /**
+     * @param Entity $entity
+     * @throws \RuntimeException
+     */
+    public function processPrePersist(Entity $entity) {
+        $array = $this->getArray();
+
+        if (isset($array['setTo'])) {
+            $this->prePersistSetTo($array['setTo'], $entity);
+        }
+
+        if (isset($array['enforce'])) {
+            $this->prePersistEnforce($array['enforce'], $entity);
+        }
+
+        if (isset($array['closure'])) {
+            $this->prePersistClosure($array['closure'], $entity);
+        }
+
+        if (isset($array['mutate'])) {
+            $this->prePersistMutate($array['mutate'], $entity);
+        }
+
+        if (isset($array['validate'])) {
+            $this->prePersistValidate($array['validate'], $entity);
+        }
+    }
+
+    /**
+     * @param array $validate
+     * @param Entity $entity
+     * @throws \RuntimeException
+     */
+    protected function prePersistValidate(array $validate, Entity $entity)
+    {
+        /** @var Factory $factory */
+        $factory = $entity->getValidationFactory();
+        $fields = $validate['fields'] ?? array_keys($validate['rules']);
+        $rules = $validate['rules'] ?? [];
+        $messages = $validate['messages'] ?? [];
+        $customAttributes = $validate['customAttributes'] ?? [];
+        $values = $entity->getValuesOfFields($fields);
+        $validator = $factory->make($values, $rules, $messages, $customAttributes);
+        if ($validator->fails()) {
+            $messages = $validator->getMessageBag()->all();
+            $errorMessage = implode(' \n', $messages);
+            $errorMessage = $errorMessage === ''?$this->getErrorFromConstant('prePersistValidatorFails')['message']:$errorMessage;
+            throw new RuntimeException($errorMessage);
+        }
+    }
+
+    /**
+     * @param callable $closure
+     * @param Entity $entity
+     */
+    protected function prePersistMutate(Callable $closure, Entity $entity)
+    {
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getArrayHelper()->parseClosure($closure, ['self' => $entity]);
+    }
+
+    /**
+     * @param callable $closure
+     * @param Entity $entity
+     * @throws \RuntimeException
+     */
+    protected function prePersistClosure(Callable $closure, Entity $entity)
+    {
+        /** @noinspection NullPointerExceptionInspection */
+        $allowed = $this->getArrayHelper()->parseClosure($closure, ['self' => $entity]);
+        if ($allowed === false) {
+            throw new RuntimeException($this->getErrorFromConstant('closureFails')['message']);
+        }
+    }
+
+    /**
+     * @param array $values
+     * @param Entity $entity
+     */
+    protected function prePersistSetTo(array $values, Entity $entity)
+    {
+        $extra = ['self' => $this];
+        foreach ($values as $key => $value) {
+            /** @noinspection NullPointerExceptionInspection */
+            $value = $this->getArrayHelper()->parse($value, $extra);
+            $methodName = $entity->accessorMethodName('set', $key);
+            $entity->$methodName($value);
+        }
+    }
+
+    /**
+     * @param array $values
+     * @param Entity $entity
+     * @throws \RuntimeException
+     */
+    protected function prePersistEnforce(array $values, Entity $entity)
+    {
+        $extra = ['self' => $entity];
+        foreach ($values as $key => $value) {
+            /** @noinspection NullPointerExceptionInspection */
+            $value = $this->getArrayHelper()->parse($value, $extra);
+            $methodName = $entity->accessorMethodName('get', $key);
+            $result = $entity->$methodName();
+            if (!is_scalar($result)) {
+                /** @var array $value */
+                foreach ($value as $key2 => $value2) {
+                    /** @noinspection NullPointerExceptionInspection */
+                    $value2 = $this->getArrayHelper()->parse($value2, $extra);
+                    $methodName = $entity->accessorMethodName('get', $key2);
+                    $result2 = $result->$methodName();
+                    if ($result2 !== $value2) {
+                        throw new RuntimeException(sprintf($this->getErrorFromConstant('enforcementFails')['message'], $result2, $value2));
+                    }
+                }
+            } else if ($result !== $value) {
+                throw new RuntimeException(sprintf($this->getErrorFromConstant('enforcementFails')['message'], $result, $value));
+            }
+        }
     }
 }
 ?>

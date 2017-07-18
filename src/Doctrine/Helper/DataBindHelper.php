@@ -7,6 +7,7 @@ use TempestTools\Common\Doctrine\Utility\EmTrait;
 use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
+use TempestTools\Crud\Contracts\Entity;
 use TempestTools\Crud\Doctrine\EntityAbstract;
 use TempestTools\Crud\Doctrine\RepositoryAbstract;
 use TempestTools\Common\Contracts\ArrayHelper as ArrayHelperContract;
@@ -55,9 +56,9 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
     }
 
     /**
-     * @param EntityAbstract $entity
+     * @param Entity $entity
      * @param array $params
-     * @return EntityAbstract
+     * @return Entity
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \RuntimeException
      * @throws \Mockery\Exception
@@ -65,7 +66,7 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \InvalidArgumentException
      */
-    public function bind(EntityAbstract $entity, array $params): EntityAbstract
+    public function bind(Entity $entity, array $params): Entity
     {
         /** @noinspection NullPointerExceptionInspection */
         $entity->allowed();
@@ -104,7 +105,7 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
-     * @param EntityAbstract $entity
+     * @param Entity $entity
      * @param string $associationName
      * @param array $params
      * @param string $targetClass
@@ -115,7 +116,7 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      */
-    public function bindAssociation(EntityAbstract $entity, string $associationName, array $params = NULL, string $targetClass)
+    public function bindAssociation(Entity $entity, string $associationName, array $params = NULL, string $targetClass)
     {
         $repo = $this->getRepoForRelation($targetClass);
         $chainOverrides = ['transaction'=>false, 'flush'=>false];
@@ -135,11 +136,11 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
 
     /**
      * @param array $entities
-     * @param EntityAbstract $targetEntity
+     * @param Entity $targetEntity
      * @param string $associationName
      * @throws \RuntimeException
      */
-    public function bindEntities (array $entities, EntityAbstract $targetEntity, string $associationName) {
+    public function bindEntities (array $entities, Entity $targetEntity, string $associationName) {
         foreach ($entities as $foundEntity) {
             $params = $foundEntity->getBindParams();
             $assignType = $params['assignType'];
@@ -184,13 +185,13 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
         return $foundEntities;
     }
     /**
-     * @param EntityAbstract $entity
+     * @param Entity $entity
      * @param string $associationName
      * @param array $paramsForEntities
      * @return array
      * @throws \RuntimeException
      */
-    protected function prepareAssociationParams (EntityAbstract $entity, string $associationName, array $paramsForEntities):array {
+    protected function prepareAssociationParams (Entity $entity, string $associationName, array $paramsForEntities):array {
         /** @var array $paramsForEntities */
         foreach ($paramsForEntities as $key=>$paramsForEntity) {
             $paramsForEntities[$key] = $entity->processAssociationParams($associationName, $paramsForEntity);
