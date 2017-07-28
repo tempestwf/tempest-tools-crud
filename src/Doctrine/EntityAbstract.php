@@ -64,7 +64,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId, Entity
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function init(string $mode, ArrayHelperContract $arrayHelper = null, array $path = null, array $fallBack = null, bool $force = true)
+    public function init(string $mode, ArrayHelperContract $arrayHelper = null, array $path = null, array $fallBack = null, bool $force = false)
     {
         if ($arrayHelper !== null && ($force === true || $this->getArrayHelper() === null)) {
             $this->setArrayHelper($arrayHelper);
@@ -89,7 +89,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId, Entity
             throw new \RuntimeException($this->getErrorFromConstant('noArrayHelper')['message']);
         }
 
-        if ($force !== true || $this->getConfigArrayHelper() === null) {
+        if ($force === true || $this->getConfigArrayHelper() === null) {
             $entityArrayHelper = new EntityArrayHelper();
             $entityArrayHelper->setArrayHelper($this->getArrayHelper());
             $this->parseTTConfig($entityArrayHelper);
