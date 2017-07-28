@@ -119,7 +119,7 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
     public function bindAssociation(Entity $entity, string $associationName, array $params = NULL, string $targetClass)
     {
         $repo = $this->getRepoForRelation($targetClass);
-        $chainOverrides = ['transaction'=>false, 'flush'=>false];
+        $chainOverrides = ['transaction'=>false, 'flush'=>false, 'batchMax'=>null];
         if ($params !== NULL) {
             foreach ($params as $chainType => $paramsForEntities) {
                 $paramsForEntities = $this->prepareAssociationParams($entity, $associationName, $paramsForEntities);
