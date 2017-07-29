@@ -143,7 +143,7 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
     public function bindEntities (array $entities, Entity $targetEntity, string $associationName) {
         foreach ($entities as $foundEntity) {
             $params = $foundEntity->getBindParams();
-            $assignType = $params['assignType'];
+            $assignType = $params['assignType'] ?? null;
             $targetEntity->bindAssociation($assignType, $associationName, $foundEntity, true);
         }
     }
@@ -175,10 +175,10 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
                     $foundEntities = $this->findEntitiesFromArrayKeys($params, $repo);
                     break;
                 case 'update':
-                    $foundEntities = $repo->update($params, $chainOverrides)[0];
+                    $foundEntities = $repo->update($params, $chainOverrides);
                     break;
                 case 'delete':
-                    $foundEntities = $repo->delete($params, $chainOverrides)[0];
+                    $foundEntities = $repo->delete($params, $chainOverrides);
                     break;
             }
         }

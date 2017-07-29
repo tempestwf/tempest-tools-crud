@@ -204,7 +204,8 @@ $backendOptions = [
         'transaction'=>'<true or false to wrap everythign in a transations>',
         'entitiesShareConfigs'=>'<if true then to optimize the process configs during batches the same config is used for each entity processed, to save reprocessing time>',
         'flush' => '<whether or not to automatically flush>',
-        'batchMax' => '<the max we can do in one batch>'
+        'batchMax' => '<the max we can do in one batch>',
+        'queryMaxParams' => 'the max number of query params that can be passed in to a read request'
     ]
 ];
 

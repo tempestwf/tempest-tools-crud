@@ -162,15 +162,18 @@ abstract class EntityAbstract implements EventSubscriber, HasId, Entity
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function bindAssociation(string $assignType, string $associationName, Entity $entity = null, $force = false)
+    public function bindAssociation(string $assignType=null, string $associationName, Entity $entity = null, $force = false)
     {
         if ($force === false) {
             /** @noinspection NullPointerExceptionInspection */
             $this->getConfigArrayHelper()->canAssign($assignType, $associationName);
         }
 
-        $methodName = $this->accessorMethodName($assignType, $associationName);
-        $this->$methodName($entity);
+        if ($assignType !== null) {
+            $methodName = $this->accessorMethodName($assignType, $associationName);
+            $this->$methodName($entity);
+        }
+
     }
 
     /**
