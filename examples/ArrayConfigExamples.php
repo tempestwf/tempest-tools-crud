@@ -7,7 +7,7 @@ $readInfo = [
         'where'=>[
             '<keyName>'=>[
                 'type'=>'<null, and, or>',
-                'value'=>'<string>'
+                'value'=>'<string>' // If an array of: ['xpr'=>'<xpr name>', 'arguments'=>['<arguments, could be another xpr array>']] is used, then all parts will be parsed by the array helper, and corresponding xpr methods will be called with the specified arguments.
             ]
         ],
         'having'=>[
@@ -235,16 +235,16 @@ $entityInfo = [
                 'assign'=>[ // Note: all combinations of assign type as not tested, but there component parts are tested and shown to work.
                     'set'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
                     'add'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
-                    'remove'=>'<true or false>',
+                    'remove'=>'<true or false>',//Tested in: testChainRemove
                     'setSingle'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
                     'addSingle'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
-                    'removeSingle'=>'<true or false>',
-                    'null'=>'<true or false>' // Whether or having no assign type is allowed
+                    'removeSingle'=>'<true or false>', //Tested in: testChainRemove
+                    'null'=>'<true or false>' // Tested in: testNullAssignType. Whether or not having no assign type is allowed
                 ],
                 'chain'=>[
                     'create'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
-                    'update'=>'<true or false>',
-                    'delete'=>'<true or false>',
+                    'update'=>'<true or false>', //Tested in: testUpdateWithChainAndEvents
+                    'delete'=>'<true or false>', //Tested in: testMultiDeleteAndEvents
                     'read'=>'<true or false>' //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
                 ]
             ]
@@ -253,42 +253,42 @@ $entityInfo = [
             '<custom option name>'=>'<custom option value>',
         ]
     ],
-    // TODO: move from above when tests are done
     'update'=>[
-        'allowed'=>'<true or false>',
-        'permissive'=>'<true or false>',
-        'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>',
-        'validate'=>[
+        'allowed'=>'<true or false>', //Tested in: testAllowedWorks
+        'permissive'=>'<true or false>',//Tested in: testPermissiveWorks1
+        'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>', //Tested in: testFastMode1
+        'validate'=>[ // Tested in: testValidatorWorks
             'fields'=>['<array of fields to validate>'], // if not set the keys from rules will be used instead
-            'rules'=>['<rules>'],
+            'rules'=>['<rules>'], // Tested in: testValidatorWorks
             'messages'=>['<messages>'],
             'customAttributes'=>['<customAttributes>'],
         ],
-        'setTo'=>'<array of field names with values to set them to, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>',
-        'enforce'=>'<array of field names with values to make sure they match, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>',
-        'closure'=>'<validation closure>',
-        'mutate'=>'<mutate closure>',
+        'setTo'=>'<array of field names with values to set them to, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>', // Tested In: testTopLevelSetToAndMutate
+        'enforce'=>'<array of field names with values to make sure they match, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>', // Tested in: testEnforceTopLevelWorks
+        'closure'=>'<validation closure>', // Tested in: testTopLevelClosure
+        'mutate'=>'<mutate closure>', // Tested In: testTopLevelSetToAndMutate
         'fields'=>[
             '<field name>'=>[
-                'permissive'=>'<true or false>',
-                'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>',
-                'setTo'=>'<a value to set it to>',
-                'enforce'=>'<error if not this value, this can be array if used on a relation>',
-                'closure'=>'<validation closure>',
-                'mutate'=>'<mutate closure>',
-                'assign'=>[
+                'permissive'=>'<true or false>', //Tested in: testPermissiveWorks1 / testPermissiveWorks2
+                'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>', //Tested in: testFastMode2AndLowLevelSetTo
+                'setTo'=>'<a value to set it to>', //Tested in: testFastMode2AndLowLevelSetTo
+                'enforce'=>'<error if not this value, this can be array if used on a relation>', // Tested in: testLowLevelEnforce and testLowLevelEnforceOnRelation
+                'closure'=>'<validation closure>', // Tested in testLowLevelClosure
+                'mutate'=>'<mutate closure>', // Tested in testLowLevelMutate
+                'assign'=>[ // Note: all combinations of assign type as not tested, but there component parts are tested and shown to work.
                     'set'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
-                    'add'=>'<true or false>',
-                    'remove'=>'<true or false>',
-                    'setSingle'=>'<true or false>',
+                    'add'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
+                    'remove'=>'<true or false>',//Tested in: testChainRemove
+                    'setSingle'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
                     'addSingle'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
-                    'removeSingle'=>'<true or false>',
+                    'removeSingle'=>'<true or false>', //Tested in: testChainRemove
+                    'null'=>'<true or false>' // Tested in: testNullAssignType. Whether or not having no assign type is allowed
                 ],
                 'chain'=>[
-                    'create'=>'<true or false>',
-                    'update'=>'<true or false>',
-                    'delete'=>'<true or false>',
-                    'read'=>'<true or false>'
+                    'create'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
+                    'update'=>'<true or false>', //Tested in: testUpdateWithChainAndEvents
+                    'delete'=>'<true or false>', //Tested in: testMultiDeleteAndEvents
+                    'read'=>'<true or false>' //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
                 ]
             ]
         ],
@@ -296,39 +296,42 @@ $entityInfo = [
             '<custom option name>'=>'<custom option value>',
         ]
     ],
-    // TODO: move from above when tests are done
     'delete'=>[
-        'allowed'=>'<true or false>',
-        'permissive'=>'<true or false>',
-        'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>',
-        'validate'=>[
+        'allowed'=>'<true or false>', //Tested in: testAllowedWorks
+        'permissive'=>'<true or false>',//Tested in: testPermissiveWorks1
+        'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>', //Tested in: testFastMode1
+        'validate'=>[ // Tested in: testValidatorWorks
             'fields'=>['<array of fields to validate>'], // if not set the keys from rules will be used instead
-            'rules'=>['<rules>'],
+            'rules'=>['<rules>'], // Tested in: testValidatorWorks
             'messages'=>['<messages>'],
             'customAttributes'=>['<customAttributes>'],
         ],
-        'setTo'=>'<array of field names with values to set them to, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>',
-        'enforce'=>'<array of field names with values to make sure they match, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>',
-        'closure'=>'<validation closure>',
-        'mutate'=>'<mutate closure>',
+        'setTo'=>'<array of field names with values to set them to, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>', // Tested In: testTopLevelSetToAndMutate
+        'enforce'=>'<array of field names with values to make sure they match, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>', // Tested in: testEnforceTopLevelWorks
+        'closure'=>'<validation closure>', // Tested in: testTopLevelClosure
+        'mutate'=>'<mutate closure>', // Tested In: testTopLevelSetToAndMutate
         'fields'=>[
             '<field name>'=>[
-                'permissive'=>'<true or false>',
-                'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>',
-                'setTo'=>'<a value to set it to>',
-                'enforce'=>'<error if not this value, this can be array if used on a relation>',
-                'closure'=>'<validation closure>',
-                'mutate'=>'<mutate closure>',
-                'assign'=>[
-                    'set'=>'<true or false>',
-                    'add'=>'<true or false>',
-                    'remove'=>'<true or false>',
+                'permissive'=>'<true or false>', //Tested in: testPermissiveWorks1 / testPermissiveWorks2
+                'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>', //Tested in: testFastMode2AndLowLevelSetTo
+                'setTo'=>'<a value to set it to>', //Tested in: testFastMode2AndLowLevelSetTo
+                'enforce'=>'<error if not this value, this can be array if used on a relation>', // Tested in: testLowLevelEnforce and testLowLevelEnforceOnRelation
+                'closure'=>'<validation closure>', // Tested in testLowLevelClosure
+                'mutate'=>'<mutate closure>', // Tested in testLowLevelMutate
+                'assign'=>[ // Note: all combinations of assign type as not tested, but there component parts are tested and shown to work.
+                    'set'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
+                    'add'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
+                    'remove'=>'<true or false>',//Tested in: testChainRemove
+                    'setSingle'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
+                    'addSingle'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
+                    'removeSingle'=>'<true or false>', //Tested in: testChainRemove
+                    'null'=>'<true or false>' // Tested in: testNullAssignType. Whether or not having no assign type is allowed
                 ],
                 'chain'=>[
-                    'create'=>'<true or false>',
-                    'update'=>'<true or false>',
-                    'delete'=>'<true or false>',
-                    'read'=>'<true or false>'
+                    'create'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
+                    'update'=>'<true or false>', //Tested in: testUpdateWithChainAndEvents
+                    'delete'=>'<true or false>', //Tested in: testMultiDeleteAndEvents
+                    'read'=>'<true or false>' //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
                 ]
             ]
         ],
