@@ -331,7 +331,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         $evm = $this->getEvm();
         $evm->dispatchEvent(RepositoryEvents::PRE_UPDATE, $eventArgs);
         $evm->dispatchEvent(RepositoryEvents::VALIDATE_UPDATE, $eventArgs);
-        $evm->dispatchEvent(RepositoryEvents::VERIFY_CREATE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEvents::VERIFY_UPDATE, $eventArgs);
         $result = $this->processSingleEntity($eventArgs, $entity);
         $eventArgs->getArgs()['results'][] = $result;
         $evm->dispatchEvent(RepositoryEvents::PROCESS_RESULTS_UPDATE, $eventArgs);
