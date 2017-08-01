@@ -144,7 +144,7 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
         foreach ($entities as $foundEntity) {
             $params = $foundEntity->getBindParams();
             $assignType = $params['assignType'] ?? null;
-            $targetEntity->bindAssociation($assignType, $associationName, $foundEntity, true);
+            $targetEntity->bindAssociation($assignType, $associationName, $foundEntity);
         }
     }
 

@@ -44,6 +44,11 @@ abstract class EntityAbstract implements EventSubscriber, HasId, Entity
     protected $bindParams;
 
     /**
+     * @var string|null $lastMode
+     */
+    protected $lastMode;
+
+    /**
      * Makes sure the entity is ready to go
      *
      * @throws RuntimeException
@@ -70,7 +75,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId, Entity
             $this->setArrayHelper($arrayHelper);
         }
 
-        if ($path !== null && ($force === true || $this->getTTPath() === null)) {
+        if ($path !== null && ($force === true || $this->getTTPath() === null || $mode !== $this->getLastMode())) {
             $this->setTTPath($path);
             $path = $this->getTTPath();
             $path[] = $mode;
@@ -78,7 +83,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId, Entity
         }
 
 
-        if ($fallBack !== null && ($force === true || $this->getTTFallBack() === null)) {
+        if ($fallBack !== null && ($force === true || $this->getTTFallBack() === null || $mode !== $this->getLastMode())) {
             $this->setTTFallBack($fallBack);
             $path = $this->getTTFallBack();
             $path[] = $mode;
@@ -89,11 +94,13 @@ abstract class EntityAbstract implements EventSubscriber, HasId, Entity
             throw new \RuntimeException($this->getErrorFromConstant('noArrayHelper')['message']);
         }
 
-        if ($force === true || $this->getConfigArrayHelper() === null) {
+        if ($force === true || $this->getConfigArrayHelper() === null || $mode !== $this->getLastMode()) {
             $entityArrayHelper = new EntityArrayHelper();
             $entityArrayHelper->setArrayHelper($this->getArrayHelper());
             $this->parseTTConfig($entityArrayHelper);
         }
+
+        $this->setLastMode($mode);
     }
 
 
@@ -166,7 +173,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId, Entity
     {
         if ($force === false) {
             /** @noinspection NullPointerExceptionInspection */
-            $this->getConfigArrayHelper()->canAssign($assignType, $associationName);
+            $this->getConfigArrayHelper()->canAssign($associationName, $assignType);
         }
 
         if ($assignType !== null) {
@@ -298,6 +305,22 @@ abstract class EntityAbstract implements EventSubscriber, HasId, Entity
     public function setConfigArrayHelper(EntityArrayHelperContract $configArrayHelper)
     {
         $this->configArrayHelper = $configArrayHelper;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getLastMode():?string
+    {
+        return $this->lastMode;
+    }
+
+    /**
+     * @param null|string $lastMode
+     */
+    public function setLastMode(string $lastMode = null)
+    {
+        $this->lastMode = $lastMode;
     }
 
 }

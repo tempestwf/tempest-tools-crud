@@ -81,9 +81,9 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @return bool
      * @throws RuntimeException
      */
-    public function canAssign (string $associationName, string $assignType, array $fieldSettings = NULL, bool $nosey = true):bool {
-
-        if (!in_array($assignType, ['set', 'add', 'remove', 'setSingle', 'addSingle', 'removeSingle', NULL], true)) {
+    public function canAssign (string $associationName, string $assignType=null, array $fieldSettings = NULL, bool $nosey = true):bool {
+        $assignType = $assignType ?? 'null';
+        if (!in_array($assignType, ['set', 'add', 'remove', 'setSingle', 'addSingle', 'removeSingle', 'null'], true)) {
             throw new RuntimeException(sprintf($this->getErrorFromConstant('assignTypeMustBe')['message'], $assignType));
         }
 

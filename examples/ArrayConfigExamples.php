@@ -239,6 +239,7 @@ $entityInfo = [
                     'setSingle'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
                     'addSingle'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
                     'removeSingle'=>'<true or false>',
+                    'null'=>'<true or false>' // Whether or having no assign type is allowed
                 ],
                 'chain'=>[
                     'create'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
