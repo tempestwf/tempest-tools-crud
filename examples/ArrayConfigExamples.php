@@ -7,7 +7,7 @@ $readInfo = [
         'where'=>[
             '<keyName>'=>[
                 'type'=>'<null, and, or>',
-                'value'=>'<string>' // If an array of: ['xpr'=>'<xpr name>', 'arguments'=>['<arguments, could be another xpr array>']] is used, then all parts will be parsed by the array helper, and corresponding xpr methods will be called with the specified arguments.
+                'value'=>'<string>' // If an array of: ['xpr'=>'<xpr name>', 'arguments'=>['<arguments, could be another xpr array>']] is used, then all parts will be parsed by the array helper, and corresponding xpr methods will be called with the specified arguments. This is true for all parts of the query
             ]
         ],
         'having'=>[
