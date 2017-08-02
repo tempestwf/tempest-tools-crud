@@ -6,7 +6,7 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Mockery\Exception;
+use \Exception;
 use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\EvmTrait;
@@ -205,7 +205,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Doctrine\DBAL\ConnectionException
-     * @throws \Mockery\Exception
+     * @throws Exception
      */
     public function create(array $params, array $optionOverrides = [], array $frontEndOption=[]){
 
@@ -240,7 +240,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Doctrine\DBAL\ConnectionException
-     * @throws \Mockery\Exception
+     * @throws Exception
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
@@ -260,7 +260,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @return Entity
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
-     * @throws \Mockery\Exception
+     * @throws Exception
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
@@ -283,7 +283,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Doctrine\DBAL\ConnectionException
-     * @throws \Mockery\Exception
+     * @throws Exception
      */
     public function update(array $params, array $optionOverrides = [], array $frontEndOption=[]){
 
@@ -323,7 +323,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Doctrine\DBAL\ConnectionException
-     * @throws \Mockery\Exception
+     * @throws Exception
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
@@ -348,7 +348,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Doctrine\DBAL\ConnectionException
-     * @throws \Mockery\Exception
+     * @throws Exception
      */
     public function delete(array $params, array $optionOverrides = [], array $frontEndOption=[]){
 
@@ -388,7 +388,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Doctrine\DBAL\ConnectionException
-     * @throws \Mockery\Exception
+     * @throws Exception
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
@@ -410,7 +410,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @return Entity
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
-     * @throws \Mockery\Exception
+     * @throws Exception
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
