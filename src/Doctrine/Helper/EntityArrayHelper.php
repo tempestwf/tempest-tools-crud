@@ -224,14 +224,12 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $fieldSettings = $this->getFieldSettings($associationName, $params);
 
         // Check if assignment and chaining settings are allowed
-        $assignType = $values['assignType'] ?? 'set';
         $chainType = $values['chainType'] ?? null;
         if ($chainType !== null) {
             /** @noinspection NullPointerExceptionInspection */
             $this->canChain($associationName, $chainType);
         }
         /** @noinspection NullPointerExceptionInspection */
-        $this->canAssign($associationName, $assignType);
         $this->enforceRelation($associationName, $values, $params, $fieldSettings);
         $this->closureOnField($associationName, $params, $fieldSettings);
         $values = $this->setToOnAssociation($associationName, $values, $params, $fieldSettings);
