@@ -48,7 +48,7 @@ class RepositoryEvents{
     /**
      * @return array
      */
-    static public function getAll():array {
+    public static function getAll():array {
         return [
             static::PRE_START,
             static::PRE_STOP,

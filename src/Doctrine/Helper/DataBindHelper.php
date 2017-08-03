@@ -37,7 +37,8 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function init( ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL, bool $force= true) {
+    public function init( ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL, bool $force= true): void
+    {
         if ($arrayHelper !== NULL && ($force === true || $this->getArrayHelper() === NULL)) {
             $this->setArrayHelper($arrayHelper);
         }
@@ -116,7 +117,7 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      */
-    public function bindAssociation(Entity $entity, string $associationName, array $params = NULL, string $targetClass)
+    public function bindAssociation(Entity $entity, string $associationName, array $params = NULL, string $targetClass): void
     {
         $repo = $this->getRepoForRelation($targetClass);
         $chainOverrides = ['transaction'=>false, 'flush'=>false, 'batchMax'=>null];
@@ -140,7 +141,8 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
      * @param string $associationName
      * @throws \RuntimeException
      */
-    public function bindEntities (array $entities, Entity $targetEntity, string $associationName) {
+    public function bindEntities (array $entities, Entity $targetEntity, string $associationName): void
+    {
         foreach ($entities as $foundEntity) {
             $params = $foundEntity->getBindParams();
             $assignType = $params['assignType'] ?? null;
@@ -162,6 +164,7 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\DBAL\ConnectionException
+     * @throws \Exception
      */
     protected function processChaining (string $chainType, array $params, array $chainOverrides, RepositoryAbstract $repo):?array {
         $foundEntities = null;

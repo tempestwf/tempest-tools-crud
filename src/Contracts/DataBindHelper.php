@@ -14,9 +14,8 @@ interface DataBindHelper {
      * @param array|null $path
      * @param array|null $fallBack
      * @param bool $force
-     * @return
      */
-    public function init(ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL, bool $force= true);
+    public function init(ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL, bool $force= true):void;
 
     /**
      * @param Entity $entity
@@ -30,9 +29,8 @@ interface DataBindHelper {
      * @param string $associationName
      * @param array $params
      * @param string $targetClass
-     * @return
      */
-    public function bindAssociation(Entity $entity, string $associationName, array $params, string $targetClass);
+    public function bindAssociation(Entity $entity, string $associationName, array $params, string $targetClass):void;
 
     /**
      * @param array $entities

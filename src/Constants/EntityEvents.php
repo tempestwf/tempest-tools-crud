@@ -19,7 +19,7 @@ class EntityEvents{
     /**
      * @return array
      */
-    static public function getAll():array {
+    public static function getAll():array {
         return [
             static::PRE_SET_FIELD,
             static::PRE_PROCESS_ASSOCIATION_PARAMS,
