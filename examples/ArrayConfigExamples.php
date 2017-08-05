@@ -44,10 +44,11 @@ $readInfo = [
             ]
         ],
         'cache'=>[
-            'useCache'=>'<true or false>',
+            'useQueryCache'=>'<true or false>',
+            'useResultCache'=>'<true or false>',
             'timeToLive'=>'<time to live>',
             'cacheId'=>'<template for cache id, optional>',
-            'tagSet'=>[
+            'tagSet'=>[ // Future release
                 '<tag set name>'=>[
                     'disjunction'=>'<true or false>',
                     'templates'=>[

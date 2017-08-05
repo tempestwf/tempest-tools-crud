@@ -19,6 +19,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
      * @param $options
      * @param $optionOverrides
      * @param $frontEndOption
+     * @throws \RuntimeException
      */
     public function read(QueryBuilder $qb, $params, $options, $optionOverrides, $frontEndOption) {
         $extra = [
@@ -28,7 +29,24 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
             'frontEndOption'=>$frontEndOption,
         ];
         $this->buildBaseQuery($qb, $extra);
+        $this->applyCachingToQuery($qb, $extra);
 
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param array $extra
+     * @throws \RuntimeException
+     */
+    public function applyCachingToQuery (QueryBuilder $qb, array $extra) {
+        $params = $extra['params'];
+        $useQueryCache = $params['useQueryCache'] ?? true;
+        $useResultCache = $params['useResultCache'] ?? true;
+        $timeToLive = $params['timeToLive'] ?? null;
+        $cacheId = $params['cacheId'] ?? null;
+        $qb->getQuery()->useQueryCache($useQueryCache);
+        $qb->getQuery()->useResultCache($useResultCache, $timeToLive, $cacheId);
+        //TODO: Add tagging in later version
     }
 
     /**
