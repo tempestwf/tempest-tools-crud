@@ -61,7 +61,7 @@ $readInfo = [
         'placeholders'=>[
             '<placeholder name>'=>[
                 'value'=>'<value>',
-                'type'=>'<param type>'
+                'type'=>'<param type can be null>'
             ]
         ]
     ],
@@ -155,7 +155,7 @@ $frontEndQuery = [
         'placeholders'=>[
             '<placeholder name>'=>[
                 'value'=>'<value>',
-                'type'=>'<param type>'
+                'type'=>'<param type can be null>'
             ]
         ],
     ],
@@ -223,7 +223,7 @@ $backendOptions = [
         'hydrationType'=>'doctrine hydration type',
         '<placeholder name>'=>[
             'value'=>'<value>',
-            'type'=>'<param type>'
+            'type'=>'<param type can be null>'
         ],
         'queryCacheDrive'=>'<driver for query cache>',
         'resultCacheDrive'=>'<driver for query cache>',

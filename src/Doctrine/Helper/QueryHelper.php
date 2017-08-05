@@ -38,15 +38,24 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
     /**
      * @param QueryBuilder $qb
      * @param array $extra
+     * @throws \RuntimeException
      */
     public function addPlaceholders(QueryBuilder $qb, array $extra) {
+        $frontendPlaceholders = $extra['frontEndOption']['placeholders'] ?? [];
         $queryPlaceholders = $extra['params']['placeholders'] ?? [];
         $options = $extra['options']['placeholders'] ?? [];
         $overridePlaceholders = $extra['options']['optionOverrides'] ?? [];
-        $placeholder = array_replace($queryPlaceholders, $options, $overridePlaceholders);
-        foreach ($placeholder as $key=>$value) {
+        $placeholders = array_replace($queryPlaceholders, $options, $overridePlaceholders);
+        $keys = array_keys($placeholders);
+        $placeholders = array_replace($frontendPlaceholders, $placeholders);
+        foreach ($placeholders as $key=>$value) {
             $type = $value['type'] ?? null;
-            $qb->setParameter($key, $value['value'], $type);
+            $value = $value['value'] ?? null;
+            if (in_array($key, $keys, true)) {
+                $type = $this->parse($type, $extra);
+                $value = $this->parse($value, $extra);
+            }
+            $qb->setParameter($key, $value, $type);
         }
     }
 
