@@ -32,11 +32,14 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
             'message'=>'Error: Entity to bind not found.',
         ],
         'moreRowsRequestedThanBatchMax'=>[
-            'message'=>'Error: More rows requested than batch max allows.',
+            'message'=>'Error: More rows requested than batch max allows. count = %2, max = %s',
         ],
         'wrongTypeOfRepo'=>[
             'message'=>'Error: Wrong type of repo used with chaining.',
         ],
+        'moreQueryParamsThanMax'=>[
+            'message'=>'Error: More query params than passed than permitted. count = %2, max = %s'
+        ]
     ];
 
     /** @var  QueryHelperContract|null  */
@@ -127,6 +130,44 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         /** @noinspection NullPointerExceptionInspection */
         $this->getDataBindHelper()->init($arrayHelper, $path, $fallBack, $force);
     }
+
+    public function read (array $params, array $optionOverrides = [], array $frontEndOption=[]) {
+        /** @noinspection NullPointerExceptionInspection */
+        $eventArgs = $this->makeEventArgs($params, $optionOverrides, $frontEndOption);
+        $eventArgs->getArgs()['action'] = 'read';
+        $evm = $this->getEvm();
+        $evm->dispatchEvent(RepositoryEvents::PRE_READ, $eventArgs);
+        $evm->dispatchEvent(RepositoryEvents::VALIDATE_READ, $eventArgs);
+        $evm->dispatchEvent(RepositoryEvents::VERIFY_READ, $eventArgs);
+        /** @var array $params */
+        $params = $eventArgs->getArgs()['params'];
+        $this->checkQueryMaxParams($params, $optionOverrides);
+        $qb = $this->createQueryBuilder(get_class($this)[0]);
+        /** @noinspection NullPointerExceptionInspection */
+        $eventArgs->getArgs()['results'] = $this->getConfigArrayHelper()->read($qb, $params, $this->getOptions(), $optionOverrides, $frontEndOption);
+
+        $evm->dispatchEvent(RepositoryEvents::PROCESS_RESULTS_READ, $eventArgs);
+        $evm->dispatchEvent(RepositoryEvents::POST_READ, $eventArgs);
+
+        return $eventArgs->getArgs()['results'];
+    }
+
+    /**
+     * @param array $values
+     * @param array $optionOverrides
+     * @throws \RuntimeException
+     */
+    protected function checkQueryMaxParams(array $values, array $optionOverrides) {
+        $maxBatch = $this->findSetting($optionOverrides, 'queryMaxParams');
+        if ($maxBatch !== NULL) {
+            $count = count($values, COUNT_RECURSIVE);
+
+            if ($count > $maxBatch) {
+                throw new \RuntimeException(sprintf($this->getErrorFromConstant('moreQueryParamsThanMax')['message'], $count, $maxBatch));
+            }
+        }
+    }
+
     /**
      * @param array $overrides
      * @param string $key
@@ -222,6 +263,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         try {
             $eventArgs->getArgs()['batchParams'] = $eventArgs->getArgs()['params'];
             $evm->dispatchEvent(RepositoryEvents::PRE_CREATE_BATCH, $eventArgs);
+            /** @var array $params */
+            $params = $eventArgs->getArgs()['params'];
             $this->checkBatchMax($params, $optionOverrides);
             foreach ($params as $batchParams) {
                 $eventArgs->getArgs()['params'] = $batchParams;
@@ -300,6 +343,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         try {
             $eventArgs->getArgs()['batchParams'] = $eventArgs->getArgs()['params'];
             $evm->dispatchEvent(RepositoryEvents::PRE_UPDATE_BATCH, $eventArgs);
+            /** @var array $params */
+            $params = $eventArgs->getArgs()['params'];
             $this->checkBatchMax($params, $optionOverrides);
             /** @noinspection NullPointerExceptionInspection */
             $entities = $this->getDataBindHelper()->findEntitiesFromArrayKeys($params, $this);
@@ -365,6 +410,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         try {
             $eventArgs->getArgs()['batchParams'] = $eventArgs->getArgs()['params'];
             $evm->dispatchEvent(RepositoryEvents::PRE_DELETE_BATCH, $eventArgs);
+            /** @var array $params */
+            $params = $eventArgs->getArgs()['params'];
             $this->checkBatchMax($params, $optionOverrides);
             /** @noinspection NullPointerExceptionInspection */
             $entities = $this->getDataBindHelper()->findEntitiesFromArrayKeys($params, $this);
@@ -453,7 +500,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
             $count = count($values, COUNT_RECURSIVE);
 
             if ($count > $maxBatch) {
-                throw new \RuntimeException($this->getErrorFromConstant('moreRowsRequestedThanBatchMax')['message']);
+                throw new \RuntimeException(sprintf($this->getErrorFromConstant('moreRowsRequestedThanBatchMax')['message'], $count, $maxBatch));
             }
         }
     }
@@ -542,6 +589,24 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     public function setDataBindHelper(DataBindHelperContract $dataBindHelper)
     {
         $this->dataBindHelper = $dataBindHelper;
+    }
+
+
+
+    /**
+     * @return NULL|QueryHelperContract
+     */
+    public function getConfigArrayHelper():?QueryHelperContract
+    {
+        return $this->configArrayHelper;
+    }
+
+    /**
+     * @param QueryHelperContract $configArrayHelper
+     */
+    public function setConfigArrayHelper(QueryHelperContract $configArrayHelper)
+    {
+        $this->configArrayHelper = $configArrayHelper;
     }
 }
 ?>

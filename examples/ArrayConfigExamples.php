@@ -17,16 +17,31 @@ $readInfo = [
             ]
         ],
         'orderBy'=>[
-            '<keyName>'=>'<string>'
+            '<keyName>'=>[
+                'sort'=>'<sort string>',
+                'order'=>'sort order'
+            ]
         ],
         'groupBy'=>[
             '<keyName>'=>'<string>'
         ],
         'leftJoin'=>[
-            '<keyName>'=>'<string>'
+            '<keyName>'=>[
+                'join'=>'<join string>',
+                'alias'=>'<join alias>',
+                'conditionType'=>'<condition type>',
+                'condition'=>'<condition>',
+                'indexBy'=>'<index by>',
+            ]
         ],
         'innerJoin'=>[
-            '<keyName>'=>'<string>'
+            '<keyName>'=>[
+                'join'=>'<join string>',
+                'alias'=>'<join alias>',
+                'conditionType'=>'<condition type>',
+                'condition'=>'<condition>',
+                'indexBy'=>'<index by>',
+            ]
         ],
         'cache'=>[
             'useCache'=>'<true or false>',
