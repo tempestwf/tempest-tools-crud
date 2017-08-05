@@ -37,15 +37,30 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
      * @param QueryBuilder $qb
      * @param array $extra
      * @throws \RuntimeException
+     * @throws \Doctrine\ORM\ORMException
      */
     public function applyCachingToQuery (QueryBuilder $qb, array $extra) {
         $params = $extra['params'];
+        $options = $extra['options'];
+        $optionOverrides = $extra['optionOverrides'];
+        $queryCacheDriver = $this->findSetting([$options, $optionOverrides], 'queryCacheDrive') ?? null;
+        $resultCacheDriver = $this->findSetting([$options, $optionOverrides], 'resultCacheDriver') ?? null;
+        $allowQueryCache = $this->findSetting([$options, $optionOverrides], 'allowQueryCache') ?? true;
         $useQueryCache = $params['useQueryCache'] ?? true;
         $useResultCache = $params['useResultCache'] ?? true;
         $timeToLive = $params['timeToLive'] ?? null;
         $cacheId = $params['cacheId'] ?? null;
-        $qb->getQuery()->useQueryCache($useQueryCache);
-        $qb->getQuery()->useResultCache($useResultCache, $timeToLive, $cacheId);
+        if ($allowQueryCache === true) {
+            $qb->getQuery()->useQueryCache($useQueryCache);
+            $qb->getQuery()->useResultCache($useResultCache, $timeToLive, $cacheId);
+            if ($queryCacheDriver !== null) {
+                $qb->getQuery()->setQueryCacheDriver($queryCacheDriver);
+            }
+            if ($resultCacheDriver !== null) {
+                $qb->getQuery()->setResultCacheDriver($resultCacheDriver);
+            }
+        }
+
         //TODO: Add tagging in later version
     }
 
