@@ -20,6 +20,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
      * @param $optionOverrides
      * @param $frontEndOption
      * @throws \RuntimeException
+     * @throws \Doctrine\ORM\ORMException
      */
     public function read(QueryBuilder $qb, $params, $options, $optionOverrides, $frontEndOption) {
         $extra = [
@@ -30,7 +31,23 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         ];
         $this->buildBaseQuery($qb, $extra);
         $this->applyCachingToQuery($qb, $extra);
+        $this->addPlaceholders($qb, $extra);
 
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param array $extra
+     */
+    public function addPlaceholders(QueryBuilder $qb, array $extra) {
+        $queryPlaceholders = $extra['params']['placeholders'] ?? [];
+        $options = $extra['options']['placeholders'] ?? [];
+        $overridePlaceholders = $extra['options']['optionOverrides'] ?? [];
+        $placeholder = array_replace($queryPlaceholders, $options, $overridePlaceholders);
+        foreach ($placeholder as $key=>$value) {
+            $type = $value['type'] ?? null;
+            $qb->setParameter($key, $value['value'], $type);
+        }
     }
 
     /**
@@ -51,8 +68,10 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         $timeToLive = $params['timeToLive'] ?? null;
         $cacheId = $params['cacheId'] ?? null;
         if ($allowQueryCache === true) {
-            $qb->getQuery()->useQueryCache($useQueryCache);
-            $qb->getQuery()->useResultCache($useResultCache, $timeToLive, $cacheId);
+            /** @noinspection NullPointerExceptionInspection */
+            $qb->getQuery()->useQueryCache($this->getArrayHelper()->parse($useQueryCache, $extra));
+            /** @noinspection NullPointerExceptionInspection */
+            $qb->getQuery()->useResultCache($this->getArrayHelper()->parse($useResultCache, $extra), $this->getArrayHelper()->parse($timeToLive, $extra), $this->getArrayHelper()->parse($cacheId, $extra));
             if ($queryCacheDriver !== null) {
                 $qb->getQuery()->setQueryCacheDriver($queryCacheDriver);
             }

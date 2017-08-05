@@ -58,6 +58,12 @@ $readInfo = [
 
             ]
         ],
+        'placeholders'=>[
+            '<placeholder name>'=>[
+                'value'=>'<value>',
+                'type'=>'<param type>'
+            ]
+        ]
     ],
     'permissions'=>[
         'maxLimit'=>'<max limit>',
@@ -147,7 +153,10 @@ $frontEndQuery = [
             '<field name>'
         ],
         'placeholders'=>[
-            '<placeholder name>'=>'<value>'
+            '<placeholder name>'=>[
+                'value'=>'<value>',
+                'type'=>'<param type>'
+            ]
         ],
     ],
     'options'=>[
@@ -212,8 +221,9 @@ $backendOptions = [
         'paginate'=>'<true or false>',
         'hydrate'=>'<if false qb or paginator is returned>',
         'hydrationType'=>'doctrine hydration type',
-        'placeholders'=>[
-            '<placeholder name>'=>'<value>'
+        '<placeholder name>'=>[
+            'value'=>'<value>',
+            'type'=>'<param type>'
         ],
         'queryCacheDrive'=>'<driver for query cache>',
         'resultCacheDrive'=>'<driver for query cache>',
@@ -222,7 +232,7 @@ $backendOptions = [
         'entitiesShareConfigs'=>'<if true then to optimize the process configs during batches the same config is used for each entity processed, to save reprocessing time>',
         'flush' => '<whether or not to automatically flush>',
         'batchMax' => '<the max we can do in one batch>',
-        'queryMaxParams' => 'the max number of query params that can be passed in to a read request'
+        'queryMaxParams' => '<the max number of query params that can be passed in to a read request.>'
     ]
 ];
 
