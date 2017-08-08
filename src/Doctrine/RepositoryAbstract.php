@@ -125,7 +125,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         if ($force !== true || $this->getConfigArrayHelper() === null) {
             $entityArrayHelper = new QueryHelper();
             $entityArrayHelper->setArrayHelper($this->getArrayHelper());
-            $this->parseTTConfig();
+            $this->parseTTConfig($entityArrayHelper);
         }
         /** @noinspection NullPointerExceptionInspection */
         $this->getDataBindHelper()->init($arrayHelper, $path, $fallBack, $force);

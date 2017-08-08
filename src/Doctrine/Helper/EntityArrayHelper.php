@@ -56,14 +56,19 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @return bool
      * @throws RuntimeException
      */
-    public function canChain (string $associationName, string $chainType, bool $nosey = true):bool {
+    public function canChain (string $associationName, string $chainType, bool $nosey = true):bool
+    {
+        $extra = ['associationName'=>$associationName, 'chainType'=> $chainType, 'self'=>$this];
         /** @noinspection NullPointerExceptionInspection */
         $actionSettings = $this->getArray();
         $fieldSettings = $this->parseArrayPath(['fields', $associationName]);
 
+        /** @noinspection NullPointerExceptionInspection */
+        $fieldSettings = $this->getArrayHelper()->parse($fieldSettings, $extra);
+
         $allowed = $this->permissivePermissionCheck($actionSettings, $fieldSettings, 'chain', $chainType);
         /** @noinspection NullPointerExceptionInspection */
-        $allowed = $this->getArrayHelper()->parse($allowed, ['associationName'=>$associationName, 'chainType'=> $chainType, 'self'=>$this]);
+        $allowed = $this->getArrayHelper()->parse($allowed, $extra);
         if ($nosey === true && $allowed === false) {
             throw new RuntimeException(sprintf($this->getErrorFromConstant('chainTypeNotAllow')['message'], $chainType, $associationName));
         }
@@ -81,7 +86,9 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @return bool
      * @throws RuntimeException
      */
-    public function canAssign (string $associationName, string $assignType=null, array $fieldSettings = NULL, bool $nosey = true):bool {
+    public function canAssign (string $associationName, string $assignType=null, array $fieldSettings = NULL, bool $nosey = true):bool
+    {
+        $extra = ['associationName'=>$associationName, 'assignType'=> $assignType, 'self'=>$this];
         $assignType = $assignType ?? 'null';
         if (!in_array($assignType, ['set', 'add', 'remove', 'setSingle', 'addSingle', 'removeSingle', 'null'], true)) {
             throw new RuntimeException(sprintf($this->getErrorFromConstant('assignTypeMustBe')['message'], $assignType));
@@ -89,11 +96,13 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
 
         /** @noinspection NullPointerExceptionInspection */
         $actionSettings = $this->getArray();
-        $fieldSettings = $fieldSettings ?? $this->getFieldSettings($associationName);
+        /** @noinspection NullPointerExceptionInspection */
+        $fieldSettings = $fieldSettings ?? $this->getArrayHelper()->parse($this->getFieldSettings($associationName), $extra);
+
 
         $allowed = $this->permissivePermissionCheck($actionSettings, $fieldSettings, 'assign', $assignType);
         /** @noinspection NullPointerExceptionInspection */
-        $allowed = $this->getArrayHelper()->parse($allowed, ['associationName'=>$associationName, 'assignType'=> $assignType, 'self'=>$this]);
+        $allowed = $this->getArrayHelper()->parse($allowed, $extra);
         if ($nosey === true && $allowed === false) {
             throw new RuntimeException(sprintf($this->getErrorFromConstant('assignTypeNotAllow')['message'], $assignType, $associationName));
         }
@@ -124,14 +133,18 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @return bool
      * @throws RuntimeException
      */
-    public function checkFastMode(string $fieldName):bool {
-
+    public function checkFastMode(string $fieldName):bool
+    {
+        $extra = ['fieldName'=>$fieldName, 'self'=>$this];
         /** @noinspection NullPointerExceptionInspection */
         $actionSettings = $this->getArray();
         $fieldSettings = $this->parseArrayPath(['fields', $fieldName]);
+        /** @noinspection NullPointerExceptionInspection */
+        $fieldSettings = $this->getArrayHelper()->parse($fieldSettings, $extra);
+
         $fastMode = $this->highLowSettingCheck($actionSettings, $fieldSettings, 'fastMode');
         /** @noinspection NullPointerExceptionInspection */
-        $fastMode = $this->getArrayHelper()->parse($fastMode, ['fieldName'=>$fieldName, 'self'=>$this]);
+        $fastMode = $this->getArrayHelper()->parse($fastMode, $extra);
         return $fastMode;
     }
 
@@ -156,7 +169,8 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $fieldName = $params['fieldName'];
         $value = $params['value'];
 
-        $fieldSettings = $this->getFieldSettings($fieldName, $params);
+        /** @noinspection NullPointerExceptionInspection */
+        $fieldSettings = $this->getArrayHelper()->parse($this->getFieldSettings($fieldName), $params);
 
         /** @noinspection NullPointerExceptionInspection */
         $this->canAssign($fieldName, 'set', $fieldSettings);
@@ -178,7 +192,8 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      */
     public function enforceRelation(string $fieldName, array $values, array $params = [], array $fieldSettings=NULL, bool $nosey = true) {
         // Get the settings for the field so we can do quick comparisons
-        $fieldSettings = $fieldSettings ?? $this->getFieldSettings($fieldName);
+        /** @noinspection NullPointerExceptionInspection */
+        $fieldSettings = $fieldSettings ?? $this->getArrayHelper()->parse($this->getFieldSettings($fieldName), $params);
 
         // Check if fields that are needed to be enforced as enforced
         /** @noinspection NullPointerExceptionInspection */
@@ -201,7 +216,9 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @return array
      */
     public function setToOnAssociation(string $associationName, array $values, array $params = [], array $fieldSettings=NULL):array {
-        $fieldSettings = $fieldSettings ?? $this->getFieldSettings($associationName);
+        /** @noinspection NullPointerExceptionInspection */
+        $fieldSettings = $fieldSettings ?? $this->getArrayHelper()->parse($this->getFieldSettings($associationName), $params);
+
         // Figure out if there are values that need to be set to, and set it to those values if any found
         /** @noinspection NullPointerExceptionInspection */
         $setTo = isset($fieldSettings['setTo']) ? $this->getArrayHelper()->parse($fieldSettings['setTo'], $params) : [];
@@ -221,7 +238,8 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $associationName = $params['associationName'];
         $values = $params['values'];
 
-        $fieldSettings = $this->getFieldSettings($associationName, $params);
+        /** @noinspection NullPointerExceptionInspection */
+        $fieldSettings = $this->getArrayHelper()->parse($this->getFieldSettings($associationName), $params);
 
         // Check if assignment and chaining settings are allowed
         $chainType = $values['chainType'] ?? null;
@@ -247,7 +265,8 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      */
     public function mutateOnField (string $fieldName, $params, $value, array $fieldSettings = NULL) {
         // Get the settings for the field so we can do quick comparisons
-        $fieldSettings = $fieldSettings ?? $this->getFieldSettings($fieldName);
+        /** @noinspection NullPointerExceptionInspection */
+        $fieldSettings = $fieldSettings ?? $this->getArrayHelper()->parse($this->getFieldSettings($fieldName), $params);
         /** @noinspection NullPointerExceptionInspection */
         $value = isset($fieldSettings['mutate']) ? $this->getArrayHelper()->parse($fieldSettings['mutate'], $params) : $value;
         return $value;
@@ -263,7 +282,8 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      */
     public function setToOnField (string $fieldName, $params, $value, array $fieldSettings = NULL) {
         // Get the settings for the field so we can do quick comparisons
-        $fieldSettings = $fieldSettings ?? $this->getFieldSettings($fieldName);
+        /** @noinspection NullPointerExceptionInspection */
+        $fieldSettings = $fieldSettings ?? $this->getArrayHelper()->parse($this->getFieldSettings($fieldName), $params);
         /** @noinspection NullPointerExceptionInspection */
         $value = isset($fieldSettings['setTo']) ? $this->getArrayHelper()->parse($fieldSettings['setTo'], $params) : $value;
         return $value;
@@ -280,7 +300,8 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      */
     public function closureOnField (string $fieldName, array $params, array $fieldSettings = NULL, bool $noisy = true):bool {
         // Get the settings for the field so we can do quick comparisons
-        $fieldSettings = $fieldSettings ?? $this->getFieldSettings($fieldName);
+        /** @noinspection NullPointerExceptionInspection */
+        $fieldSettings = $fieldSettings ?? $this->getArrayHelper()->parse($this->getFieldSettings($fieldName), $params);
         /** @noinspection NullPointerExceptionInspection */
         $allowed = !(isset($fieldSettings['closure']) && $this->getArrayHelper()->parse($fieldSettings['closure'], $params) === false);
 
@@ -302,7 +323,8 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      */
     public function enforceField (string $fieldName, $value, array $params, array $fieldSettings = NULL, bool $noisy = true):bool {
         // Get the settings for the field so we can do quick comparisons
-        $fieldSettings = $fieldSettings ?? $this->getFieldSettings($fieldName);
+        /** @noinspection NullPointerExceptionInspection */
+        $fieldSettings = $fieldSettings ?? $this->getArrayHelper()->parse($this->getFieldSettings($fieldName), $params);
         // Additional validation
         /** @noinspection NullPointerExceptionInspection */
         $allowed = !(isset($fieldSettings['enforce']) && $this->getArrayHelper()->parse($value, $params) !== $this->getArrayHelper()->parse($fieldSettings['enforce'], $params));
@@ -350,12 +372,21 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      */
     protected function prePersistValidate(array $validate, Entity $entity)
     {
+        $extra = ['validate'=>$validate, 'entity'=>$entity];
         /** @var Factory $factory */
         $factory = $entity->getValidationFactory();
         $fields = $validate['fields'] ?? array_keys($validate['rules']);
+        /** @noinspection NullPointerExceptionInspection */
+        $fields = $this->getArrayHelper()->parse($fields, $extra);
         $rules = $validate['rules'] ?? [];
+        /** @noinspection NullPointerExceptionInspection */
+        $rules = $this->getArrayHelper()->parse($rules, $extra);
         $messages = $validate['messages'] ?? [];
+        /** @noinspection NullPointerExceptionInspection */
+        $messages = $this->getArrayHelper()->parse($messages, $extra);
         $customAttributes = $validate['customAttributes'] ?? [];
+        /** @noinspection NullPointerExceptionInspection */
+        $customAttributes = $this->getArrayHelper()->parse($customAttributes, $extra);
         $values = $entity->getValuesOfFields($fields);
         $validator = $factory->make($values, $rules, $messages, $customAttributes);
         if ($validator->fails()) {

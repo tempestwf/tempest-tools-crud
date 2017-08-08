@@ -62,10 +62,10 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
      * @return Entity
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \RuntimeException
-     * @throws \Mockery\Exception
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function bind(Entity $entity, array $params): Entity
     {
@@ -112,10 +112,10 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
      * @param string $targetClass
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \InvalidArgumentException
-     * @throws \Mockery\Exception
      * @throws \RuntimeException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     * @throws \Exception
      */
     public function bindAssociation(Entity $entity, string $associationName, array $params = NULL, string $targetClass): void
     {
@@ -159,7 +159,6 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
      * @param RepositoryAbstract $repo
      * @return array|null
      * @throws \RuntimeException
-     * @throws \Mockery\Exception
      * @throws \InvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
