@@ -63,7 +63,8 @@ $readInfo = [
                 'value'=>'<value>',
                 'type'=>'<param type can be null>'
             ]
-        ]
+        ],
+        'fetchJoin'=>'<true or false>' // whether or not when paginating this query requires a fetch join
     ],
     'permissions'=>[
         'maxLimit'=>'<max limit>',
@@ -99,7 +100,7 @@ $readInfo = [
                     'permissive'=>'<true or false>',
                     'closure'=>'closure',
                     'directions'=>[
-                        '<operator name>'=>'<allowed>'
+                        '<operator name>'=>'<allowed true or false>'
                     ]
                 ]
             ]
@@ -108,7 +109,7 @@ $readInfo = [
             'permissive'=>'<true or false>',
             'fields'=>[
                 '<field name>'=>[
-                    'permissive'=>'<true or false>',
+                    'allowed'=>'<true or false>',
                     'closure'=>'closure'
                 ]
             ]
@@ -161,10 +162,10 @@ $frontEndQuery = [
     ],
     'options'=>[
         'returnCount'=>'<true or false>',
-        'resultsPerPage'=>'<resutls per page>',
         'limit'=>'<limit>',
         'offset'=>'<offset>',
-        'page'=>'<used instead of limit and offset>'
+        'page'=>'<page number of return>', // May be used instead of limit and offset
+        'resultsPerPage'=>'<results per page>', // May be used instead of limit and offset
     ]
 ];
 

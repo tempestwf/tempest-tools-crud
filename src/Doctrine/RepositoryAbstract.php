@@ -131,9 +131,9 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         $this->getDataBindHelper()->init($arrayHelper, $path, $fallBack, $force);
     }
 
-    public function read (array $params, array $optionOverrides = [], array $frontEndOption=[]) {
+    public function read (array $params, array $optionOverrides = [], array $frontEndOptions=[]) {
         /** @noinspection NullPointerExceptionInspection */
-        $eventArgs = $this->makeEventArgs($params, $optionOverrides, $frontEndOption);
+        $eventArgs = $this->makeEventArgs($params, $optionOverrides, $frontEndOptions);
         $eventArgs->getArgs()['action'] = 'read';
         $evm = $this->getEvm();
         $evm->dispatchEvent(RepositoryEvents::PRE_READ, $eventArgs);
@@ -144,7 +144,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         $this->checkQueryMaxParams($params, $optionOverrides);
         $qb = $this->createQueryBuilder(get_class($this)[0]);
         /** @noinspection NullPointerExceptionInspection */
-        $eventArgs->getArgs()['results'] = $this->getConfigArrayHelper()->read($qb, $params, $this->getOptions(), $optionOverrides, $frontEndOption);
+        $eventArgs->getArgs()['results'] = $this->getConfigArrayHelper()->read($qb, $params, $this->getOptions(), $optionOverrides, $frontEndOptions);
 
         $evm->dispatchEvent(RepositoryEvents::PROCESS_RESULTS_READ, $eventArgs);
         $evm->dispatchEvent(RepositoryEvents::POST_READ, $eventArgs);
@@ -241,7 +241,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     /**
      * @param array $params
      * @param array $optionOverrides
-     * @param array $frontEndOption
+     * @param array $frontEndOptions
      * @return mixed
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -250,11 +250,11 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws Exception
      */
-    public function create(array $params, array $optionOverrides = [], array $frontEndOption=[]){
+    public function create(array $params, array $optionOverrides = [], array $frontEndOptions=[]){
 
         /** @noinspection NullPointerExceptionInspection */
         $this->getArrayHelper()->wrapArray($params);
-        $eventArgs = $this->makeEventArgs($params, $optionOverrides, $frontEndOption);
+        $eventArgs = $this->makeEventArgs($params, $optionOverrides, $frontEndOptions);
         $eventArgs->getArgs()['action'] = 'create';
         $evm = $this->getEvm();
 
@@ -321,7 +321,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     /**
      * @param array $params
      * @param array $optionOverrides
-     * @param array $frontEndOption
+     * @param array $frontEndOptions
      * @return mixed
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -330,11 +330,11 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws Exception
      */
-    public function update(array $params, array $optionOverrides = [], array $frontEndOption=[]){
+    public function update(array $params, array $optionOverrides = [], array $frontEndOptions=[]){
 
         /** @noinspection NullPointerExceptionInspection */
         $this->getArrayHelper()->wrapArray($params);
-        $eventArgs = $this->makeEventArgs($params, $optionOverrides, $frontEndOption);
+        $eventArgs = $this->makeEventArgs($params, $optionOverrides, $frontEndOptions);
         $eventArgs->getArgs()['action'] = 'update';
         $evm = $this->getEvm();
 
@@ -388,7 +388,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     /**
      * @param array $params
      * @param array $optionOverrides
-     * @param array $frontEndOption
+     * @param array $frontEndOptions
      * @return mixed
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -397,11 +397,11 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws Exception
      */
-    public function delete(array $params, array $optionOverrides = [], array $frontEndOption=[]){
+    public function delete(array $params, array $optionOverrides = [], array $frontEndOptions=[]){
 
         /** @noinspection NullPointerExceptionInspection */
         $this->getArrayHelper()->wrapArray($params);
-        $eventArgs = $this->makeEventArgs($params, $optionOverrides, $frontEndOption);
+        $eventArgs = $this->makeEventArgs($params, $optionOverrides, $frontEndOptions);
         $eventArgs->getArgs()['action'] = 'delete';
         $evm = $this->getEvm();
 

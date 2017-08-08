@@ -12,9 +12,9 @@ interface QueryHelper extends ArrayHelper {
      * @param $params
      * @param $options
      * @param $optionOverrides
-     * @param $frontEndOption
+     * @param $frontEndOptions
      */
-    public function read(QueryBuilder $qb, $params, $options, $optionOverrides, $frontEndOption);
+    public function read(QueryBuilder $qb, $params, $options, $optionOverrides, $frontEndOptions);
 
     public function buildBaseQuery(QueryBuilder $qb, array $extra):void;
 
