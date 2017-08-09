@@ -38,6 +38,9 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         'operatorNotSafe'=>[
             'message'=>'Error: Requested operator is not safe to use. operator = %s',
         ],
+        'closureFails' => [
+            'message' => 'Error: A validation closure did not pass while building query.',
+        ],
     ];
 
     /**
@@ -211,6 +214,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         /** @noinspection NullPointerExceptionInspection */
         $permissions = $this->getArrayHelper()->parse($permissions, $extra);
         foreach ($groupBys as $key => $value) {
+            $this->closurePermission($value, $extra);
             $this->verifyFieldFormat($key);
 
             $allowed = $this->permissiveAllowedCheck($permissions, $value);
@@ -220,6 +224,23 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
                 throw new RuntimeException(sprintf($this->getErrorFromConstant('groupByNotAllowed')['message'], $key));
             }
         }
+    }
+
+    /**
+     * @param array $permissions
+     * @param array $extra
+     * @param bool $noisy
+     * @return bool
+     * @throws \RuntimeException
+     */
+    public function closurePermission (array $permissions, array $extra, bool $noisy = true):bool {
+        /** @noinspection NullPointerExceptionInspection */
+        $allowed = !(isset($fieldSettings['closure']) && $this->getArrayHelper()->parse($permissions['closure'], $extra) === false);
+
+        if ($allowed === false && $noisy === true) {
+            throw new RuntimeException(sprintf($this->getErrorFromConstant('closureFails')['message']));
+        }
+        return $allowed;
     }
 
     /**
@@ -252,6 +273,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         /** @noinspection NullPointerExceptionInspection */
         $permissions = $this->getArrayHelper()->parse($permissions, $extra);
         foreach ($orderBys as $fieldName => $value) {
+            $this->closurePermission($value, $extra);
             $this->verifyFieldFormat($fieldName);
             $fieldSettings = $permissions['fields'][$fieldName];
             $direction = $value['direction'];
@@ -375,6 +397,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         $operator = $condition['operator'];
         $this->verifyFieldFormat($fieldName);
         $fieldSettings = $permissions['fields'][$fieldName] ?? [];
+        $this->closurePermission($fieldSettings, $extra);
         /** @noinspection NullPointerExceptionInspection */
         $fieldSettings = $this->getArrayHelper()->parse($fieldSettings, $extra);
         $allowed = $this->permissivePermissionCheck($permissions, $fieldSettings, 'operators', $operator);
@@ -416,6 +439,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         /** @noinspection NullPointerExceptionInspection */
         $permissions = $this->getArrayHelper()->parse($permissions, $extra);
         foreach ($frontendPlaceholders as $key => $value) {
+            $this->closurePermission($value, $extra);
             $allowed = $this->permissiveAllowedCheck($permissions, $value);
             /** @noinspection NullPointerExceptionInspection */
             $allowed = $this->getArrayHelper()->parse($allowed, $extra);
