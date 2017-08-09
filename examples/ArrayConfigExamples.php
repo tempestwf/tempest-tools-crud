@@ -68,7 +68,6 @@ $readInfo = [
     ],
     'permissions'=>[
         'maxLimit'=>'<max limit>',
-        'limitAllowed'=>'<use page instead if false>',
         'where'=>[
             'permissive'=>'<true or false>',
             'fields'=>[
@@ -164,8 +163,6 @@ $frontEndQuery = [
         'returnCount'=>'<true or false>',
         'limit'=>'<limit>',
         'offset'=>'<offset>',
-        'page'=>'<page number of return>', // May be used instead of limit and offset
-        'resultsPerPage'=>'<results per page>', // May be used instead of limit and offset
     ]
 ];
 

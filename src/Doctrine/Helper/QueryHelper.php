@@ -3,6 +3,7 @@ namespace TempestTools\Crud\Doctrine\Helper;
 
 
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use RuntimeException;
 use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Common\Helper\ArrayHelperTrait;
@@ -13,6 +14,9 @@ use Doctrine\ORM\QueryBuilder;
 class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\QueryHelper {
     use TTConfigTrait, ErrorConstantsTrait, ArrayHelperTrait;
 
+    /**
+     * ERRORS
+     */
     const ERRORS = [
         'placeholderNoAllowed'=>[
             'message'=>'Error: You do not have access requested placeholder. placeholder = %s',
@@ -29,26 +33,62 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         'groupByNotAllowed'=>[
             'message'=>'Error: Group by not allowed. field = %s',
         ],
-
+        'maxLimitHit'=>[
+            'message'=>'Error: Requested limit greater than max. limit = %s, max = %s',
+        ],
+        'operatorNotSafe'=>[
+            'message'=>'Error: Requested operator is not safe to use. operator = %s',
+        ],
     ];
 
-
-
+    /**
+     * FIELD_REGEX
+     */
     const FIELD_REGEX = '/^\w+\.\w+$/';
 
+    /**
+     * DEFAULT_LIMIT
+     */
+    const DEFAULT_LIMIT = 25;
+
+    /**
+     * DEFAULT_MAX_LIMIT
+     */
+    const DEFAULT_MAX_LIMIT = 100;
+
+    /**
+     * DEFAULT_OFFSET
+     */
+    const DEFAULT_OFFSET = 1;
+
+    /**
+     * DEFAULT_RETURN_COUNT
+     */
+    const DEFAULT_RETURN_COUNT = true;
+
+    /**
+     * DEFAULT_FETCH_JOIN
+     */
+    const DEFAULT_FETCH_JOIN = true;
+
+    /**
+     * SAFE_OPERATORS
+     */
+    const SAFE_OPERATORS = ['andX', 'orX', 'eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'in', 'notIn', 'isNull', 'isNotNull', 'like', 'notLike', 'between' ];
 
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
      * @param QueryBuilder $qb
-     * @param $params
-     * @param $options
-     * @param $optionOverrides
-     * @param $frontEndOptions
+     * @param array $params
+     * @param array $options
+     * @param array $optionOverrides
+     * @param array $frontEndOptions
+     * @return array
      * @throws RuntimeException
      * @throws \Doctrine\ORM\ORMException
      */
-    public function read(QueryBuilder $qb, $params, $options, $optionOverrides, $frontEndOptions)
+    public function read(QueryBuilder $qb, array $params, array $options, array $optionOverrides, array $frontEndOptions):array
     {
         $extra = [
             'params'=>$params,
@@ -62,6 +102,81 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         $this->addFrontEndWhere($qb, $extra);
         $this->addFrontEndOrderBys($qb, $extra);
         $this->addFrontEndGroupBys($qb, $extra);
+        $this->addLimitAndOffset($qb, $extra);
+        return $this->prepareResult($qb, $extra);
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param array $extra
+     * @return array
+     * @throws \RuntimeException
+     */
+    public function prepareResult (QueryBuilder $qb, array $extra):array
+    {
+        $options = $extra['options']??[];
+        $optionOverrides = $extra['optionOverrides']??[];
+        $frontEndOptions = $extra['frontEndOptions']??[];
+        $hydrationType = $this->findSetting([$options, $optionOverrides], 'hydrationType');
+        $paginate = $this->findSetting([$options, $optionOverrides], 'paginate');
+        $returnCount = $frontEndOptions['options']['returnCount'] ?? static::DEFAULT_RETURN_COUNT;
+        $hydrate = $this->findSetting([$options, $optionOverrides], 'hydrate');
+        $fetchJoin = $this->getArray()['read']['fetchJoin'] ?? static::DEFAULT_FETCH_JOIN;
+
+        if ($hydrate !== true) {
+            return ['qb'=>$qb];
+        }
+
+        $qb->getQuery()->setHydrationMode($hydrationType);
+
+        if ($paginate === true) {
+            $paginator = new Paginator($qb->getQuery());
+            $count = $returnCount?count($paginator, $fetchJoin):null;
+            $result = $paginator->getIterator()->getArrayCopy();
+            return ['count'=>$count, 'result'=>$result];
+        }
+
+        return $qb->getQuery()->getResult();
+
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param array $extra
+     * @param bool $verify
+     * @throws \RuntimeException
+     */
+    public function addLimitAndOffset(QueryBuilder $qb, array $extra, bool $verify = true):void
+    {
+        if ($verify === true) {
+            $this->verifyLimitAndOffset($extra);
+        }
+        $frontEndOptions = $extra['frontEndOptions'];
+        $options = $frontEndOptions['options'] ?? [];
+
+        $limit = $options['limit'] ?? static::DEFAULT_LIMIT;
+        $offset = $options['offset'] ?? static::DEFAULT_OFFSET;
+        $qb->setFirstResult($limit);
+        $qb->setFirstResult($offset);
+    }
+
+
+    /**
+     * @param array $extra
+     * @throws \RuntimeException
+     * @internal param array $extra
+     */
+    public function verifyLimitAndOffset (array $extra):void
+    {
+        $frontEndOptions = $extra['frontEndOptions'];
+        $options = $frontEndOptions['options'] ?? [];
+        $limit = $options['limit'] ?? static::DEFAULT_LIMIT;
+        $maxLimit = $this->getArray()['permissions']['maxLimit'] ?? static::DEFAULT_MAX_LIMIT;
+        /** @noinspection NullPointerExceptionInspection */
+        $maxLimit = $this->getArrayHelper()->parse($maxLimit, $extra);
+        if ($limit > $maxLimit) {
+            throw new RuntimeException(sprintf($this->getErrorFromConstant('maxLimitHit')['message'], $limit, $maxLimit));
+        }
 
     }
 
@@ -104,7 +219,6 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
             $allowed = $this->getArrayHelper()->parse($allowed, $extra);
             if ($allowed === false) {
                 throw new RuntimeException(sprintf($this->getErrorFromConstant('groupByNotAllowed')['message'], $key));
-
             }
         }
     }
@@ -227,14 +341,26 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
      */
     public function verifyFrontEndConditions (array $conditions, array $permissions):void
     {
-        /** @var array[] $condition */
+        /** @var array $condition */
         foreach ($conditions as $condition) {
             $operator = $condition['operator'];
+            $this->verifyOperatorAllowed($operator);
             if ($operator === 'andX' || $operator === 'orX') {
                 $this->verifyFrontEndConditions($condition['conditions'], $permissions);
             } else {
                 $this->verifyFrontEndCondition($condition, $permissions);
             }
+        }
+    }
+
+    /**
+     * @param string $operator
+     * @throws \RuntimeException
+     */
+    protected function verifyOperatorAllowed(string $operator):void
+    {
+        if (!in_array($operator, static::SAFE_OPERATORS, true)) {
+            throw new RuntimeException(sprintf($this->getErrorFromConstant('operatorNotSafe')['message'], $operator));
         }
     }
 
@@ -314,7 +440,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         $frontendPlaceholders = $extra['frontEndOptions']['placeholders'] ?? [];
         $queryPlaceholders = $extra['params']['placeholders'] ?? [];
         $options = $extra['options']['placeholders'] ?? [];
-        $overridePlaceholders = $extra['options']['optionOverrides'] ?? [];
+        $overridePlaceholders = $extra['optionOverrides']['placeholders'] ?? [];
         $placeholders = array_replace($queryPlaceholders, $options, $overridePlaceholders);
         $keys = array_keys($placeholders);
         $placeholders = array_replace($frontendPlaceholders, $placeholders);
