@@ -10,7 +10,8 @@ use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
 use Doctrine\ORM\QueryBuilder;
 
-class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\QueryHelper {
+class QueryHelper extends ArrayHelper //implements \TempestTools\Crud\Contracts\QueryHelper
+{
     use TTConfigTrait, ErrorConstantsTrait, ArrayHelperTrait;
 
     /**
@@ -97,6 +98,8 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
             'options'=>$options,
             'optionOverrides'=>$optionOverrides,
             'frontEndOptions'=>$frontEndOptions,
+            'qb'=>$qb,
+            'helper'=>$this
         ];
         $this->buildBaseQuery($qb, $extra);
         $this->applyCachingToQuery($qb, $extra);
@@ -145,144 +148,126 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
     /**
      * @param QueryBuilder $qb
      * @param array $extra
-     * @param bool $verify
      * @throws \RuntimeException
      */
-    public function addLimitAndOffset(QueryBuilder $qb, array $extra, bool $verify = true):void
+    public function addLimitAndOffset(QueryBuilder $qb, array $extra):void
     {
-        if ($verify === true) {
-            $this->verifyLimitAndOffset($extra);
-        }
         $frontEndOptions = $extra['frontEndOptions'];
         $options = $frontEndOptions['options'] ?? [];
 
         $limit = $options['limit'] ?? static::DEFAULT_LIMIT;
         $offset = $options['offset'] ?? static::DEFAULT_OFFSET;
+        $this->verifyLimitAndOffset($limit, $extra);
         $qb->setFirstResult($limit);
         $qb->setFirstResult($offset);
     }
 
 
     /**
+     * @param int $limit
      * @param array $extra
-     * @throws \RuntimeException
      * @internal param array $extra
+     * @internal param array $extra
+     * @throws \RuntimeException
      */
-    public function verifyLimitAndOffset (array $extra):void
+    public function verifyLimitAndOffset (int $limit, array $extra):void
     {
-        $frontEndOptions = $extra['frontEndOptions'];
-        $options = $frontEndOptions['options'] ?? [];
-        $limit = $options['limit'] ?? static::DEFAULT_LIMIT;
         $maxLimit = $this->getArray()['permissions']['maxLimit'] ?? static::DEFAULT_MAX_LIMIT;
         /** @noinspection NullPointerExceptionInspection */
         $maxLimit = $this->getArrayHelper()->parse($maxLimit, $extra);
         if ($limit > $maxLimit) {
             throw new RuntimeException(sprintf($this->getErrorFromConstant('maxLimitHit')['message'], $limit, $maxLimit));
         }
-
     }
 
     /**
      * @param QueryBuilder $qb
      * @param array $extra
-     * @param bool $verify
      * @throws \RuntimeException
      */
-    public function addFrontEndGroupBys(QueryBuilder $qb, array $extra, bool $verify = true):void
+    public function addFrontEndGroupBys(QueryBuilder $qb, array $extra):void
     {
         $frontEndOptions = $extra['frontEndOptions'];
-        if ($verify === true) {
-            $this->verifyFrontEndGroupBys($extra);
-        }
         $groupBys = $frontEndOptions['query']['groupBy'] ?? [];
+        /** @noinspection NullPointerExceptionInspection */
+        $permissions = $this->getArrayHelper()->parse($this->getArray()['permissions']['groupBy'] ?? [], $extra) ?? [];
         foreach ($groupBys as $key => $value) {
+            $fastMode = $this->highLowSettingCheck($permissions, $permissions['fields'][$key] ?? [], 'fastMode');
+            if ($fastMode !== true) {
+                $this->verifyFrontEndGroupBys($key, $value, $permissions, $extra);
+                /** @noinspection PhpUnusedLocalVariableInspection */
+                [$key, $value] = $this->closureMutate($key, $value, $extra);
+            }
             $qb->groupBy($key);
         }
     }
 
+    /** @noinspection MoreThanThreeArgumentsInspection */
+
 
     /**
-     * @param array $extra
-     * @throws \RuntimeException
-     * @internal param array $extra
-     */
-    public function verifyFrontEndGroupBys (array $extra):void
-    {
-        $frontEndOptions = $extra['frontEndOptions'];
-        $groupBys = $frontEndOptions['query']['groupBy'] ?? [];
-        $permissions = $this->getArray()['permissions']['groupBy'] ?? [];
-        /** @noinspection NullPointerExceptionInspection */
-        $permissions = $this->getArrayHelper()->parse($permissions, $extra);
-        foreach ($groupBys as $key => $value) {
-            $this->closurePermission($value, $extra);
-            $this->verifyFieldFormat($key);
-
-            $allowed = $this->permissiveAllowedCheck($permissions, $value);
-            /** @noinspection NullPointerExceptionInspection */
-            $allowed = $this->getArrayHelper()->parse($allowed, $extra);
-            if ($allowed === false) {
-                throw new RuntimeException(sprintf($this->getErrorFromConstant('groupByNotAllowed')['message'], $key));
-            }
-        }
-    }
-
-    /**
+     * @param string $key
+     * @param array $value
      * @param array $permissions
      * @param array $extra
-     * @param bool $noisy
-     * @return bool
+     * @internal param array $extra
      * @throws \RuntimeException
      */
-    public function closurePermission (array $permissions, array $extra, bool $noisy = true):bool {
-        /** @noinspection NullPointerExceptionInspection */
-        $allowed = !(isset($fieldSettings['closure']) && $this->getArrayHelper()->parse($permissions['closure'], $extra) === false);
+    public function verifyFrontEndGroupBys (string $key, array $value, array $permissions, array $extra):void
+    {
+        $this->closurePermission($value, $extra);
+        $this->verifyFieldFormat($key);
 
-        if ($allowed === false && $noisy === true) {
-            throw new RuntimeException(sprintf($this->getErrorFromConstant('closureFails')['message']));
+        $allowed = $this->permissiveAllowedCheck($permissions, $value);
+        /** @noinspection NullPointerExceptionInspection */
+        $allowed = $this->getArrayHelper()->parse($allowed, $extra);
+        if ($allowed === false) {
+            throw new RuntimeException(sprintf($this->getErrorFromConstant('groupByNotAllowed')['message'], $key));
         }
-        return $allowed;
     }
+
 
     /**
      * @param QueryBuilder $qb
      * @param array $extra
-     * @param bool $verify
      * @throws \RuntimeException
      */
-    public function addFrontEndOrderBys(QueryBuilder $qb, array $extra, bool $verify = true):void {
+    public function addFrontEndOrderBys(QueryBuilder $qb, array $extra):void {
         $frontEndOptions = $extra['frontEndOptions'];
-        if ($verify === true) {
-            $this->verifyFrontEndOrderBys($extra);
-        }
         $orderBys = $frontEndOptions['query']['orderBy'] ?? [];
+        /** @noinspection NullPointerExceptionInspection */
+        $permissions = $this->getArrayHelper()->parse($this->getArray()['permissions']['orderBy'] ?? [], $extra) ?? [];
         foreach ($orderBys as $key => $value) {
+            $fastMode = $this->highLowSettingCheck($permissions, $permissions['fields'][$key] ?? [], 'fastMode');
+            if ($fastMode !== true) {
+                $this->verifyFrontEndOrderBys($key, $value, $permissions, $extra);
+                /** @noinspection PhpUnusedLocalVariableInspection */
+                [$key, $value] = $this->closureMutate($key, $value, $extra);
+            }
             $direction = $value['direction'];
             $qb->orderBy($key, $direction);
         }
     }
+    /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * @param string $key
+     * @param array $value
+     * @param array $permissions
      * @param $extra
      * @throws \RuntimeException
      */
-    public function verifyFrontEndOrderBys ($extra):void
+    public function verifyFrontEndOrderBys (string $key, array $value, array $permissions, $extra):void
     {
-        $frontEndOptions = $extra['frontEndOptions'];
-        $orderBys = $frontEndOptions['query']['orderBy'] ?? [];
-        $permissions = $this->getArray()['permissions']['orderBy'] ?? [];
+        $this->closurePermission($value, $extra);
+        $this->verifyFieldFormat($key);
+        $fieldSettings = $permissions['fields'][$key]??[];
+        $direction = $value['direction']??'';
+        $allowed = $this->permissivePermissionCheck($permissions, $fieldSettings, 'directions', $direction);
         /** @noinspection NullPointerExceptionInspection */
-        $permissions = $this->getArrayHelper()->parse($permissions, $extra);
-        foreach ($orderBys as $fieldName => $value) {
-            $this->closurePermission($value, $extra);
-            $this->verifyFieldFormat($fieldName);
-            $fieldSettings = $permissions['fields'][$fieldName];
-            $direction = $value['direction'];
-            $allowed = $this->permissivePermissionCheck($permissions, $fieldSettings, 'directions', $direction);
-            /** @noinspection NullPointerExceptionInspection */
-            $allowed = $this->getArrayHelper()->parse($allowed, $extra);
-            if ($allowed === false) {
-                throw new RuntimeException(sprintf($this->getErrorFromConstant('orderByNotAllowed')['message'], $fieldName, $direction));
-            }
+        $allowed = $this->getArrayHelper()->parse($allowed, $extra);
+        if ($allowed === false) {
+            throw new RuntimeException(sprintf($this->getErrorFromConstant('orderByNotAllowed')['message'], $key, $direction));
         }
 
     }
@@ -290,23 +275,18 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
     /**
      * @param QueryBuilder $qb
      * @param array $extra
-     * @param bool $verify
      * @throws \RuntimeException
      */
-    public function addFrontEndWhere(QueryBuilder $qb, array $extra, bool $verify = true):void
+    public function addFrontEndWhere(QueryBuilder $qb, array $extra):void
     {
         $frontEndOptions = $extra['frontEndOptions'];
-        $permissions = $this->getArray()['permissions']['where'] ?? [];
         /** @noinspection NullPointerExceptionInspection */
-        $permissions = $this->getArrayHelper()->parse($permissions, $extra);
-        if ($verify === true) {
-            $this->verifyFrontEndConditions($frontEndOptions['query']['where'], $permissions);
-        }
+        $permissions = $this->getArrayHelper()->parse($this->getArray()['permissions']['where']??[], $extra) ?? [];
         $wheres = $frontEndOptions['query']['where'] ?? [];
         foreach ($wheres as $where) {
             $type = !isset($where['type'])?'where':null;
             $type = $type === null && $where['type'] === 'and'?'andWhere':'orWhere';
-            $string = $this->buildFilterFromFrontEnd($qb->expr(), $where);
+            $string = $this->buildFilterFromFrontEnd($qb->expr(), $where, $permissions, $extra);
             $qb->$type($string);
         }
     }
@@ -315,74 +295,48 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
     /**
      * @param QueryBuilder $qb
      * @param array $extra
-     * @param bool $verify
      * @throws \RuntimeException
      */
-    public function addFrontEndHaving(QueryBuilder $qb, array $extra, bool $verify = true):void {
+    public function addFrontEndHaving(QueryBuilder $qb, array $extra):void {
         $frontEndOptions = $extra['frontEndOptions'];
-        $permissions = $this->getArray()['permissions']['having'] ?? [];
         /** @noinspection NullPointerExceptionInspection */
-        $permissions = $this->getArrayHelper()->parse($permissions, $extra);
-        if ($verify === true) {
-            $this->verifyFrontEndConditions($frontEndOptions['query']['having'], $permissions);
-        }
+        $permissions = $this->getArrayHelper()->parse($this->getArray()['permissions']['having'] ?? [], $extra);
         $havings = $frontEndOptions['query']['having'] ?? [];
         foreach ($havings as $having) {
             $type = !isset($having['type'])?'having':null;
             $type = $type === null && $having['type'] === 'and'?'andHaving':'orHaving';
-            $string = $this->buildFilterFromFrontEnd($qb->expr(), $having);
+            $string = $this->buildFilterFromFrontEnd($qb->expr(), $having, $permissions, $extra);
             $qb->$type($string);
         }
     }
+    /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
      * @param Expr $expr
-     * @param $condition
-     * @return mixed
+     * @param array $condition
+     * @param array $permissions
+     * @param array $extra
+     * @return string
+     * @throws \RuntimeException
      */
-    protected function buildFilterFromFrontEnd (Expr $expr, $condition):string
+    protected function buildFilterFromFrontEnd (Expr $expr, array $condition, array $permissions, array $extra):string
     {
         $operator = $condition['operator'];
         $fieldName = $condition['field'];
         $arguments = $condition['arguments']??[];
         if ($operator === 'andX' || $operator === 'orX') {
-            $string = $this->buildFilterFromFrontEnd($expr, $condition['conditions']);
+            $string = $this->buildFilterFromFrontEnd($expr, $condition['conditions'], $permissions, $extra);
         } else {
+            $fastMode = $this->highLowSettingCheck($permissions, $permissions['fields'][$condition['field']] ?? [], 'fastMode');
+            if ($fastMode !== true) {
+                $this->verifyFrontEndCondition($condition, $permissions);
+                /** @noinspection PhpUnusedLocalVariableInspection */
+                [$key, $where] = $this->closureMutate(null, $condition, $extra);
+            }
             array_unshift($arguments, $fieldName);
             $string = $expr->$operator($arguments);
         }
         return $string;
-    }
-
-    /**
-     * @param array $conditions
-     * @param array $permissions
-     * @throws \RuntimeException
-     * @internal param string $part
-     */
-    public function verifyFrontEndConditions (array $conditions, array $permissions):void
-    {
-        /** @var array $condition */
-        foreach ($conditions as $condition) {
-            $operator = $condition['operator'];
-            $this->verifyOperatorAllowed($operator);
-            if ($operator === 'andX' || $operator === 'orX') {
-                $this->verifyFrontEndConditions($condition['conditions'], $permissions);
-            } else {
-                $this->verifyFrontEndCondition($condition, $permissions);
-            }
-        }
-    }
-
-    /**
-     * @param string $operator
-     * @throws \RuntimeException
-     */
-    protected function verifyOperatorAllowed(string $operator):void
-    {
-        if (!in_array($operator, static::SAFE_OPERATORS, true)) {
-            throw new RuntimeException(sprintf($this->getErrorFromConstant('operatorNotSafe')['message'], $operator));
-        }
     }
 
     /**
@@ -408,66 +362,30 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         }
     }
 
-    /**
-     * @param string $field
-     * @param bool $noisy
-     * @return bool
-     * @throws \RuntimeException
-     */
-    public function verifyFieldFormat (string $field, bool $noisy = true):bool {
-        $fieldFormatOk = preg_match(static::FIELD_REGEX, $field);
-        if ($fieldFormatOk === false) {
-            if ($noisy === false) {
-                throw new RuntimeException(sprintf($this->getErrorFromConstant('fieldBadlyFormed')['message'], $field));
-            }
-            return false;
-        }
-        return true;
-    }
-
-
-    /**
-     * @param array $extra
-     * @throws \RuntimeException
-     * @internal param array $extra
-     */
-    public function verifyPlaceholders (array $extra):void
-    {
-        $frontEndOptions = $extra['frontEndOptions'];
-        $frontendPlaceholders = $frontEndOptions['query']['placeholders'] ?? [];
-        $permissions = $this->getArray()['permissions']['placeholders'] ?? [];
-        /** @noinspection NullPointerExceptionInspection */
-        $permissions = $this->getArrayHelper()->parse($permissions, $extra);
-        foreach ($frontendPlaceholders as $key => $value) {
-            $this->closurePermission($value, $extra);
-            $allowed = $this->permissiveAllowedCheck($permissions, $value);
-            /** @noinspection NullPointerExceptionInspection */
-            $allowed = $this->getArrayHelper()->parse($allowed, $extra);
-            if ($allowed === false) {
-                throw new RuntimeException(sprintf($this->getErrorFromConstant('placeholderNoAllowed')['message'], $key));
-            }
-        }
-    }
 
     /**
      * @param QueryBuilder $qb
      * @param array $extra
-     * @param bool $verify
      * @throws \RuntimeException
      */
-    public function addPlaceholders(QueryBuilder $qb, array $extra, bool $verify = true)
+    public function addPlaceholders(QueryBuilder $qb, array $extra)
     {
-        if ($verify === true) {
-            $this->verifyPlaceholders($extra);
-        }
         $frontendPlaceholders = $extra['frontEndOptions']['placeholders'] ?? [];
         $queryPlaceholders = $extra['params']['placeholders'] ?? [];
         $options = $extra['options']['placeholders'] ?? [];
         $overridePlaceholders = $extra['optionOverrides']['placeholders'] ?? [];
+        /** @noinspection NullPointerExceptionInspection */
+        $permissions = $this->getArrayHelper()->parse($this->getArray()['permissions']['placeholders'] ?? [], $extra);
         $placeholders = array_replace($queryPlaceholders, $options, $overridePlaceholders);
         $keys = array_keys($placeholders);
         $placeholders = array_replace($frontendPlaceholders, $placeholders);
         foreach ($placeholders as $key=>$value) {
+            $fastMode = $this->highLowSettingCheck($permissions, $permissions['fields'][$key] ?? [], 'fastMode');
+            if ($fastMode !== true) {
+                $this->verifyPlaceholders($key, $value, $permissions, $extra);
+                /** @noinspection PhpUnusedLocalVariableInspection */
+                [$key, $having] = $this->closureMutate($key, $value, $extra);
+            }
             $type = $value['type'] ?? null;
             $value = $value['value'] ?? null;
             if (in_array($key, $keys, true)) {
@@ -477,6 +395,26 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
                 $value = $this->getArrayHelper()->parse($value, $extra);
             }
             $qb->setParameter($key, $value, $type);
+        }
+    }
+    /** @noinspection MoreThanThreeArgumentsInspection */
+
+    /**
+     * @param string $key
+     * @param array $value
+     * @param array $permissions
+     * @param array $extra
+     * @internal param array $extra
+     * @throws \RuntimeException
+     */
+    public function verifyPlaceholders (string $key, array $value, array $permissions , array $extra):void
+    {
+        $this->closurePermission($value, $extra);
+        $allowed = $this->permissiveAllowedCheck($permissions, $value);
+        /** @noinspection NullPointerExceptionInspection */
+        $allowed = $this->getArrayHelper()->parse($allowed, $extra);
+        if ($allowed === false) {
+            throw new RuntimeException(sprintf($this->getErrorFromConstant('placeholderNoAllowed')['message'], $key));
         }
     }
 
@@ -649,5 +587,65 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         /** @noinspection NullPointerExceptionInspection */
         return $this->getArrayHelper()->parse($value, $extra);
     }
+
+    /**
+     * @param $key
+     * @param array $settings
+     * @param array $extra
+     * @return array
+     */
+    public function closureMutate (string $key=null, array $settings=null, array $extra):array {
+        $extra['key'] = $key;
+        $extra['settings'] = $settings;
+        /** @noinspection NullPointerExceptionInspection */
+        return isset($settings['mutate'])?$this->getArrayHelper()->parse($settings['mutate'], $extra):[$key, $settings];
+
+    }
+
+    /**
+     * @param array $permissions
+     * @param array $extra
+     * @param bool $noisy
+     * @return bool
+     * @throws \RuntimeException
+     */
+    public function closurePermission (array $permissions, array $extra, bool $noisy = true):bool {
+        /** @noinspection NullPointerExceptionInspection */
+        $allowed = !(isset($fieldSettings['closure']) && $this->getArrayHelper()->parse($permissions['closure'], $extra) === false);
+
+        if ($allowed === false && $noisy === true) {
+            throw new RuntimeException(sprintf($this->getErrorFromConstant('closureFails')['message']));
+        }
+        return $allowed;
+    }
+
+    /**
+     * @param string $field
+     * @param bool $noisy
+     * @return bool
+     * @throws \RuntimeException
+     */
+    public function verifyFieldFormat (string $field, bool $noisy = true):bool {
+        $fieldFormatOk = preg_match(static::FIELD_REGEX, $field);
+        if ($fieldFormatOk === false) {
+            if ($noisy === false) {
+                throw new RuntimeException(sprintf($this->getErrorFromConstant('fieldBadlyFormed')['message'], $field));
+            }
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @param string $operator
+     * @throws \RuntimeException
+     */
+    protected function verifyOperatorAllowed(string $operator):void
+    {
+        if (!in_array($operator, static::SAFE_OPERATORS, true)) {
+            throw new RuntimeException(sprintf($this->getErrorFromConstant('operatorNotSafe')['message'], $operator));
+        }
+    }
+
 }
 ?>

@@ -73,7 +73,9 @@ $readInfo = [
             'fields'=>[
                 '<field name>'=>[
                     'permissive'=>'<true or false>',
-                    'closure'=>'closure',
+                    'closure'=>'<closure to test param, return false from closure to cancel execution>',
+                    'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
+                    'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>',
                     'operators'=>[
                         '<operator name>'=>'<allowed>'
                     ]
@@ -85,7 +87,9 @@ $readInfo = [
             'fields'=>[
                 '<field name>'=>[
                     'permissive'=>'<true or false>',
-                    'closure'=>'closure',
+                    'closure'=>'<closure to test param, return false from closure to cancel execution>',
+                    'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
+                    'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>',
                     'operators'=>[
                         '<operator name>'=>'<allowed>'
                     ]
@@ -97,7 +101,9 @@ $readInfo = [
             'fields'=>[
                 '<field name>'=>[
                     'permissive'=>'<true or false>',
-                    'closure'=>'closure',
+                    'closure'=>'<closure to test param, return false from closure to cancel execution>',
+                    'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
+                    'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>',
                     'directions'=>[
                         '<operator name>'=>'<allowed true or false>'
                     ]
@@ -109,7 +115,9 @@ $readInfo = [
             'fields'=>[
                 '<field name>'=>[
                     'allowed'=>'<true or false>',
-                    'closure'=>'closure'
+                    'closure'=>'<closure to test param, return false from closure to cancel execution>',
+                    'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
+                    'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>',
                 ]
             ]
         ],
@@ -118,7 +126,9 @@ $readInfo = [
             'placeholderNames'=>[
                 '<field name>'=>[
                     'allowed'=>'<true or false>',
-                    'closure'=>'closure'
+                    'closure'=>'<closure to test param, return false from closure to cancel execution>',
+                    'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
+                    'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>',
                 ]
             ]
         ],
