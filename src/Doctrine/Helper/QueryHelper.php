@@ -1,7 +1,6 @@
 <?php
 namespace TempestTools\Crud\Doctrine\Helper;
 
-
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use RuntimeException;
