@@ -464,70 +464,72 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         $firstSelect = true;
         /** @var array $config */
         foreach ($config as $queryPart => $entries) {
-            /**
-             * @var array $entries
-             * @var string $key
-             * @var  array $value
-             */
-            foreach ($entries as $key => $value) {
-                if ($value !== null) {
-                    switch ($queryPart) {
-                        case 'select':
-                            $value = $this->processQueryPart($value, $qb, $extra);
-                            if ($firstSelect === true) {
-                                $qb->select($value);
-                                $firstSelect = false;
-                            } else {
-                                $qb->addSelect($value);
-                            }
-                            break;
-                        case 'from':
-                            $value = $this->processFrom($value, $qb, $extra);
-                            $qb->from($value['className'], $value['alias'], $value['indexBy']);
-                            break;
-                        case 'leftJoin':
-                            $value = $this->processJoinParams($value, $qb, $extra);
-                            $qb->leftJoin($value['join'], $value['alias'], $value['conditionType'], $value['condition'], $value['indexBy']);
-                            break;
-                        case 'innerJoin':
-                            $value = $this->processJoinParams($value, $qb, $extra);
-                            $qb->innerJoin($value['join'], $value['alias'], $value['conditionType'], $value['condition'], $value['indexBy']);
-                            break;
-                        case 'where':
-                            $where = $this->processQueryPart($value['value'], $qb, $extra);
-                            if (isset($value['type'])) {
-                                if ($value['type'] === 'and') {
-                                    $qb->andWhere($where);
-                                } else if ($value['type'] === 'or') {
-                                    $qb->orWhere($where);
+            if ($queryPart === 'from') {
+                $entries = $this->processFrom($entries, $qb, $extra);
+                $qb->from($entries['className'], $entries['alias'], $entries['indexBy']);
+            } else {
+                /**
+                 * @var array $entries
+                 * @var string $key
+                 * @var  array $value
+                 */
+                foreach ($entries as $key => $value) {
+                    if ($value !== null) {
+                        switch ($queryPart) {
+                            case 'select':
+                                $value = $this->processQueryPart($value, $qb, $extra);
+                                if ($firstSelect === true) {
+                                    $qb->select($value);
+                                    $firstSelect = false;
+                                } else {
+                                    $qb->addSelect($value);
                                 }
-                            } else {
-                                $qb->where($where);
-                            }
-                            break;
-                        case 'having':
-                            $having = $this->processQueryPart($value['value'], $qb, $extra);
-                            if (isset($value['type'])) {
-                                if ($value['type'] === 'and') {
-                                    $qb->andHaving($having);
-                                } else if ($value['type'] === 'or') {
-                                    $qb->orHaving($having);
+                                break;
+                            case 'leftJoin':
+                                $value = $this->processJoinParams($value, $qb, $extra);
+                                $qb->leftJoin($value['join'], $value['alias'], $value['conditionType'], $value['condition'], $value['indexBy']);
+                                break;
+                            case 'innerJoin':
+                                $value = $this->processJoinParams($value, $qb, $extra);
+                                $qb->innerJoin($value['join'], $value['alias'], $value['conditionType'], $value['condition'], $value['indexBy']);
+                                break;
+                            case 'where':
+                                $where = $this->processQueryPart($value['value'], $qb, $extra);
+                                if (isset($value['type'])) {
+                                    if ($value['type'] === 'and') {
+                                        $qb->andWhere($where);
+                                    } else if ($value['type'] === 'or') {
+                                        $qb->orWhere($where);
+                                    }
+                                } else {
+                                    $qb->where($where);
                                 }
-                            } else {
-                                $qb->having($having);
-                            }
-                            break;
-                        case 'orderBy':
-                            $value = $this->processOrderParams($value, $qb, $extra);
-                            $qb->addOrderBy($value['sort'], $value['order']);
-                            break;
-                        case 'groupBy':
-                            $value = $this->processQueryPart($value, $qb, $extra);
-                            $qb->addGroupBy($value);
-                            break;
+                                break;
+                            case 'having':
+                                $having = $this->processQueryPart($value['value'], $qb, $extra);
+                                if (isset($value['type'])) {
+                                    if ($value['type'] === 'and') {
+                                        $qb->andHaving($having);
+                                    } else if ($value['type'] === 'or') {
+                                        $qb->orHaving($having);
+                                    }
+                                } else {
+                                    $qb->having($having);
+                                }
+                                break;
+                            case 'orderBy':
+                                $value = $this->processOrderParams($value, $qb, $extra);
+                                $qb->addOrderBy($value['sort'], $value['order']);
+                                break;
+                            case 'groupBy':
+                                $value = $this->processQueryPart($value, $qb, $extra);
+                                $qb->addGroupBy($value);
+                                break;
+                        }
                     }
                 }
             }
+
         }
     }
 
