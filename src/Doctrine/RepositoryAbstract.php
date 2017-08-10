@@ -24,6 +24,9 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
 
     use ArrayHelperTrait, ErrorConstantsTrait, TTConfigTrait, EvmTrait;
 
+    /**
+     * ERRORS
+     */
     const ERRORS = [
         'noArrayHelper'=>[
             'message'=>'Error: No array helper set on repository.',
@@ -41,6 +44,11 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
             'message'=>'Error: More query params than passed than permitted. count = %2, max = %s'
         ]
     ];
+
+    /**
+     * ENTITY_NAME_REGEX
+     */
+    const ENTITY_NAME_REGEX = '/\w+$/';
 
     /** @var  QueryHelperContract|null  */
     protected $queryHelper;
@@ -123,9 +131,9 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         }
 
         if ($force !== true || $this->getConfigArrayHelper() === null) {
-            $entityArrayHelper = new QueryHelper();
-            $entityArrayHelper->setArrayHelper($this->getArrayHelper());
-            $this->parseTTConfig($entityArrayHelper);
+            $queryArrayHelper = new QueryHelper();
+            $queryArrayHelper->setArrayHelper($this->getArrayHelper());
+            $this->parseTTConfig($queryArrayHelper);
         }
         /** @noinspection NullPointerExceptionInspection */
         $this->getDataBindHelper()->init($arrayHelper, $path, $fallBack, $force);
@@ -139,7 +147,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \RuntimeException
      * @throws \Doctrine\ORM\ORMException
      */
-    public function read (array $params, array $frontEndOptions=[], array $optionOverrides = []) {
+    public function read (array $params=[], array $frontEndOptions=[], array $optionOverrides = []) {
         /** @noinspection NullPointerExceptionInspection */
         $eventArgs = $this->makeEventArgs($params, $optionOverrides, $frontEndOptions);
         $eventArgs->getArgs()['action'] = 'read';
@@ -150,7 +158,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         /** @var array $params */
         $params = $eventArgs->getArgs()['params'];
         $this->checkQueryMaxParams($params, $optionOverrides);
-        $qb = $this->createQueryBuilder(get_class($this)[0]);
+        $qb = $this->createQueryBuilder($this->getEntityAlias());
         /** @noinspection NullPointerExceptionInspection */
         $eventArgs->getArgs()['results'] = $this->getConfigArrayHelper()->read($qb, $params, $frontEndOptions, $this->getOptions(), $optionOverrides);
 
@@ -158,6 +166,16 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         $evm->dispatchEvent(RepositoryEvents::POST_READ, $eventArgs);
 
         return $eventArgs->getArgs()['results'];
+    }
+
+    /**
+     * @return string
+     */
+    protected function getEntityAlias():string
+    {
+        $entityName = $this->getEntityName();
+        preg_match(static::ENTITY_NAME_REGEX, $entityName, $matches);
+        return strtolower($matches[0][0]);
     }
 
     /**

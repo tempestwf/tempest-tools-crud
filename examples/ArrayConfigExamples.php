@@ -4,6 +4,11 @@ $readInfo = [
         'select'=>[
             '<keyName>'=>'<string>'
         ],
+        'from'=>[ // if not supplied it will be auto generated
+            'className'=>'<string>',
+            'alias'=>'<string>',
+            'indexBy'=>'<string>',
+        ],
         'where'=>[
             '<keyName>'=>[
                 'type'=>'<null, and, or>',

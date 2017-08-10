@@ -62,7 +62,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
     /**
      * DEFAULT_OFFSET
      */
-    const DEFAULT_OFFSET = 1;
+    const DEFAULT_OFFSET = 0;
 
     /**
      * DEFAULT_RETURN_COUNT
@@ -101,6 +101,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
             'qb'=>$qb,
             'helper'=>$this
         ];
+
         $this->buildBaseQuery($qb, $extra);
         $this->applyCachingToQuery($qb, $extra);
         $this->addPlaceholders($qb, $extra);
@@ -127,22 +128,23 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         $returnCount = $frontEndOptions['options']['returnCount'] ?? static::DEFAULT_RETURN_COUNT;
         $hydrate = $this->findSetting([$options, $optionOverrides], 'hydrate');
         $fetchJoin = $this->getArray()['read']['fetchJoin'] ?? static::DEFAULT_FETCH_JOIN;
-
+        $count = null;
         if ($hydrate !== true) {
             return ['qb'=>$qb];
         }
 
-        $qb->getQuery()->setHydrationMode($hydrationType);
-
+        //$sql = $qb->getQuery()->getSQL();
+        //$resultTest = $qb->getQuery()->getResult();
         if ($paginate === true) {
             $paginator = new Paginator($qb->getQuery());
+            $paginator->getQuery()->setHydrationMode($hydrationType);
             $count = $returnCount?count($paginator, $fetchJoin):null;
             $result = $paginator->getIterator()->getArrayCopy();
-            return ['count'=>$count, 'result'=>$result];
+        } else {
+            $qb->getQuery()->setHydrationMode($hydrationType);
+            $result = $qb->getQuery()->getResult();
         }
-
-        return $qb->getQuery()->getResult();
-
+        return ['count'=>$count, 'result'=>$result];
     }
 
     /**
@@ -153,12 +155,11 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
     public function addLimitAndOffset(QueryBuilder $qb, array $extra):void
     {
         $frontEndOptions = $extra['frontEndOptions'];
-        $options = $frontEndOptions['options'] ?? [];
 
-        $limit = $options['limit'] ?? static::DEFAULT_LIMIT;
-        $offset = $options['offset'] ?? static::DEFAULT_OFFSET;
+        $limit = $frontEndOptions['limit'] ?? static::DEFAULT_LIMIT;
+        $offset = $frontEndOptions['offset'] ?? static::DEFAULT_OFFSET;
         $this->verifyLimitAndOffset($limit, $extra);
-        $qb->setFirstResult($limit);
+        $qb->setMaxResults($limit);
         $qb->setFirstResult($offset);
     }
 
@@ -460,6 +461,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
     public function buildBaseQuery(QueryBuilder $qb, array $extra):void
     {
         $config = $this->getArray()['read'] ?? [];
+        $firstSelect = true;
         /** @var array $config */
         foreach ($config as $queryPart => $entries) {
             /**
@@ -472,7 +474,15 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
                     switch ($queryPart) {
                         case 'select':
                             $value = $this->processQueryPart($value, $qb, $extra);
-                            $qb->addSelect($value);
+                            if ($firstSelect === true) {
+                                $qb->select($value);
+                            } else {
+                                $qb->addSelect($value);
+                            }
+                            break;
+                        case 'from':
+                            $value = $this->processFrom($value, $qb, $extra);
+                            $qb->from($value['className'], $value['alias'], $value['indexBy']);
                             break;
                         case 'leftJoin':
                             $value = $this->processJoinParams($value, $qb, $extra);
@@ -512,7 +522,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
                             break;
                         case 'groupBy':
                             $value = $this->processQueryPart($value, $qb, $extra);
-                            $qb->groupBy($value);
+                            $qb->addGroupBy($value);
                             break;
                     }
                 }
@@ -569,6 +579,23 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         ];
         return $this->processQueryPartArray($array, $defaults, $qb, $extra);
     }
+
+    /**
+     * @param array $array
+     * @param QueryBuilder $qb
+     * @param array $extra
+     * @return array
+     */
+    protected function processFrom(array $array, QueryBuilder $qb, array $extra):array
+    {
+        $defaults = [
+            'className'=>null,
+            'alias'=>null,
+            'indexBy'=>null,
+        ];
+        return $this->processQueryPartArray($array, $defaults, $qb, $extra);
+    }
+
 
     /**
      * @param $value
