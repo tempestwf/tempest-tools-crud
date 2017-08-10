@@ -10,7 +10,7 @@ use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
 use Doctrine\ORM\QueryBuilder;
 
-class QueryHelper extends ArrayHelper //implements \TempestTools\Crud\Contracts\QueryHelper
+class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\QueryHelper
 {
     use TTConfigTrait, ErrorConstantsTrait, ArrayHelperTrait;
 
@@ -232,7 +232,8 @@ class QueryHelper extends ArrayHelper //implements \TempestTools\Crud\Contracts\
      * @param array $extra
      * @throws \RuntimeException
      */
-    public function addFrontEndOrderBys(QueryBuilder $qb, array $extra):void {
+    public function addFrontEndOrderBys(QueryBuilder $qb, array $extra):void
+    {
         $frontEndOptions = $extra['frontEndOptions'];
         $orderBys = $frontEndOptions['query']['orderBy'] ?? [];
         /** @noinspection NullPointerExceptionInspection */
@@ -368,7 +369,7 @@ class QueryHelper extends ArrayHelper //implements \TempestTools\Crud\Contracts\
      * @param array $extra
      * @throws \RuntimeException
      */
-    public function addPlaceholders(QueryBuilder $qb, array $extra)
+    public function addPlaceholders(QueryBuilder $qb, array $extra):void
     {
         $frontendPlaceholders = $extra['frontEndOptions']['placeholders'] ?? [];
         $queryPlaceholders = $extra['params']['placeholders'] ?? [];
@@ -424,7 +425,8 @@ class QueryHelper extends ArrayHelper //implements \TempestTools\Crud\Contracts\
      * @throws RuntimeException
      * @throws \Doctrine\ORM\ORMException
      */
-    public function applyCachingToQuery (QueryBuilder $qb, array $extra) {
+    public function applyCachingToQuery (QueryBuilder $qb, array $extra):void
+    {
         $params = $extra['params'];
         $options = $extra['options'];
         $optionOverrides = $extra['optionOverrides'];
@@ -455,7 +457,8 @@ class QueryHelper extends ArrayHelper //implements \TempestTools\Crud\Contracts\
      * @param QueryBuilder $qb
      * @param array $extra
      */
-    public function buildBaseQuery(QueryBuilder $qb, array $extra):void {
+    public function buildBaseQuery(QueryBuilder $qb, array $extra):void
+    {
         $config = $this->getArray()['read'] ?? [];
         /** @var array $config */
         foreach ($config as $queryPart => $entries) {
@@ -526,7 +529,8 @@ class QueryHelper extends ArrayHelper //implements \TempestTools\Crud\Contracts\
      * @param array $extra
      * @return array
      */
-    protected function processQueryPartArray (array $array, array $defaults, QueryBuilder $qb, array $extra):array {
+    protected function processQueryPartArray (array $array, array $defaults, QueryBuilder $qb, array $extra):array
+    {
         foreach ($array as $key => $value) {
             $array[$key] = $this->processQueryPart($value, $qb, $extra);
         }
@@ -539,7 +543,8 @@ class QueryHelper extends ArrayHelper //implements \TempestTools\Crud\Contracts\
      * @param array $extra
      * @return array
      */
-    protected function processJoinParams(array $array, QueryBuilder $qb, array $extra):array {
+    protected function processJoinParams(array $array, QueryBuilder $qb, array $extra):array
+    {
         $defaults = [
             'join'=>null,
             'alias'=>null,
@@ -556,7 +561,8 @@ class QueryHelper extends ArrayHelper //implements \TempestTools\Crud\Contracts\
      * @param array $extra
      * @return array
      */
-    protected function processOrderParams(array $array, QueryBuilder $qb, array $extra):array {
+    protected function processOrderParams(array $array, QueryBuilder $qb, array $extra):array
+    {
         $defaults = [
             'sort'=>null,
             'order'=>null
@@ -570,7 +576,8 @@ class QueryHelper extends ArrayHelper //implements \TempestTools\Crud\Contracts\
      * @param array $extra
      * @return string
      */
-    protected function processQueryPart($value, QueryBuilder $qb, array $extra):string {
+    protected function processQueryPart($value, QueryBuilder $qb, array $extra):string
+    {
         if (is_array($value)) {
             /** @var array[] $value */
             foreach ($value['arguments'] as &$argument) {
@@ -594,7 +601,8 @@ class QueryHelper extends ArrayHelper //implements \TempestTools\Crud\Contracts\
      * @param array $extra
      * @return array
      */
-    public function closureMutate (string $key=null, array $settings=null, array $extra):array {
+    public function closureMutate (string $key=null, array $settings=null, array $extra):array
+    {
         $extra['key'] = $key;
         $extra['settings'] = $settings;
         /** @noinspection NullPointerExceptionInspection */
@@ -609,7 +617,8 @@ class QueryHelper extends ArrayHelper //implements \TempestTools\Crud\Contracts\
      * @return bool
      * @throws \RuntimeException
      */
-    public function closurePermission (array $permissions, array $extra, bool $noisy = true):bool {
+    public function closurePermission (array $permissions, array $extra, bool $noisy = true):bool
+    {
         /** @noinspection NullPointerExceptionInspection */
         $allowed = !(isset($fieldSettings['closure']) && $this->getArrayHelper()->parse($permissions['closure'], $extra) === false);
 
@@ -625,7 +634,8 @@ class QueryHelper extends ArrayHelper //implements \TempestTools\Crud\Contracts\
      * @return bool
      * @throws \RuntimeException
      */
-    public function verifyFieldFormat (string $field, bool $noisy = true):bool {
+    public function verifyFieldFormat (string $field, bool $noisy = true):bool
+    {
         $fieldFormatOk = preg_match(static::FIELD_REGEX, $field);
         if ($fieldFormatOk === false) {
             if ($noisy === false) {

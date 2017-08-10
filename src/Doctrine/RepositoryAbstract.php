@@ -131,6 +131,14 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         $this->getDataBindHelper()->init($arrayHelper, $path, $fallBack, $force);
     }
 
+    /**
+     * @param array $params
+     * @param array $optionOverrides
+     * @param array $frontEndOptions
+     * @return mixed
+     * @throws \RuntimeException
+     * @throws \Doctrine\ORM\ORMException
+     */
     public function read (array $params, array $optionOverrides = [], array $frontEndOptions=[]) {
         /** @noinspection NullPointerExceptionInspection */
         $eventArgs = $this->makeEventArgs($params, $optionOverrides, $frontEndOptions);
