@@ -187,8 +187,8 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
      */
     public function addFrontEndGroupBys(QueryBuilder $qb, array $extra):void
     {
-        $frontEndOptions = $extra['frontEndOptions'];
-        $groupBys = $frontEndOptions['query']['groupBy'] ?? [];
+        $params = $extra['params'];
+        $groupBys = $params['query']['groupBy'] ?? [];
         /** @noinspection NullPointerExceptionInspection */
         $permissions = $this->getArrayHelper()->parse($this->getArray()['permissions']['groupBy'] ?? [], $extra) ?? [];
         foreach ($groupBys as $key => $value) {
@@ -234,8 +234,8 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
      */
     public function addFrontEndOrderBys(QueryBuilder $qb, array $extra):void
     {
-        $frontEndOptions = $extra['frontEndOptions'];
-        $orderBys = $frontEndOptions['query']['orderBy'] ?? [];
+        $params = $extra['params'];
+        $orderBys = $params['query']['orderBy'] ?? [];
         /** @noinspection NullPointerExceptionInspection */
         $permissions = $this->getArrayHelper()->parse($this->getArray()['permissions']['orderBy'] ?? [], $extra) ?? [];
         foreach ($orderBys as $key => $value) {
@@ -280,10 +280,10 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
      */
     public function addFrontEndWhere(QueryBuilder $qb, array $extra):void
     {
-        $frontEndOptions = $extra['frontEndOptions'];
+        $params = $extra['params'];
         /** @noinspection NullPointerExceptionInspection */
         $permissions = $this->getArrayHelper()->parse($this->getArray()['permissions']['where']??[], $extra) ?? [];
-        $wheres = $frontEndOptions['query']['where'] ?? [];
+        $wheres = $params['query']['where'] ?? [];
         foreach ($wheres as $where) {
             $type = !isset($where['type'])?'where':null;
             $type = $type === null && $where['type'] === 'and'?'andWhere':'orWhere';
@@ -299,10 +299,10 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
      * @throws \RuntimeException
      */
     public function addFrontEndHaving(QueryBuilder $qb, array $extra):void {
-        $frontEndOptions = $extra['frontEndOptions'];
+        $params = $extra['params'];
         /** @noinspection NullPointerExceptionInspection */
         $permissions = $this->getArrayHelper()->parse($this->getArray()['permissions']['having'] ?? [], $extra);
-        $havings = $frontEndOptions['query']['having'] ?? [];
+        $havings = $params['query']['having'] ?? [];
         foreach ($havings as $having) {
             $type = !isset($having['type'])?'having':null;
             $type = $type === null && $having['type'] === 'and'?'andHaving':'orHaving';
@@ -371,15 +371,15 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
      */
     public function addPlaceholders(QueryBuilder $qb, array $extra):void
     {
-        $frontendPlaceholders = $extra['frontEndOptions']['placeholders'] ?? [];
-        $queryPlaceholders = $extra['params']['placeholders'] ?? [];
+        $queryPlaceholders = $this->getArray()['read']['placeholders'] ?? [];
+        $frontEndPlaceholders = $extra['params']['query']['placeholders'] ?? [];
         $options = $extra['options']['placeholders'] ?? [];
         $overridePlaceholders = $extra['optionOverrides']['placeholders'] ?? [];
         /** @noinspection NullPointerExceptionInspection */
         $permissions = $this->getArrayHelper()->parse($this->getArray()['permissions']['placeholders'] ?? [], $extra);
         $placeholders = array_replace($queryPlaceholders, $options, $overridePlaceholders);
         $keys = array_keys($placeholders);
-        $placeholders = array_replace($frontendPlaceholders, $placeholders);
+        $placeholders = array_replace($frontEndPlaceholders, $placeholders);
         foreach ($placeholders as $key=>$value) {
             $fastMode = $this->highLowSettingCheck($permissions, $permissions['fields'][$key] ?? [], 'fastMode');
             if ($fastMode !== true) {
