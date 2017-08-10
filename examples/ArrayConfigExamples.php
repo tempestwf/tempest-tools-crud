@@ -69,9 +69,10 @@ $readInfo = [
                 'type'=>'<param type can be null>'
             ]
         ],
-        'fetchJoin'=>'<true or false>' // whether or not when paginating this query requires a fetch join
+        'fetchJoin'=>'<true or false>', // whether or not when paginating this query requires a fetch join
     ],
     'permissions'=>[
+        'allowed'=>'<true or false>',
         'maxLimit'=>'<max limit>',
         'where'=>[
             'permissive'=>'<true or false>',

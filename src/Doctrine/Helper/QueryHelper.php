@@ -42,7 +42,12 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         'closureFails' => [
             'message' => 'Error: A validation closure did not pass while building query.',
         ],
+        'readRequestNotAllowed' => [
+            'message' => 'Error: Read request not allowed.',
+        ],
     ];
+
+
 
     /**
      * FIELD_REGEX
@@ -101,7 +106,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
             'qb'=>$qb,
             'helper'=>$this
         ];
-
+        $this->verifyAllowed($extra);
         $this->buildBaseQuery($qb, $extra);
         $this->applyCachingToQuery($qb, $extra);
         $this->addPlaceholders($qb, $extra);
@@ -110,6 +115,21 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         $this->addFrontEndGroupBys($qb, $extra);
         $this->addLimitAndOffset($qb, $extra);
         return $this->prepareResult($qb, $extra);
+    }
+
+    /**
+     * @param array $extra
+     * @throws \RuntimeException
+     */
+    public function verifyAllowed(array $extra):void
+    {
+        $config = $this->getArray()['permissions'] ?? [];
+        $allowed = $config['allowed']?? true;
+        /** @noinspection NullPointerExceptionInspection */
+        $allowed = $this->getArrayHelper()->parse($allowed, $extra);
+        if ($allowed === false) {
+            throw new RuntimeException(sprintf($this->getErrorFromConstant('readRequestNotAllowed')['message']));
+        }
     }
 
     /**
