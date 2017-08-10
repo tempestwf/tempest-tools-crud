@@ -139,7 +139,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \RuntimeException
      * @throws \Doctrine\ORM\ORMException
      */
-    public function read (array $params, array $optionOverrides = [], array $frontEndOptions=[]) {
+    public function read (array $params, array $frontEndOptions=[], array $optionOverrides = []) {
         /** @noinspection NullPointerExceptionInspection */
         $eventArgs = $this->makeEventArgs($params, $optionOverrides, $frontEndOptions);
         $eventArgs->getArgs()['action'] = 'read';
@@ -152,7 +152,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         $this->checkQueryMaxParams($params, $optionOverrides);
         $qb = $this->createQueryBuilder(get_class($this)[0]);
         /** @noinspection NullPointerExceptionInspection */
-        $eventArgs->getArgs()['results'] = $this->getConfigArrayHelper()->read($qb, $params, $this->getOptions(), $optionOverrides, $frontEndOptions);
+        $eventArgs->getArgs()['results'] = $this->getConfigArrayHelper()->read($qb, $params, $frontEndOptions, $this->getOptions(), $optionOverrides);
 
         $evm->dispatchEvent(RepositoryEvents::PROCESS_RESULTS_READ, $eventArgs);
         $evm->dispatchEvent(RepositoryEvents::POST_READ, $eventArgs);

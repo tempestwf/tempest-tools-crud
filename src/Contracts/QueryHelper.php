@@ -12,14 +12,14 @@ interface QueryHelper extends ArrayHelper {
     /**
      * @param QueryBuilder $qb
      * @param array $params
+     * @param array $frontEndOptions
      * @param array $options
      * @param array $optionOverrides
-     * @param array $frontEndOptions
      * @return array
      * @throws RuntimeException
      * @throws \Doctrine\ORM\ORMException
      */
-    public function read(QueryBuilder $qb, array $params, array $options, array $optionOverrides, array $frontEndOptions):array;
+    public function read(QueryBuilder $qb, array $params, array $frontEndOptions, array $options, array $optionOverrides):array;
     /**
      * @param QueryBuilder $qb
      * @param array $extra
