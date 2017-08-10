@@ -476,6 +476,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
                             $value = $this->processQueryPart($value, $qb, $extra);
                             if ($firstSelect === true) {
                                 $qb->select($value);
+                                $firstSelect = false;
                             } else {
                                 $qb->addSelect($value);
                             }
