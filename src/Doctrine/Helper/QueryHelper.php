@@ -45,6 +45,10 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         'readRequestNotAllowed' => [
             'message' => 'Error: Read request not allowed.',
         ],
+        'directionNotAllow' => [
+            'message' => 'Error: Order by direction not allowed. direction = %s',
+        ],
+
     ];
 
 
@@ -84,6 +88,11 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
      */
     const SAFE_OPERATORS = ['andX', 'orX', 'eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'in', 'notIn', 'isNull', 'isNotNull', 'like', 'notLike', 'between' ];
 
+    /**
+     * ORDER_BY_DIRECTIONS
+     */
+    const ORDER_BY_DIRECTIONS = ['ASC', 'DESC'];
+
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
@@ -111,6 +120,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         $this->applyCachingToQuery($qb, $extra);
         $this->addPlaceholders($qb, $extra);
         $this->addFrontEndWhere($qb, $extra);
+        $this->addFrontEndHaving($qb, $extra);
         $this->addFrontEndOrderBys($qb, $extra);
         $this->addFrontEndGroupBys($qb, $extra);
         $this->addLimitAndOffset($qb, $extra);
@@ -176,8 +186,9 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
     {
         $frontEndOptions = $extra['frontEndOptions'];
 
-        $limit = $frontEndOptions['limit'] ?? static::DEFAULT_LIMIT;
-        $offset = $frontEndOptions['offset'] ?? static::DEFAULT_OFFSET;
+        $limit = isset($frontEndOptions['limit']) ? (int)$frontEndOptions['limit']:static::DEFAULT_LIMIT;
+        $offset = isset($frontEndOptions['offset']) ? (int)$frontEndOptions['offset']:static::DEFAULT_OFFSET;
+
         $this->verifyLimitAndOffset($limit, $extra);
         $qb->setMaxResults($limit);
         $qb->setFirstResult($offset);
@@ -285,6 +296,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         $this->verifyFieldFormat($key);
         $fieldSettings = $permissions['fields'][$key]??[];
         $direction = $value['direction']??'';
+        $this->verifyDirectionFormat($direction);
         $allowed = $this->permissivePermissionCheck($permissions, $fieldSettings, 'directions', $direction);
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $this->getArrayHelper()->parse($allowed, $extra);
@@ -346,10 +358,14 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         $operator = $condition['operator'];
         $fieldName = $condition['field'];
         $arguments = $condition['arguments']??[];
+        $conditions = $condition['conditions']??[];
+        $fieldSettings = $permissions['fields'][$fieldName] ?? [];
+
         if ($operator === 'andX' || $operator === 'orX') {
-            $string = $this->buildFilterFromFrontEnd($expr, $condition['conditions'], $permissions, $extra);
+            $string = $this->buildFilterFromFrontEnd($expr, $conditions, $permissions, $extra);
         } else {
-            $fastMode = $this->highLowSettingCheck($permissions, $permissions['fields'][$condition['field']] ?? [], 'fastMode');
+            $arguments = $this->argumentsToPlaceholders($arguments, $extra);
+            $fastMode = $this->highLowSettingCheck($permissions, $fieldSettings, 'fastMode');
             if ($fastMode !== true) {
                 $this->verifyFrontEndCondition($condition, $permissions);
                 /** @noinspection PhpUnusedLocalVariableInspection */
@@ -359,6 +375,24 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
             $string = $expr->$operator($arguments);
         }
         return $string;
+    }
+
+    /**
+     * @param array $arguments
+     * @param array $extra
+     * @return array
+     */
+    protected function argumentsToPlaceholders(array $arguments, array $extra):array
+    {
+        /** @var QueryBuilder $qb */
+        $qb = $extra['qb'];
+        $result = [];
+        foreach ($arguments as $argument) {
+            $placeholderName = uniqid('', true);
+            $result[] = ':' . $placeholderName;
+            $qb->setParameter($placeholderName, $argument);
+        }
+        return $result;
     }
 
     /**
@@ -670,7 +704,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
     public function closurePermission (array $permissions, array $extra, bool $noisy = true):bool
     {
         /** @noinspection NullPointerExceptionInspection */
-        $allowed = !(isset($fieldSettings['closure']) && $this->getArrayHelper()->parse($permissions['closure'], $extra) === false);
+        $allowed = !(isset($permissions['closure']) && $this->getArrayHelper()->parse($permissions['closure'], $extra) === false);
 
         if ($allowed === false && $noisy === true) {
             throw new RuntimeException(sprintf($this->getErrorFromConstant('closureFails')['message']));
@@ -695,6 +729,26 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         }
         return true;
     }
+
+    /**
+     * @param string $direction
+     * @param bool $noisy
+     * @return bool
+     * @throws \RuntimeException
+     */
+    public function verifyDirectionFormat (string $direction, bool $noisy = true):bool
+    {
+        $directionOk = in_array($direction, static::ORDER_BY_DIRECTIONS, true);
+        if ($directionOk === false) {
+            if ($noisy === false) {
+                throw new RuntimeException(sprintf($this->getErrorFromConstant('directionNotAllow')['message'], $direction));
+            }
+            return false;
+        }
+        return true;
+    }
+
+
 
     /**
      * @param string $operator
