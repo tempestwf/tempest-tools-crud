@@ -71,11 +71,13 @@ abstract class EntityAbstract implements EventSubscriber, HasId, Entity
      */
     public function init(string $mode, ArrayHelperContract $arrayHelper = null, array $path = null, array $fallBack = null, bool $force = false)
     {
+        $startPath = $this->getTTPath();
+        $startFallback = $this->getTTFallBack();
         if ($arrayHelper !== null && ($force === true || $this->getArrayHelper() === null)) {
             $this->setArrayHelper($arrayHelper);
         }
 
-        if ($path !== null && ($force === true || $this->getTTPath() === null || $mode !== $this->getLastMode())) {
+        if ($path !== null && ($force === true || $this->getTTPath() === null || $mode !== $this->getLastMode() || $path !== $this->getTTPath())) {
             $this->setTTPath($path);
             $path = $this->getTTPath();
             $path[] = $mode;
@@ -83,7 +85,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId, Entity
         }
 
 
-        if ($fallBack !== null && ($force === true || $this->getTTFallBack() === null || $mode !== $this->getLastMode())) {
+        if ($fallBack !== null && ($force === true || $this->getTTFallBack() === null || $mode !== $this->getLastMode() || $fallBack !== $this->getTTFallBack())) {
             $this->setTTFallBack($fallBack);
             $path = $this->getTTFallBack();
             $path[] = $mode;
@@ -94,7 +96,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId, Entity
             throw new \RuntimeException($this->getErrorFromConstant('noArrayHelper')['message']);
         }
 
-        if ($force === true || $this->getConfigArrayHelper() === null || $mode !== $this->getLastMode()) {
+        if ($force === true || $this->getConfigArrayHelper() === null || $mode !== $this->getLastMode() || $startPath !== $this->getTTPath() || $startFallback !== $this->getTTFallBack()) {
             $entityArrayHelper = new EntityArrayHelper();
             $entityArrayHelper->setArrayHelper($this->getArrayHelper());
             $this->parseTTConfig($entityArrayHelper);

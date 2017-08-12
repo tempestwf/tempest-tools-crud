@@ -54,13 +54,13 @@ interface QueryHelper extends ArrayHelper {
 
     /**
      * @param string $key
-     * @param array $value
+     * @param string $value
      * @param array $permissions
      * @param array $extra
      * @internal param array $extra
      * @throws \RuntimeException
      */
-    public function verifyFrontEndGroupBys (string $key, array $value, array $permissions, array $extra):void;
+    public function verifyFrontEndGroupBys (string $key, string $value, array $permissions, array $extra):void;
 
     /**
      * @param QueryBuilder $qb
@@ -72,12 +72,12 @@ interface QueryHelper extends ArrayHelper {
 
     /**
      * @param string $key
-     * @param array $value
+     * @param string $value
      * @param array $permissions
      * @param $extra
      * @throws \RuntimeException
      */
-    public function verifyFrontEndOrderBys (string $key, array $value, array $permissions, $extra):void;
+    public function verifyFrontEndOrderBys (string $key, string $value, array $permissions, $extra):void;
 
     /**
      * @param QueryBuilder $qb

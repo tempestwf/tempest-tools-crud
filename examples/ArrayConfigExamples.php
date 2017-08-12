@@ -1,18 +1,21 @@
 <?php
 $readInfo = [
     'read'=>[
-        'select'=>[
+        'select'=>[ //Tested in: testBasicRead
             '<keyName>'=>'<string>'
         ],
         'from'=>[ // if not supplied it will be auto generated
-            'className'=>'<string>',
-            'alias'=>'<string>',
-            'indexBy'=>'<string>',
+            '<keyName>'=>[
+                'className'=>'<string>',
+                'alias'=>'<string>',
+                'indexBy'=>'<string>',
+                'append'=>'<true or false>' // whether or not to ad an an addition from. Defaults to false
+            ]
         ],
         'where'=>[
             '<keyName>'=>[
                 'type'=>'<null, and, or>',
-                'value'=>'<string>' // If an array of: ['xpr'=>'<xpr name>', 'arguments'=>['<arguments, could be another xpr array>']] is used, then all parts will be parsed by the array helper, and corresponding xpr methods will be called with the specified arguments. This is true for all parts of the query
+                'value'=>'<string>' // If an array of: ['expr'=>'<xpr name>', 'arguments'=>['<arguments, could be another xpr array>']] is used, then all parts will be parsed by the array helper, and corresponding xpr methods will be called with the specified arguments. This is true for all parts of the query
             ]
         ],
         'having'=>[
@@ -20,15 +23,6 @@ $readInfo = [
                 'type'=>'<null, and, or>',
                 'value'=>'<string>'
             ]
-        ],
-        'orderBy'=>[
-            '<keyName>'=>[
-                'sort'=>'<sort string>',
-                'order'=>'sort order'
-            ]
-        ],
-        'groupBy'=>[
-            '<keyName>'=>'<string>'
         ],
         'leftJoin'=>[
             '<keyName>'=>[
@@ -48,6 +42,17 @@ $readInfo = [
                 'indexBy'=>'<index by>',
             ]
         ],
+        'orderBy'=>[
+            '<keyName>'=>[
+                'sort'=>'<sort string>',
+                'order'=>'sort order'
+            ]
+        ],
+        'groupBy'=>[
+            '<keyName>'=>'<string>'
+        ],
+    ],
+    'settings'=>[
         'cache'=>[
             'useQueryCache'=>'<true or false>',
             'useResultCache'=>'<true or false>',
@@ -145,7 +150,7 @@ $frontEndQuery = [
         'where'=>[
             [
                 'field'=>'<fieldName>',
-                'type'=>'<null, and, or>',
+                'type'=>'<and, or>',
                 'operator'=>'<operator name>', // make sure here that only the safe ones are even used. If operator is 'andX' or 'orX' then conditions with a nested list of conditions is used instead
                 'arguments'=>['<arguments that get passed to that query builder operator>'],  // If operator is 'andX' or 'orX' this is omitted. Conditions appears in instead.
                 'conditions'=>['<array of just like any other filter>'] // If operator is not 'andX' or 'orX' this is omitted. This allows condition nesting.
@@ -154,16 +159,14 @@ $frontEndQuery = [
         'having'=>[
             [
                 'field'=>'<fieldName>',
-                'type'=>'<null, and, or>',
+                'type'=>'<and, or>',
                 'operator'=>'<operator name>', // make sure here that only the safe ones are even used. If operator is 'andX' or 'orX' then conditions with a nested list of conditions is used instead
                 'arguments'=>['<arguments that get passed to that query builder operator>'],  // If operator is 'andX' or 'orX' this is omitted. Conditions appears in instead.
                 'conditions'=>['<array of just like any other filter>'] // If operator is not 'andX' or 'orX' this is omitted. This allows condition nesting.
             ]
         ],
         'orderBy'=>[
-            '<field name>'=>[
-                'direction'=>'<ASC or DESC>'
-            ]
+            '<field name>'=>'<ASC or DESC>'
         ],
         'groupBy'=>[
             '<field name>'

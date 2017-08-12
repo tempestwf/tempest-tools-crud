@@ -239,18 +239,18 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
 
     /**
      * @param string $key
-     * @param array $value
+     * @param string $value
      * @param array $permissions
      * @param array $extra
      * @internal param array $extra
      * @throws \RuntimeException
      */
-    public function verifyFrontEndGroupBys (string $key, array $value, array $permissions, array $extra):void
+    public function verifyFrontEndGroupBys (string $key, string $value, array $permissions, array $extra):void
     {
-        $this->closurePermission($value, $extra);
+        $this->closurePermission($permissions, $extra);
         $this->verifyFieldFormat($key);
 
-        $allowed = $this->permissiveAllowedCheck($permissions, $value);
+        $allowed = $this->permissiveAllowedCheck($permissions, $permissions['fields'][$key] ?? []);
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $this->getArrayHelper()->parse($allowed, $extra);
         if ($allowed === false) {
@@ -277,31 +277,29 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
                 /** @noinspection PhpUnusedLocalVariableInspection */
                 [$key, $value] = $this->closureMutate($key, $value, $extra);
             }
-            $direction = $value['direction'];
-            $qb->orderBy($key, $direction);
+            $qb->orderBy($key, $value);
         }
     }
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
      * @param string $key
-     * @param array $value
+     * @param string $value
      * @param array $permissions
      * @param $extra
      * @throws \RuntimeException
      */
-    public function verifyFrontEndOrderBys (string $key, array $value, array $permissions, $extra):void
+    public function verifyFrontEndOrderBys (string $key, string $value, array $permissions, $extra):void
     {
-        $this->closurePermission($value, $extra);
+        $this->closurePermission($permissions, $extra);
         $this->verifyFieldFormat($key);
         $fieldSettings = $permissions['fields'][$key]??[];
-        $direction = $value['direction']??'';
-        $this->verifyDirectionFormat($direction);
-        $allowed = $this->permissivePermissionCheck($permissions, $fieldSettings, 'directions', $direction);
+        $this->verifyDirectionFormat($value);
+        $allowed = $this->permissivePermissionCheck($permissions, $fieldSettings, 'directions', $value);
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $this->getArrayHelper()->parse($allowed, $extra);
         if ($allowed === false) {
-            throw new RuntimeException(sprintf($this->getErrorFromConstant('orderByNotAllowed')['message'], $key, $direction));
+            throw new RuntimeException(sprintf($this->getErrorFromConstant('orderByNotAllowed')['message'], $key, $value));
         }
 
     }
@@ -319,7 +317,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         $wheres = $params['query']['where'] ?? [];
         foreach ($wheres as $where) {
             $type = !isset($where['type'])?'where':null;
-            $type = $type === null && $where['type'] === 'and'?'andWhere':'orWhere';
+            $type = $type === null || $type === 'and'?'andWhere':'orWhere';
             $string = $this->buildFilterFromFrontEnd($qb->expr(), $where, $permissions, $extra);
             $qb->$type($string);
         }
@@ -338,7 +336,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         $havings = $params['query']['having'] ?? [];
         foreach ($havings as $having) {
             $type = !isset($having['type'])?'having':null;
-            $type = $type === null && $having['type'] === 'and'?'andHaving':'orHaving';
+            $type = $type === null || $type === 'and'?'andHaving':'orHaving';
             $string = $this->buildFilterFromFrontEnd($qb->expr(), $having, $permissions, $extra);
             $qb->$type($string);
         }
@@ -427,7 +425,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
     public function addPlaceholders(QueryBuilder $qb, array $extra):void
     {
         $queryPlaceholders = $this->getArray()['read']['placeholders'] ?? [];
-        $frontEndPlaceholders = $extra['params']['query']['placeholders'] ?? [];
+        $frontEndPlaceholders = $extra['params']['settings']['placeholders'] ?? [];
         $options = $extra['options']['placeholders'] ?? [];
         $overridePlaceholders = $extra['optionOverrides']['placeholders'] ?? [];
         /** @noinspection NullPointerExceptionInspection */
@@ -465,7 +463,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
      */
     public function verifyPlaceholders (string $key, array $value, array $permissions , array $extra):void
     {
-        $this->closurePermission($value, $extra);
+        $this->closurePermission($permissions, $extra);
         $allowed = $this->permissiveAllowedCheck($permissions, $value);
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $this->getArrayHelper()->parse($allowed, $extra);
@@ -488,10 +486,10 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         $queryCacheDriver = $this->findSetting([$options, $optionOverrides], 'queryCacheDrive') ?? null;
         $resultCacheDriver = $this->findSetting([$options, $optionOverrides], 'resultCacheDriver') ?? null;
         $allowQueryCache = $this->findSetting([$options, $optionOverrides], 'allowQueryCache') ?? true;
-        $useQueryCache = $params['useQueryCache'] ?? true;
-        $useResultCache = $params['useResultCache'] ?? true;
-        $timeToLive = $params['timeToLive'] ?? null;
-        $cacheId = $params['cacheId'] ?? null;
+        $useQueryCache = $params['settings']['useQueryCache'] ?? true;
+        $useResultCache = $params['settings']['useResultCache'] ?? false;
+        $timeToLive = $params['settings']['timeToLive'] ?? null;
+        $cacheId = $params['settings']['cacheId'] ?? null;
         if ($allowQueryCache === true) {
             /** @noinspection NullPointerExceptionInspection */
             $qb->getQuery()->useQueryCache($this->getArrayHelper()->parse($useQueryCache, $extra));
@@ -518,71 +516,82 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         $firstSelect = true;
         /** @var array $config */
         foreach ($config as $queryPart => $entries) {
-            if ($queryPart === 'from') {
-                $entries = $this->processFrom($entries, $qb, $extra);
-                $qb->from($entries['className'], $entries['alias'], $entries['indexBy']);
-            } else {
-                /**
-                 * @var array $entries
-                 * @var string $key
-                 * @var  array $value
-                 */
-                foreach ($entries as $key => $value) {
-                    if ($value !== null) {
-                        switch ($queryPart) {
-                            case 'select':
-                                $value = $this->processQueryPart($value, $qb, $extra);
-                                if ($firstSelect === true) {
-                                    $qb->select($value);
-                                    $firstSelect = false;
-                                } else {
-                                    $qb->addSelect($value);
+            /**
+             * @var array $entries
+             * @var string $key
+             * @var  array $value
+             */
+            foreach ($entries as $key => $value) {
+                if ($value !== null) {
+                    switch ($queryPart) {
+                        case 'select':
+                            /** @noinspection NullPointerExceptionInspection */
+                            $value = $this->getArrayHelper()->parse($value, $extra);
+                            if ($firstSelect === true) {
+                                $qb->select($value);
+                                $firstSelect = false;
+                            } else {
+                                $qb->addSelect($value);
+                            }
+                            break;
+                        case 'from':
+                            $value = $this->processFrom($value, $qb, $extra);
+                            if ($value['append'] === false) {
+                                /** @noinspection PhpParamsInspection */
+                                $qb->add('from', new Expr\From($value['className'], $value['alias'], $value['indexBy']));
+                            } else {
+                                $qb->from($value['className'], $value['alias'], $value['indexBy']);
+                            }
+
+                            break;
+                        case 'leftJoin':
+                            $value = $this->processJoinParams($value, $qb, $extra);
+                            $qb->leftJoin($value['join'], $value['alias'], $value['conditionType'], $value['condition'], $value['indexBy']);
+                            break;
+                        case 'innerJoin':
+                            $value = $this->processJoinParams($value, $qb, $extra);
+                            $qb->innerJoin($value['join'], $value['alias'], $value['conditionType'], $value['condition'], $value['indexBy']);
+                            break;
+                        case 'where':
+                            /** @noinspection NullPointerExceptionInspection */
+                            $where = is_array($value['value']) && isset($value['value']['arguments'])?$this->processQueryPartExpr($value['value'], $qb, $extra):$this->getArrayHelper()->parse($value['value'], $extra);
+                            if (isset($value['type'])) {
+                                if ($value['type'] === 'and') {
+                                    $qb->andWhere($where);
+                                } else if ($value['type'] === 'or') {
+                                    $qb->orWhere($where);
                                 }
-                                break;
-                            case 'leftJoin':
-                                $value = $this->processJoinParams($value, $qb, $extra);
-                                $qb->leftJoin($value['join'], $value['alias'], $value['conditionType'], $value['condition'], $value['indexBy']);
-                                break;
-                            case 'innerJoin':
-                                $value = $this->processJoinParams($value, $qb, $extra);
-                                $qb->innerJoin($value['join'], $value['alias'], $value['conditionType'], $value['condition'], $value['indexBy']);
-                                break;
-                            case 'where':
-                                $where = $this->processQueryPart($value['value'], $qb, $extra);
-                                if (isset($value['type'])) {
-                                    if ($value['type'] === 'and') {
-                                        $qb->andWhere($where);
-                                    } else if ($value['type'] === 'or') {
-                                        $qb->orWhere($where);
-                                    }
-                                } else {
-                                    $qb->where($where);
+                            } else {
+                                $qb->where($where);
+                            }
+                            break;
+                        case 'having':
+                            /** @noinspection NullPointerExceptionInspection */
+                            $having = is_array($value['value']) && isset($value['value']['arguments'])?$this->processQueryPartExpr($value['value'], $qb, $extra):$this->getArrayHelper()->parse($value['value'], $extra);
+                            if (isset($value['type'])) {
+                                if ($value['type'] === 'and') {
+                                    $qb->andHaving($having);
+                                } else if ($value['type'] === 'or') {
+                                    $qb->orHaving($having);
                                 }
-                                break;
-                            case 'having':
-                                $having = $this->processQueryPart($value['value'], $qb, $extra);
-                                if (isset($value['type'])) {
-                                    if ($value['type'] === 'and') {
-                                        $qb->andHaving($having);
-                                    } else if ($value['type'] === 'or') {
-                                        $qb->orHaving($having);
-                                    }
-                                } else {
-                                    $qb->having($having);
-                                }
-                                break;
-                            case 'orderBy':
-                                $value = $this->processOrderParams($value, $qb, $extra);
-                                $qb->addOrderBy($value['sort'], $value['order']);
-                                break;
-                            case 'groupBy':
-                                $value = $this->processQueryPart($value, $qb, $extra);
-                                $qb->addGroupBy($value);
-                                break;
-                        }
+                            } else {
+                                $qb->having($having);
+                            }
+                            break;
+                        case 'orderBy':
+                            $value = $this->processOrderParams($value, $qb, $extra);
+                            $qb->addOrderBy($value['sort'], $value['order']);
+                            break;
+                        case 'groupBy':
+                            /** @noinspection NullPointerExceptionInspection */
+                            $value = $this->getArrayHelper()->parse($value, $extra);
+                            /** @var string $value */
+                            $qb->addGroupBy($value);
+                            break;
                     }
                 }
             }
+
 
         }
     }
@@ -599,7 +608,8 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
     protected function processQueryPartArray (array $array, array $defaults, QueryBuilder $qb, array $extra):array
     {
         foreach ($array as $key => $value) {
-            $array[$key] = $this->processQueryPart($value, $qb, $extra);
+            /** @noinspection NullPointerExceptionInspection */
+            $array[$key] = is_array($value) && isset($value['arguments'])?$this->processQueryPartExpr($value, $qb, $extra):$array[$key] = $this->getArrayHelper()->parse($value, $extra);
         }
         return array_replace($defaults, $array);
     }
@@ -649,6 +659,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
             'className'=>null,
             'alias'=>null,
             'indexBy'=>null,
+            'append'=>false
         ];
         return $this->processQueryPartArray($array, $defaults, $qb, $extra);
     }
@@ -658,25 +669,20 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
      * @param $value
      * @param QueryBuilder $qb
      * @param array $extra
-     * @return string
+     * @return string|null
      */
-    protected function processQueryPart($value, QueryBuilder $qb, array $extra):string
+    protected function processQueryPartExpr($value, QueryBuilder $qb, array $extra):?string
     {
-        if (is_array($value)) {
-            /** @var array[] $value */
-            foreach ($value['arguments'] as &$argument) {
-                if (is_array($argument)) {
-                    $argument = $this->processQueryPart($argument, $qb, $extra);
-                } else {
-                    /** @noinspection NullPointerExceptionInspection */
-                    $argument = $this->getArrayHelper()->parse($argument, $extra);
-                }
+        /** @var array[] $value */
+        foreach ($value['arguments'] as &$argument) {
+            if (is_array($argument) && isset($argument['expr'])) {
+                $argument = $this->processQueryPartExpr($argument, $qb, $extra);
+            } else {
+                /** @noinspection NullPointerExceptionInspection */
+                $argument = $this->getArrayHelper()->parse($argument, $extra);
             }
-            return call_user_func_array ([$qb->expr(), $value['expr']], $value['arguments']);
         }
-
-        /** @noinspection NullPointerExceptionInspection */
-        return $this->getArrayHelper()->parse($value, $extra);
+        return call_user_func_array ([$qb->expr(), $value['expr']], $value['arguments']);
     }
 
     /**

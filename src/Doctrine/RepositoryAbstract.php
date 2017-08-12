@@ -100,12 +100,13 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      */
     public function init( ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL, bool $force= true)
     {
+        $startPath = $this->getTTPath();
+        $startFallback = $this->getTTFallBack();
         if ($force === true || $this->getEvm() === null) {
             $this->setEvm(new EventManager());
             /** @noinspection NullPointerExceptionInspection */
             $this->getEvm()->addEventSubscriber($this);
         }
-
 
         if ($force === true || $this->getQueryHelper() === null) {
             $this->setQueryHelper(new QueryHelper());
@@ -118,11 +119,11 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
             $this->setArrayHelper($arrayHelper);
         }
 
-        if ($path !== null && ($force === true || $this->getTTPath() === null)) {
+        if ($path !== null && ($force === true || $this->getTTPath() === null || $path !== $this->getTTPath())) {
             $this->setTTPath($path);
         }
 
-        if ($fallBack !== null && ($force === true || $this->getTTFallBack() === null)) {
+        if ($fallBack !== null && ($force === true || $this->getTTFallBack() === null || $fallBack !== $this->getTTFallBack() )) {
             $this->setTTFallBack($fallBack);
         }
 
@@ -130,7 +131,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
             throw new \RuntimeException($this->getErrorFromConstant('noArrayHelper'));
         }
 
-        if ($force !== true || $this->getConfigArrayHelper() === null) {
+        if ($force !== true || $this->getConfigArrayHelper() === null || $startPath !== $this->getTTPath() || $startFallback !== $this->getTTFallBack()) {
             $queryArrayHelper = new QueryHelper();
             $queryArrayHelper->setArrayHelper($this->getArrayHelper());
             $this->parseTTConfig($queryArrayHelper);
