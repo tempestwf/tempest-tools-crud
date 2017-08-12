@@ -163,8 +163,6 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
             return ['qb'=>$qb];
         }
 
-        //$sql = $qb->getQuery()->getSQL();
-        //$resultTest = $qb->getQuery()->getResult();
         if ($paginate === true) {
             $paginator = new Paginator($qb->getQuery());
             $paginator->getQuery()->setHydrationMode($hydrationType);
