@@ -204,7 +204,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
     {
         $maxLimit = $this->getArray()['permissions']['maxLimit'] ?? static::DEFAULT_MAX_LIMIT;
         /** @noinspection NullPointerExceptionInspection */
-        $maxLimit = $this->getArrayHelper()->parse($maxLimit, $extra);
+        $maxLimit = (int)$this->getArrayHelper()->parse($maxLimit, $extra);
         if ($limit > $maxLimit) {
             throw new RuntimeException(sprintf($this->getErrorFromConstant('maxLimitHit')['message'], $limit, $maxLimit));
         }
@@ -217,7 +217,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
      */
     public function addFrontEndGroupBys(QueryBuilder $qb, array $extra):void
     {
-        $params = $extra['params'];
+        $params = $extra['params']??[];
         $groupBys = $params['query']['groupBy'] ?? [];
         /** @noinspection NullPointerExceptionInspection */
         $permissions = $this->getArrayHelper()->parse($this->getArray()['permissions']['groupBy'] ?? [], $extra) ?? [];

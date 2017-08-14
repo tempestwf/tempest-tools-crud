@@ -43,11 +43,11 @@ class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
             $this->setArrayHelper($arrayHelper);
         }
 
-        if ($path !== NULL && ($force === true || $this->getTTPath() === NULL)) {
+        if ($path !== null && ($force === true || $this->getTTPath() === null || $path !== $this->getTTPath())) {
             $this->setTTPath($path);
         }
 
-        if ($fallBack !== NULL && ($force === true || $this->getTTFallBack() === NULL)) {
+        if ($fallBack !== null && ($force === true || $this->getTTFallBack() === null || $fallBack !== $this->getTTFallBack() )) {
             $this->setTTFallBack($fallBack);
         }
 
