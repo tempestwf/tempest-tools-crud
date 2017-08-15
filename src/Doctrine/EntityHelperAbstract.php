@@ -4,7 +4,7 @@ namespace TempestTools\Crud\Doctrine;
 use Doctrine\Common\EventManager;
 use Doctrine\Common\EventSubscriber;
 use RuntimeException;
-use TempestTools\AclMiddleware\Contracts\HasId;
+use TempestTools\AclMiddleware\Contracts\HasIdContract;
 use TempestTools\Common\Contracts\ArrayHelperContract;
 use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\AccessorMethodNameTrait;
@@ -19,7 +19,7 @@ use TempestTools\Crud\Contracts\EntityArrayHelperContract;
 use Doctrine\ORM\Mapping as ORM;
 
 
-abstract class EntityHelperAbstract implements EventSubscriber, HasId, EntityHelperContract
+abstract class EntityHelperAbstract implements EventSubscriber, HasIdContract, EntityHelperContract
 {
 
     use ArrayHelperTrait, ErrorConstantsTrait, TTConfigTrait, EvmTrait, AccessorMethodNameTrait;
