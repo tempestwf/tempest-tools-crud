@@ -7,11 +7,10 @@ use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
-use TempestTools\Crud\Contracts\Entity;
+use TempestTools\Crud\Contracts\Entity as EntityContract;
 use TempestTools\Crud\Contracts\EntityArrayHelper as EntityArrayHelperContract;
-use Illuminate\Contracts\Validation\Factory;
 
-class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract{
+class Entity extends ArrayHelper implements EntityArrayHelperContract{
     use TTConfigTrait, ErrorConstantsTrait, ArrayHelperTrait;
 
     const ERRORS = [
@@ -32,9 +31,6 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         ],
         'assignTypeMustBe' => [
             'message' => 'Error: Assign type must be set, add or remove. assignType = %s',
-        ],
-        'prePersistValidatorFails' => [
-            'message' => 'Error: Validation failed on pre-persist.',
         ],
     ];
 
@@ -338,10 +334,10 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     }
 
     /**
-     * @param Entity $entity
+     * @param EntityContract $entity
      * @throws \RuntimeException
      */
-    public function processPrePersist(Entity $entity) {
+    public function processPrePersist(EntityContract $entity) {
         $array = $this->getArray();
 
         if (isset($array['setTo'])) {
@@ -367,14 +363,12 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
 
     /**
      * @param array $validate
-     * @param Entity $entity
+     * @param EntityContract $entity
      * @throws \RuntimeException
      */
-    protected function prePersistValidate(array $validate, Entity $entity)
+    protected function prePersistValidate(array $validate, EntityContract $entity)
     {
         $extra = ['validate'=>$validate, 'entity'=>$entity];
-        /** @var Factory $factory */
-        $factory = $entity->getValidationFactory();
         $fields = $validate['fields'] ?? array_keys($validate['rules']);
         /** @noinspection NullPointerExceptionInspection */
         $fields = $this->getArrayHelper()->parse($fields, $extra);
@@ -388,20 +382,14 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         /** @noinspection NullPointerExceptionInspection */
         $customAttributes = $this->getArrayHelper()->parse($customAttributes, $extra);
         $values = $entity->getValuesOfFields($fields);
-        $validator = $factory->make($values, $rules, $messages, $customAttributes);
-        if ($validator->fails()) {
-            $messages = $validator->getMessageBag()->all();
-            $errorMessage = implode(' \n', $messages);
-            $errorMessage = $errorMessage === ''?$this->getErrorFromConstant('prePersistValidatorFails')['message']:$errorMessage;
-            throw new RuntimeException($errorMessage);
-        }
+        $entity->validate($values, $rules, $messages, $customAttributes);
     }
 
     /**
      * @param callable $closure
-     * @param Entity $entity
+     * @param EntityContract $entity
      */
-    protected function prePersistMutate(Callable $closure, Entity $entity)
+    protected function prePersistMutate(Callable $closure, EntityContract $entity)
     {
         /** @noinspection NullPointerExceptionInspection */
         $this->getArrayHelper()->parseClosure($closure, ['self' => $entity]);
@@ -409,10 +397,10 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
 
     /**
      * @param callable $closure
-     * @param Entity $entity
+     * @param EntityContract $entity
      * @throws \RuntimeException
      */
-    protected function prePersistClosure(Callable $closure, Entity $entity)
+    protected function prePersistClosure(Callable $closure, EntityContract $entity)
     {
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $this->getArrayHelper()->parseClosure($closure, ['self' => $entity]);
@@ -423,9 +411,9 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
 
     /**
      * @param array $values
-     * @param Entity $entity
+     * @param EntityContract $entity
      */
-    protected function prePersistSetTo(array $values, Entity $entity)
+    protected function prePersistSetTo(array $values, EntityContract $entity)
     {
         $extra = ['self' => $this];
         foreach ($values as $key => $value) {
@@ -438,10 +426,10 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
 
     /**
      * @param array $values
-     * @param Entity $entity
+     * @param EntityContract $entity
      * @throws \RuntimeException
      */
-    protected function prePersistEnforce(array $values, Entity $entity)
+    protected function prePersistEnforce(array $values, EntityContract $entity)
     {
         $extra = ['self' => $entity];
         foreach ($values as $key => $value) {

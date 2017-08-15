@@ -5,7 +5,6 @@ use Doctrine\Common\EventManager;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
-use Doctrine\ORM\QueryBuilder;
 use \Exception;
 use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
@@ -16,10 +15,11 @@ use TempestTools\Crud\Contracts\Entity;
 use TempestTools\Crud\Contracts\QueryBuilderHelper as QueryHelperContract;
 use TempestTools\Crud\Contracts\DataBindHelper as DataBindHelperContract;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
-use TempestTools\Crud\Doctrine\Helper\DataBindHelper;
-use TempestTools\Crud\Doctrine\Helper\QueryBuilderHelper;
+use TempestTools\Crud\Doctrine\Helper\DataBind;
+use TempestTools\Crud\Doctrine\Helper\QueryBuilder as QueryBuilderHelper;
 use TempestTools\Common\Contracts\ArrayHelper as ArrayHelperContract;
-use TempestTools\Crud\Doctrine\Helper\QueryBuilderWrapper;
+use TempestTools\Crud\Doctrine\Wrapper\QueryBuilder as QueryBuilderWrapper;
+use Doctrine\ORM\QueryBuilder;
 
 abstract class RepositoryAbstract extends EntityRepository implements EventSubscriber {
 
@@ -51,8 +51,6 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      */
     const ENTITY_NAME_REGEX = '/\w+$/';
 
-    /** @var  QueryHelperContract|null  */
-    protected $queryHelper;
 
     /** @var  DataBindHelperContract|null  */
     protected $dataBindHelper;
@@ -109,11 +107,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
             $this->getEvm()->addEventSubscriber($this);
         }
 
-        if ($force === true || $this->getQueryHelper() === null) {
-            $this->setQueryHelper(new QueryBuilderHelper());
-        }
         if ($force === true || $this->getDataBindHelper() === null) {
-            $this->setDataBindHelper(new DataBindHelper($this->getEntityManager()));
+            $this->setDataBindHelper(new DataBind($this->getEntityManager()));
         }
 
         if ($arrayHelper !== null && ($force === true || $this->getArrayHelper() === null)) {
@@ -563,24 +558,6 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
             }
         }
         return $subscribe;
-    }
-
-    /**
-     * @param null|QueryHelperContract $queryHelper
-     * @return RepositoryAbstract
-     */
-    public function setQueryHelper(QueryHelperContract $queryHelper):RepositoryAbstract
-    {
-        $this->queryHelper = $queryHelper;
-        return $this;
-    }
-
-    /**
-     * @return null|QueryHelperContract
-     */
-    public function getQueryHelper():?QueryHelperContract
-    {
-        return $this->queryHelper;
     }
 
     public function getTTConfig(): array

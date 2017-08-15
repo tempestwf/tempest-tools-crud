@@ -33,4 +33,27 @@ abstract class EntityAbstract extends \TempestTools\Crud\Doctrine\EntityAbstract
         return $this->getValidationFactoryHelper()->getValidationFactory();
     }
 
+    /** @noinspection MoreThanThreeArgumentsInspection */
+
+    /**
+     *
+     * @param array $values
+     * @param array $rules
+     * @param array $messages
+     * @param array $customAttributes
+     * @throws \RuntimeException
+     */
+    public function validate(array $values, array $rules, array $messages = [], array $customAttributes = []):void
+    {
+        /** @var Factory $factory */
+        $factory = $this->getValidationFactory();
+        $validator = $factory->make($values, $rules, $messages, $customAttributes);
+        if ($validator->fails()) {
+            $messages = $validator->getMessageBag()->all();
+            $errorMessage = implode(' \n', $messages);
+            $errorMessage = $errorMessage === ''?$this->getErrorFromConstant('prePersistValidatorFails')['message']:$errorMessage;
+            throw new \RuntimeException($errorMessage);
+        }
+    }
+
 }

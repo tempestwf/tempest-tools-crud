@@ -6,16 +6,16 @@
  * Time: 4:33 PM
  */
 
-namespace TempestTools\Crud\Doctrine\Helper;
+namespace TempestTools\Crud\Doctrine\Wrapper;
 
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\QueryBuilder as BaseQueryBuilder;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use RuntimeException;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use \TempestTools\Crud\Contracts\QueryBuilderWrapper as QueryBuilderWrapperContract;
 
-class QueryBuilderWrapper implements QueryBuilderWrapperContract
+class QueryBuilder implements QueryBuilderWrapperContract
 {
     use ErrorConstantsTrait;
 
@@ -49,15 +49,15 @@ class QueryBuilderWrapper implements QueryBuilderWrapperContract
      */
     const ORDER_BY_DIRECTIONS = ['ASC', 'DESC'];
 
-    /** @var QueryBuilder  $queryBuilder*/
+    /** @var BaseQueryBuilder $queryBuilder*/
     protected $queryBuilder;
 
     /**
      * QueryBuilderConstructionHelper constructor.
      *
-     * @param QueryBuilder $queryBuilder
+     * @param BaseQueryBuilder $queryBuilder
      */
-    public function __construct(QueryBuilder $queryBuilder)
+    public function __construct(BaseQueryBuilder $queryBuilder)
     {
         $this->setQueryBuilder($queryBuilder);
     }
@@ -303,17 +303,17 @@ class QueryBuilderWrapper implements QueryBuilderWrapperContract
 
 
     /**
-     * @return QueryBuilder
+     * @return BaseQueryBuilder
      */
-    public function getQueryBuilder():QueryBuilder
+    public function getQueryBuilder():BaseQueryBuilder
     {
         return $this->queryBuilder;
     }
 
     /**
-     * @param QueryBuilder $queryBuilder
+     * @param BaseQueryBuilder $queryBuilder
      */
-    public function setQueryBuilder(QueryBuilder $queryBuilder):void
+    public function setQueryBuilder(BaseQueryBuilder $queryBuilder):void
     {
         $this->queryBuilder = $queryBuilder;
     }

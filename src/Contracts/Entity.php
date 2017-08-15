@@ -116,4 +116,16 @@ interface Entity
      */
     public function setArrayHelper(ArrayHelperContract $arrayHelper);
 
+    /** @noinspection MoreThanThreeArgumentsInspection */
+
+    /**
+     *
+     * @param array $values
+     * @param array $rules
+     * @param array $messages
+     * @param array $customAttributes
+     * @throws \RuntimeException
+     */
+    public function validate(array $values, array $rules, array $messages = [], array $customAttributes = []):void;
+
 }

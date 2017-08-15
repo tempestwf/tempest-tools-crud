@@ -14,7 +14,7 @@ use TempestTools\Common\Utility\TTConfigTrait;
 use TempestTools\Crud\Constants\EntityEvents;
 use TempestTools\Crud\Contracts\Entity;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
-use TempestTools\Crud\Doctrine\Helper\EntityArrayHelper;
+use TempestTools\Crud\Doctrine\Helper\Entity as EntityHelper;
 use TempestTools\Crud\Contracts\EntityArrayHelper as EntityArrayHelperContract;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -36,7 +36,13 @@ abstract class EntityAbstract implements EventSubscriber, HasId, Entity
         ],
         'validateFactoryNotIncluded' => [
             'message' => 'Error: Validation factory is not included on this class.',
-        ]
+        ],
+        'validateNotIncluded' => [
+            'message' => 'Error: Validation is not included on this class. It was passed these param: %s',
+        ],
+        'prePersistValidatorFails' => [
+            'message' => 'Error: Validation failed on pre-persist.',
+        ],
     ];
     /**
      * @var array $bindParams
@@ -97,7 +103,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId, Entity
         }
 
         if ($force === true || $this->getConfigArrayHelper() === null || $mode !== $this->getLastMode() || $startPath !== $this->getTTPath() || $startFallback !== $this->getTTFallBack()) {
-            $entityArrayHelper = new EntityArrayHelper();
+            $entityArrayHelper = new EntityHelper();
             $entityArrayHelper->setArrayHelper($this->getArrayHelper());
             $this->parseTTConfig($entityArrayHelper);
         }
@@ -247,6 +253,22 @@ abstract class EntityAbstract implements EventSubscriber, HasId, Entity
     public function getValidationFactory()
     {
         throw new RuntimeException($this->getErrorFromConstant('validateFactoryNotIncluded')['message']);
+    }
+
+    /** @noinspection MoreThanThreeArgumentsInspection */
+
+    /**
+     *
+     * @param array $values
+     * @param array $rules
+     * @param array $messages
+     * @param array $customAttributes
+     * @throws \RuntimeException
+     */
+    public function validate(array $values, array $rules, array $messages = [], array $customAttributes = []):void
+    {
+        $string = json_encode(['values'=>$values, 'rules'=>$rules, 'messages'=>$messages, 'customAttributes'=>$customAttributes]);
+        throw new RuntimeException(sprintf($this->getErrorFromConstant('validateFactoryNotIncluded')['message'], $string));
     }
 
 

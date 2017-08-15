@@ -9,7 +9,7 @@ use TempestTools\Common\Utility\TTConfigTrait;
 use \TempestTools\Crud\Contracts\QueryBuilderWrapper as QueryBuilderWrapperContract;
 use \TempestTools\Crud\Contracts\QueryBuilderHelper as QueryBuilderHelperContract;
 
-class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContract
+class QueryBuilder extends ArrayHelper implements QueryBuilderHelperContract
 {
     use TTConfigTrait, ErrorConstantsTrait, ArrayHelperTrait;
 

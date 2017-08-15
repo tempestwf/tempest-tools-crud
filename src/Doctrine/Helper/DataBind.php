@@ -7,12 +7,13 @@ use TempestTools\Common\Doctrine\Utility\EmTrait;
 use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
+use TempestTools\Crud\Contracts\DataBindHelper;
 use TempestTools\Crud\Contracts\Entity;
 use TempestTools\Crud\Doctrine\EntityAbstract;
 use TempestTools\Crud\Doctrine\RepositoryAbstract;
 use TempestTools\Common\Contracts\ArrayHelper as ArrayHelperContract;
 
-class DataBindHelper implements \TempestTools\Crud\Contracts\DataBindHelper {
+class DataBind implements DataBindHelper {
     use EmTrait, ArrayHelperTrait, TTConfigTrait, ErrorConstantsTrait;
 
     const ERRORS = [
