@@ -13,12 +13,13 @@ use TempestTools\Common\Utility\EvmTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
 use TempestTools\Crud\Constants\RepositoryEvents;
 use TempestTools\Crud\Contracts\Entity;
-use TempestTools\Crud\Contracts\QueryHelper as QueryHelperContract;
+use TempestTools\Crud\Contracts\QueryBuilderHelper as QueryHelperContract;
 use TempestTools\Crud\Contracts\DataBindHelper as DataBindHelperContract;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
 use TempestTools\Crud\Doctrine\Helper\DataBindHelper;
-use TempestTools\Crud\Doctrine\Helper\QueryHelper;
+use TempestTools\Crud\Doctrine\Helper\QueryBuilderHelper;
 use TempestTools\Common\Contracts\ArrayHelper as ArrayHelperContract;
+use TempestTools\Crud\Doctrine\Helper\QueryBuilderWrapper;
 
 abstract class RepositoryAbstract extends EntityRepository implements EventSubscriber {
 
@@ -109,7 +110,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         }
 
         if ($force === true || $this->getQueryHelper() === null) {
-            $this->setQueryHelper(new QueryHelper());
+            $this->setQueryHelper(new QueryBuilderHelper());
         }
         if ($force === true || $this->getDataBindHelper() === null) {
             $this->setDataBindHelper(new DataBindHelper($this->getEntityManager()));
@@ -132,7 +133,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         }
 
         if ($force !== true || $this->getConfigArrayHelper() === null || $startPath !== $this->getTTPath() || $startFallback !== $this->getTTFallBack()) {
-            $queryArrayHelper = new QueryHelper();
+            $queryArrayHelper = new QueryBuilderHelper();
             $queryArrayHelper->setArrayHelper($this->getArrayHelper());
             $this->parseTTConfig($queryArrayHelper);
         }
@@ -160,8 +161,9 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         $params = $eventArgs->getArgs()['params'];
         $this->checkQueryMaxParams($params, $optionOverrides);
         $qb = $this->createQueryBuilder($this->getEntityAlias());
+        $qbWrapper = new QueryBuilderWrapper($qb);
         /** @noinspection NullPointerExceptionInspection */
-        $eventArgs->getArgs()['results'] = $this->getConfigArrayHelper()->read($qb, $params, $frontEndOptions, $this->getOptions(), $optionOverrides);
+        $eventArgs->getArgs()['results'] = $this->getConfigArrayHelper()->read($qbWrapper, $params, $frontEndOptions, $this->getOptions(), $optionOverrides);
 
         $evm->dispatchEvent(RepositoryEvents::PROCESS_RESULTS_READ, $eventArgs);
         $evm->dispatchEvent(RepositoryEvents::POST_READ, $eventArgs);

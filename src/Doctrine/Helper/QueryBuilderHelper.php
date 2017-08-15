@@ -1,16 +1,15 @@
 <?php
 namespace TempestTools\Crud\Doctrine\Helper;
 
-use Doctrine\ORM\Query\Expr;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use RuntimeException;
 use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
-use Doctrine\ORM\QueryBuilder;
+use \TempestTools\Crud\Contracts\QueryBuilderWrapper as QueryBuilderWrapperContract;
+use \TempestTools\Crud\Contracts\QueryBuilderHelper as QueryBuilderHelperContract;
 
-class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\QueryHelper
+class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContract
 {
     use TTConfigTrait, ErrorConstantsTrait, ArrayHelperTrait;
 
@@ -24,9 +23,6 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         'operatorNotAllowed'=>[
             'message'=>'Error: Operator not allowed. field = %s, operator = %s',
         ],
-        'fieldBadlyFormed'=>[
-            'message'=>'Error: Fields must be passed as [table alias].[field name]. field = %s',
-        ],
         'orderByNotAllowed'=>[
             'message'=>'Error: Order by not allowed. field = %s, direction = %s',
         ],
@@ -36,27 +32,14 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         'maxLimitHit'=>[
             'message'=>'Error: Requested limit greater than max. limit = %s, max = %s',
         ],
-        'operatorNotSafe'=>[
-            'message'=>'Error: Requested operator is not safe to use. operator = %s',
-        ],
         'closureFails' => [
             'message' => 'Error: A validation closure did not pass while building query.',
         ],
         'readRequestNotAllowed' => [
             'message' => 'Error: Read request not allowed.',
         ],
-        'directionNotAllow' => [
-            'message' => 'Error: Order by direction not allowed. direction = %s',
-        ],
 
     ];
-
-
-
-    /**
-     * FIELD_REGEX
-     */
-    const FIELD_REGEX = '/^\w+\.\w+$/';
 
     /**
      * DEFAULT_LIMIT
@@ -83,20 +66,11 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
      */
     const DEFAULT_FETCH_JOIN = true;
 
-    /**
-     * SAFE_OPERATORS
-     */
-    const SAFE_OPERATORS = ['andX', 'orX', 'eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'in', 'notIn', 'isNull', 'isNotNull', 'like', 'notLike', 'between' ];
-
-    /**
-     * ORDER_BY_DIRECTIONS
-     */
-    const ORDER_BY_DIRECTIONS = ['ASC', 'DESC'];
 
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
-     * @param QueryBuilder $qb
+     * @param QueryBuilderWrapperContract $qb
      * @param array $params
      * @param array $frontEndOptions
      * @param array $options
@@ -105,7 +79,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
      * @throws RuntimeException
      * @throws \Doctrine\ORM\ORMException
      */
-    public function read(QueryBuilder $qb, array $params, array $frontEndOptions, array $options, array $optionOverrides):array
+    public function read(QueryBuilderWrapperContract $qb, array $params, array $frontEndOptions, array $options, array $optionOverrides):array
     {
         $extra = [
             'params'=>$params,
@@ -131,7 +105,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
      * @param array $extra
      * @throws \RuntimeException
      */
-    public function verifyAllowed(array $extra):void
+    protected function verifyAllowed(array $extra):void
     {
         $config = $this->getArray()['permissions'] ?? [];
         $allowed = $config['allowed']?? true;
@@ -143,12 +117,12 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
     }
 
     /**
-     * @param QueryBuilder $qb
+     * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @return array
      * @throws \RuntimeException
      */
-    public function prepareResult (QueryBuilder $qb, array $extra):array
+    public function prepareResult (QueryBuilderWrapperContract $qb, array $extra):array
     {
         $options = $extra['options']??[];
         $optionOverrides = $extra['optionOverrides']??[];
@@ -163,24 +137,17 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
             return ['qb'=>$qb];
         }
 
-        if ($paginate === true) {
-            $paginator = new Paginator($qb->getQuery());
-            $paginator->getQuery()->setHydrationMode($hydrationType);
-            $count = $returnCount?count($paginator, $fetchJoin):null;
-            $result = $paginator->getIterator()->getArrayCopy();
-        } else {
-            $qb->getQuery()->setHydrationMode($hydrationType);
-            $result = $qb->getQuery()->getResult();
-        }
-        return ['count'=>$count, 'result'=>$result];
+        return $qb->getResult($paginate, $returnCount, $hydrationType, $fetchJoin);
+
+
     }
 
     /**
-     * @param QueryBuilder $qb
+     * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws \RuntimeException
      */
-    public function addLimitAndOffset(QueryBuilder $qb, array $extra):void
+    public function addLimitAndOffset(QueryBuilderWrapperContract $qb, array $extra):void
     {
         $frontEndOptions = $extra['frontEndOptions'];
 
@@ -188,8 +155,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         $offset = isset($frontEndOptions['offset']) ? (int)$frontEndOptions['offset']:static::DEFAULT_OFFSET;
 
         $this->verifyLimitAndOffset($limit, $extra);
-        $qb->setMaxResults($limit);
-        $qb->setFirstResult($offset);
+        $qb->setLimitAndOffset($limit, $offset);
     }
 
 
@@ -200,7 +166,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
      * @internal param array $extra
      * @throws \RuntimeException
      */
-    public function verifyLimitAndOffset (int $limit, array $extra):void
+    protected function verifyLimitAndOffset (int $limit, array $extra):void
     {
         $maxLimit = $this->getArray()['permissions']['maxLimit'] ?? static::DEFAULT_MAX_LIMIT;
         /** @noinspection NullPointerExceptionInspection */
@@ -211,11 +177,11 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
     }
 
     /**
-     * @param QueryBuilder $qb
+     * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws \RuntimeException
      */
-    public function addFrontEndGroupBys(QueryBuilder $qb, array $extra):void
+    public function addFrontEndGroupBys(QueryBuilderWrapperContract $qb, array $extra):void
     {
         $params = $extra['params']??[];
         $groupBys = $params['query']['groupBy'] ?? [];
@@ -224,7 +190,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         foreach ($groupBys as $key => $value) {
             $fastMode = $this->highLowSettingCheck($permissions, $permissions['fields'][$key] ?? [], 'fastMode');
             if ($fastMode !== true) {
-                $this->verifyFrontEndGroupBys($key, $value, $permissions, $extra);
+                $this->verifyFrontEndGroupBys($qb, $key, $permissions, $extra);
                 /** @noinspection PhpUnusedLocalVariableInspection */
                 [$key, $value] = $this->closureMutate($key, $value, $extra);
             }
@@ -236,17 +202,17 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
 
 
     /**
+     * @param QueryBuilderWrapperContract $qb
      * @param string $key
-     * @param string $value
      * @param array $permissions
      * @param array $extra
      * @internal param array $extra
      * @throws \RuntimeException
      */
-    public function verifyFrontEndGroupBys (string $key, string $value, array $permissions, array $extra):void
+    protected function verifyFrontEndGroupBys (QueryBuilderWrapperContract $qb, string $key, array $permissions, array $extra):void
     {
         $this->closurePermission($permissions, $extra);
-        $this->verifyFieldFormat($key);
+        $qb->verifyFieldFormat($key);
 
         $allowed = $this->permissiveAllowedCheck($permissions, $permissions['fields'][$key] ?? []);
         /** @noinspection NullPointerExceptionInspection */
@@ -258,11 +224,11 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
 
 
     /**
-     * @param QueryBuilder $qb
+     * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws \RuntimeException
      */
-    public function addFrontEndOrderBys(QueryBuilder $qb, array $extra):void
+    public function addFrontEndOrderBys(QueryBuilderWrapperContract $qb, array $extra):void
     {
         $params = $extra['params'];
         $orderBys = $params['query']['orderBy'] ?? [];
@@ -271,7 +237,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         foreach ($orderBys as $key => $value) {
             $fastMode = $this->highLowSettingCheck($permissions, $permissions['fields'][$key] ?? [], 'fastMode');
             if ($fastMode !== true) {
-                $this->verifyFrontEndOrderBys($key, $value, $permissions, $extra);
+                $this->verifyFrontEndOrderBys($qb, $key, $value, $permissions, $extra);
                 /** @noinspection PhpUnusedLocalVariableInspection */
                 [$key, $value] = $this->closureMutate($key, $value, $extra);
             }
@@ -281,18 +247,19 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * @param QueryBuilderWrapperContract $qb
      * @param string $key
      * @param string $value
      * @param array $permissions
      * @param $extra
      * @throws \RuntimeException
      */
-    public function verifyFrontEndOrderBys (string $key, string $value, array $permissions, $extra):void
+    protected function verifyFrontEndOrderBys (QueryBuilderWrapperContract $qb, string $key, string $value, array $permissions, $extra):void
     {
         $this->closurePermission($permissions, $extra);
-        $this->verifyFieldFormat($key);
+        $qb->verifyFieldFormat($key);
         $fieldSettings = $permissions['fields'][$key]??[];
-        $this->verifyDirectionFormat($value);
+        $qb->verifyDirectionFormat($value);
         $allowed = $this->permissivePermissionCheck($permissions, $fieldSettings, 'directions', $value);
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $this->getArrayHelper()->parse($allowed, $extra);
@@ -303,11 +270,11 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
     }
 
     /**
-     * @param QueryBuilder $qb
+     * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws \RuntimeException
      */
-    public function addFrontEndWhere(QueryBuilder $qb, array $extra):void
+    public function addFrontEndWhere(QueryBuilderWrapperContract $qb, array $extra):void
     {
         $params = $extra['params'];
         /** @noinspection NullPointerExceptionInspection */
@@ -315,41 +282,39 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         $wheres = $params['query']['where'] ?? [];
         foreach ($wheres as $where) {
             $type = !isset($where['type'])?'where':null;
-            $type = $type === null || $type === 'and'?'andWhere':'orWhere';
-            $string = $this->buildFilterFromFrontEnd($qb->expr(), $where, $permissions, $extra);
-            $qb->$type($string);
+            $string = $this->buildFilterFromFrontEnd($qb, $where, $permissions, $extra);
+            $qb->where($type, $string);
         }
     }
 
 
     /**
-     * @param QueryBuilder $qb
+     * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws \RuntimeException
      */
-    public function addFrontEndHaving(QueryBuilder $qb, array $extra):void {
+    public function addFrontEndHaving(QueryBuilderWrapperContract $qb, array $extra):void {
         $params = $extra['params'];
         /** @noinspection NullPointerExceptionInspection */
         $permissions = $this->getArrayHelper()->parse($this->getArray()['permissions']['having'] ?? [], $extra);
         $havings = $params['query']['having'] ?? [];
         foreach ($havings as $having) {
             $type = !isset($having['type'])?'having':null;
-            $type = $type === null || $type === 'and'?'andHaving':'orHaving';
-            $string = $this->buildFilterFromFrontEnd($qb->expr(), $having, $permissions, $extra);
-            $qb->$type($string);
+            $string = $this->buildFilterFromFrontEnd($qb, $having, $permissions, $extra);
+            $qb->having($type, $string);
         }
     }
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
-     * @param Expr $expr
+     * @param QueryBuilderWrapperContract $qb
      * @param array $condition
      * @param array $permissions
      * @param array $extra
      * @return string
      * @throws \RuntimeException
      */
-    protected function buildFilterFromFrontEnd (Expr $expr, array $condition, array $permissions, array $extra):string
+    protected function buildFilterFromFrontEnd (QueryBuilderWrapperContract $qb, array $condition, array $permissions, array $extra):string
     {
         $operator = $condition['operator'];
         $fieldName = $condition['field'];
@@ -358,30 +323,28 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         $fieldSettings = $permissions['fields'][$fieldName] ?? [];
 
         if ($operator === 'andX' || $operator === 'orX') {
-            $string = $this->buildFilterFromFrontEnd($expr, $conditions, $permissions, $extra);
+            $string = $this->buildFilterFromFrontEnd($qb, $conditions, $permissions, $extra);
         } else {
             $arguments = $this->argumentsToPlaceholders($arguments, $extra);
             $fastMode = $this->highLowSettingCheck($permissions, $fieldSettings, 'fastMode');
             if ($fastMode !== true) {
-                $this->verifyFrontEndCondition($condition, $permissions);
+                $this->verifyFrontEndCondition($qb, $condition, $permissions);
                 /** @noinspection PhpUnusedLocalVariableInspection */
                 [$key, $where] = $this->closureMutate(null, $condition, $extra);
             }
             array_unshift($arguments, $fieldName);
-            $string = $expr->$operator($arguments);
+            $string = $qb->useExpression($operator, $arguments);
         }
         return $string;
     }
 
     /**
+     * @param QueryBuilderWrapperContract $qb
      * @param array $arguments
-     * @param array $extra
      * @return array
      */
-    protected function argumentsToPlaceholders(array $arguments, array $extra):array
+    protected function argumentsToPlaceholders(QueryBuilderWrapperContract $qb, array $arguments):array
     {
-        /** @var QueryBuilder $qb */
-        $qb = $extra['qb'];
         $result = [];
         foreach ($arguments as $argument) {
             $placeholderName = uniqid('', true);
@@ -392,16 +355,17 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
     }
 
     /**
+     * @param QueryBuilderWrapperContract $qb
      * @param array $condition
      * @param array $permissions
      * @throws \RuntimeException
      */
-    public function verifyFrontEndCondition (array $condition, array $permissions):void
+    protected function verifyFrontEndCondition (QueryBuilderWrapperContract $qb, array $condition, array $permissions):void
     {
         $extra = ['condition'=>$condition, 'permissions'=>$permissions];
         $fieldName = $condition['field'];
         $operator = $condition['operator'];
-        $this->verifyFieldFormat($fieldName);
+        $qb->verifyFieldFormat($fieldName);
         $fieldSettings = $permissions['fields'][$fieldName] ?? [];
         $this->closurePermission($fieldSettings, $extra);
         /** @noinspection NullPointerExceptionInspection */
@@ -416,11 +380,11 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
 
 
     /**
-     * @param QueryBuilder $qb
+     * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws \RuntimeException
      */
-    public function addPlaceholders(QueryBuilder $qb, array $extra):void
+    public function addPlaceholders(QueryBuilderWrapperContract $qb, array $extra):void
     {
         $queryPlaceholders = $this->getArray()['read']['placeholders'] ?? [];
         $frontEndPlaceholders = $extra['params']['settings']['placeholders'] ?? [];
@@ -459,7 +423,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
      * @internal param array $extra
      * @throws \RuntimeException
      */
-    public function verifyPlaceholders (string $key, array $value, array $permissions , array $extra):void
+    protected function verifyPlaceholders (string $key, array $value, array $permissions , array $extra):void
     {
         $this->closurePermission($permissions, $extra);
         $allowed = $this->permissiveAllowedCheck($permissions, $value);
@@ -471,12 +435,12 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
     }
 
     /**
-     * @param QueryBuilder $qb
+     * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws RuntimeException
      * @throws \Doctrine\ORM\ORMException
      */
-    public function applyCachingToQuery (QueryBuilder $qb, array $extra):void
+    public function applyCachingToQuery (QueryBuilderWrapperContract $qb, array $extra):void
     {
         $params = $extra['params'];
         $options = $extra['options'];
@@ -490,25 +454,24 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         $cacheId = $params['settings']['cacheId'] ?? null;
         if ($allowQueryCache === true) {
             /** @noinspection NullPointerExceptionInspection */
-            $qb->getQuery()->useQueryCache($this->getArrayHelper()->parse($useQueryCache, $extra));
+            $useQueryCache = $this->getArrayHelper()->parse($useQueryCache, $extra);
             /** @noinspection NullPointerExceptionInspection */
-            $qb->getQuery()->useResultCache($this->getArrayHelper()->parse($useResultCache, $extra), $this->getArrayHelper()->parse($timeToLive, $extra), $this->getArrayHelper()->parse($cacheId, $extra));
-            if ($queryCacheDriver !== null) {
-                $qb->getQuery()->setQueryCacheDriver($queryCacheDriver);
-            }
-            if ($resultCacheDriver !== null) {
-                $qb->getQuery()->setResultCacheDriver($resultCacheDriver);
-            }
+            $useResultCache = $this->getArrayHelper()->parse($useResultCache, $extra);
+            /** @noinspection NullPointerExceptionInspection */
+            $timeToLive = $this->getArrayHelper()->parse($timeToLive, $extra);
+            /** @noinspection NullPointerExceptionInspection */
+            $cacheId = $this->getArrayHelper()->parse($cacheId, $extra);
+            $qb->setCacheSettings($useQueryCache, $useResultCache, $timeToLive, $cacheId, $queryCacheDriver, $resultCacheDriver);
         }
 
         //TODO: Add tagging in later version
     }
 
     /**
-     * @param QueryBuilder $qb
+     * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      */
-    public function buildBaseQuery(QueryBuilder $qb, array $extra):void
+    public function buildBaseQuery(QueryBuilderWrapperContract $qb, array $extra):void
     {
         $config = $this->getArray()['read'] ?? [];
         $firstSelect = true;
@@ -523,24 +486,23 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
                 if ($value !== null) {
                     switch ($queryPart) {
                         case 'select':
+                            /** @var string $value */
                             /** @noinspection NullPointerExceptionInspection */
                             $value = $this->getArrayHelper()->parse($value, $extra);
                             if ($firstSelect === true) {
-                                $qb->select($value);
+                                $qb->select($value, false);
                                 $firstSelect = false;
                             } else {
-                                $qb->addSelect($value);
+                                $qb->select($value);
                             }
                             break;
                         case 'from':
                             $value = $this->processFrom($value, $qb, $extra);
                             if ($value['append'] === false) {
-                                /** @noinspection PhpParamsInspection */
-                                $qb->add('from', new Expr\From($value['className'], $value['alias'], $value['indexBy']));
-                            } else {
                                 $qb->from($value['className'], $value['alias'], $value['indexBy']);
+                            } else {
+                                $qb->from($value['className'], $value['alias'], $value['indexBy'], true);
                             }
-
                             break;
                         case 'leftJoin':
                             $value = $this->processJoinParams($value, $qb, $extra);
@@ -554,37 +516,29 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
                             /** @noinspection NullPointerExceptionInspection */
                             $where = is_array($value['value']) && isset($value['value']['arguments'])?$this->processQueryPartExpr($value['value'], $qb, $extra):$this->getArrayHelper()->parse($value['value'], $extra);
                             if (isset($value['type'])) {
-                                if ($value['type'] === 'and') {
-                                    $qb->andWhere($where);
-                                } else if ($value['type'] === 'or') {
-                                    $qb->orWhere($where);
-                                }
+                                $qb->where($value['type'], $where);
                             } else {
-                                $qb->where($where);
+                                $qb->where($value['type'], $where, false);
                             }
                             break;
                         case 'having':
                             /** @noinspection NullPointerExceptionInspection */
                             $having = is_array($value['value']) && isset($value['value']['arguments'])?$this->processQueryPartExpr($value['value'], $qb, $extra):$this->getArrayHelper()->parse($value['value'], $extra);
                             if (isset($value['type'])) {
-                                if ($value['type'] === 'and') {
-                                    $qb->andHaving($having);
-                                } else if ($value['type'] === 'or') {
-                                    $qb->orHaving($having);
-                                }
+                                $qb->having($value['type'], $having);
                             } else {
-                                $qb->having($having);
+                                $qb->having($value['type'], $having, false);
                             }
                             break;
                         case 'orderBy':
                             $value = $this->processOrderParams($value, $qb, $extra);
-                            $qb->addOrderBy($value['sort'], $value['order']);
+                            $qb->orderBy($value['sort'], $value['order']);
                             break;
                         case 'groupBy':
                             /** @noinspection NullPointerExceptionInspection */
                             $value = $this->getArrayHelper()->parse($value, $extra);
                             /** @var string $value */
-                            $qb->addGroupBy($value);
+                            $qb->groupBy($value);
                             break;
                     }
                 }
@@ -599,11 +553,11 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
     /**
      * @param array $array
      * @param array $defaults
-     * @param QueryBuilder $qb
+     * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @return array
      */
-    protected function processQueryPartArray (array $array, array $defaults, QueryBuilder $qb, array $extra):array
+    protected function processQueryPartArray (array $array, array $defaults, QueryBuilderWrapperContract $qb, array $extra):array
     {
         foreach ($array as $key => $value) {
             /** @noinspection NullPointerExceptionInspection */
@@ -614,11 +568,11 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
 
     /**
      * @param array $array
-     * @param QueryBuilder $qb
+     * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @return array
      */
-    protected function processJoinParams(array $array, QueryBuilder $qb, array $extra):array
+    protected function processJoinParams(array $array, QueryBuilderWrapperContract $qb, array $extra):array
     {
         $defaults = [
             'join'=>null,
@@ -632,11 +586,11 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
 
     /**
      * @param array $array
-     * @param QueryBuilder $qb
+     * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @return array
      */
-    protected function processOrderParams(array $array, QueryBuilder $qb, array $extra):array
+    protected function processOrderParams(array $array, QueryBuilderWrapperContract $qb, array $extra):array
     {
         $defaults = [
             'sort'=>null,
@@ -647,11 +601,11 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
 
     /**
      * @param array $array
-     * @param QueryBuilder $qb
+     * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @return array
      */
-    protected function processFrom(array $array, QueryBuilder $qb, array $extra):array
+    protected function processFrom(array $array, QueryBuilderWrapperContract $qb, array $extra):array
     {
         $defaults = [
             'className'=>null,
@@ -665,11 +619,11 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
 
     /**
      * @param $value
-     * @param QueryBuilder $qb
+     * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @return string|null
      */
-    protected function processQueryPartExpr($value, QueryBuilder $qb, array $extra):?string
+    protected function processQueryPartExpr($value, QueryBuilderWrapperContract $qb, array $extra):?string
     {
         /** @var array[] $value */
         foreach ($value['arguments'] as &$argument) {
@@ -680,7 +634,10 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
                 $argument = $this->getArrayHelper()->parse($argument, $extra);
             }
         }
-        return call_user_func_array ([$qb->expr(), $value['expr']], $value['arguments']);
+        unset($argument);
+        /** @var string $expr */
+        $expr = $value['expr'];
+        return $qb->useExpression($expr, $value['arguments']);
     }
 
     /**
@@ -689,7 +646,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
      * @param array $extra
      * @return array
      */
-    public function closureMutate (string $key=null, array $settings=null, array $extra):array
+    protected function closureMutate (string $key=null, array $settings=null, array $extra):array
     {
         $extra['key'] = $key;
         $extra['settings'] = $settings;
@@ -705,7 +662,7 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
      * @return bool
      * @throws \RuntimeException
      */
-    public function closurePermission (array $permissions, array $extra, bool $noisy = true):bool
+    protected function closurePermission (array $permissions, array $extra, bool $noisy = true):bool
     {
         /** @noinspection NullPointerExceptionInspection */
         $allowed = !(isset($permissions['closure']) && $this->getArrayHelper()->parse($permissions['closure'], $extra) === false);
@@ -716,54 +673,11 @@ class QueryHelper extends ArrayHelper implements \TempestTools\Crud\Contracts\Qu
         return $allowed;
     }
 
-    /**
-     * @param string $field
-     * @param bool $noisy
-     * @return bool
-     * @throws \RuntimeException
-     */
-    public function verifyFieldFormat (string $field, bool $noisy = true):bool
-    {
-        $fieldFormatOk = preg_match(static::FIELD_REGEX, $field);
-        if ($fieldFormatOk === false) {
-            if ($noisy === false) {
-                throw new RuntimeException(sprintf($this->getErrorFromConstant('fieldBadlyFormed')['message'], $field));
-            }
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * @param string $direction
-     * @param bool $noisy
-     * @return bool
-     * @throws \RuntimeException
-     */
-    public function verifyDirectionFormat (string $direction, bool $noisy = true):bool
-    {
-        $directionOk = in_array($direction, static::ORDER_BY_DIRECTIONS, true);
-        if ($directionOk === false) {
-            if ($noisy === false) {
-                throw new RuntimeException(sprintf($this->getErrorFromConstant('directionNotAllow')['message'], $direction));
-            }
-            return false;
-        }
-        return true;
-    }
 
 
 
-    /**
-     * @param string $operator
-     * @throws \RuntimeException
-     */
-    protected function verifyOperatorAllowed(string $operator):void
-    {
-        if (!in_array($operator, static::SAFE_OPERATORS, true)) {
-            throw new RuntimeException(sprintf($this->getErrorFromConstant('operatorNotSafe')['message'], $operator));
-        }
-    }
+
+
 
 }
 ?>
