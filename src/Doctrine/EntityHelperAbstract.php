@@ -11,15 +11,15 @@ use TempestTools\Common\Utility\AccessorMethodNameTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\EvmTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
-use TempestTools\Crud\Constants\EntityEvents;
-use TempestTools\Crud\Contracts\Entity;
+use TempestTools\Crud\Constants\EntityEventsConstants;
+use TempestTools\Crud\Contracts\EntityHelperContract;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
-use TempestTools\Crud\Doctrine\Helper\Entity as EntityHelper;
-use TempestTools\Crud\Contracts\EntityArrayHelper as EntityArrayHelperContract;
+use TempestTools\Crud\Orm\Helper\EntityHelper;
+use TempestTools\Crud\Contracts\EntityArrayHelperContract;
 use Doctrine\ORM\Mapping as ORM;
 
 
-abstract class EntityAbstract implements EventSubscriber, HasId, Entity
+abstract class EntityHelperAbstract implements EventSubscriber, HasId, EntityHelperContract
 {
 
     use ArrayHelperTrait, ErrorConstantsTrait, TTConfigTrait, EvmTrait, AccessorMethodNameTrait;
@@ -128,7 +128,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId, Entity
 
             // Give event listeners a chance to do something then pull out the args again
             /** @noinspection NullPointerExceptionInspection */
-            $this->getEvm()->dispatchEvent(EntityEvents::PRE_SET_FIELD, $eventArgs);
+            $this->getEvm()->dispatchEvent(EntityEventsConstants::PRE_SET_FIELD, $eventArgs);
 
             $processedParams = $eventArgs->getArgs()['params'];
             $value = $configArrayHelper->processSetField($processedParams);
@@ -157,7 +157,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId, Entity
             $eventArgs = $this->makeEventArgs($params);
             // Give event listeners a chance to do something and pull the args out again after wards
             /** @noinspection NullPointerExceptionInspection */
-            $this->getEvm()->dispatchEvent(EntityEvents::PRE_PROCESS_ASSOCIATION_PARAMS, $eventArgs);
+            $this->getEvm()->dispatchEvent(EntityEventsConstants::PRE_PROCESS_ASSOCIATION_PARAMS, $eventArgs);
 
             $processedParams = $eventArgs->getArgs()['params'];
             /** @noinspection NullPointerExceptionInspection */
@@ -173,11 +173,11 @@ abstract class EntityAbstract implements EventSubscriber, HasId, Entity
     /**
      * @param string $assignType
      * @param string $associationName
-     * @param Entity $entity
+     * @param EntityHelperContract $entity
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function bindAssociation(string $assignType=null, string $associationName, Entity $entity = null, $force = false)
+    public function bindAssociation(string $assignType=null, string $associationName, EntityHelperContract $entity = null, $force = false)
     {
         if ($force === false) {
             /** @noinspection NullPointerExceptionInspection */
@@ -209,7 +209,7 @@ abstract class EntityAbstract implements EventSubscriber, HasId, Entity
      */
     public function getSubscribedEvents(): array
     {
-        $all = EntityEvents::getAll();
+        $all = EntityEventsConstants::getAll();
         $subscribe = [];
         foreach ($all as $event) {
             if (method_exists($this, $event)) {
@@ -234,12 +234,12 @@ abstract class EntityAbstract implements EventSubscriber, HasId, Entity
 
             // Give event listeners a chance to do something then pull out the args again
             /** @noinspection NullPointerExceptionInspection */
-            $this->getEvm()->dispatchEvent(EntityEvents::PRE_PERSIST, $eventArgs);
+            $this->getEvm()->dispatchEvent(EntityEventsConstants::PRE_PERSIST, $eventArgs);
 
             $arrayHelper->processPrePersist($this);
 
             /** @noinspection NullPointerExceptionInspection */
-            $this->getEvm()->dispatchEvent(EntityEvents::POST_PERSIST, $eventArgs);
+            $this->getEvm()->dispatchEvent(EntityEventsConstants::POST_PERSIST, $eventArgs);
         }
     }
 

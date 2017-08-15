@@ -4,10 +4,10 @@ namespace TempestTools\Crud\Contracts;
 
 use RuntimeException;
 use TempestTools\Common\Contracts\ArrayHelper as ArrayHelperContract;
-use TempestTools\Crud\Contracts\EntityArrayHelper as EntityArrayHelperContract;
+use TempestTools\Crud\Contracts\EntityArrayHelperContract as EntityArrayHelperContract;
 use Doctrine\ORM\Mapping as ORM;
 
-interface Entity
+interface EntityHelperContract
 {
 
     /** @noinspection MoreThanThreeArgumentsInspection */
@@ -43,11 +43,11 @@ interface Entity
     /**
      * @param string $assignType
      * @param string $associationName
-     * @param Entity $entity
+     * @param EntityHelperContract $entity
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function bindAssociation(string $assignType, string $associationName, Entity $entity = null, $force = false);
+    public function bindAssociation(string $assignType, string $associationName, EntityHelperContract $entity = null, $force = false);
 
 
     /**

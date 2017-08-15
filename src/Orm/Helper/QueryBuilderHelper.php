@@ -1,15 +1,15 @@
 <?php
-namespace TempestTools\Crud\Doctrine\Helper;
+namespace TempestTools\Crud\Orm\Helper;
 
 use RuntimeException;
 use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
-use \TempestTools\Crud\Contracts\QueryBuilderWrapper as QueryBuilderWrapperContract;
-use \TempestTools\Crud\Contracts\QueryBuilderHelper as QueryBuilderHelperContract;
+use \TempestTools\Crud\Contracts\QueryBuilderWrapperContract as QueryBuilderWrapperContract;
+use \TempestTools\Crud\Contracts\QueryBuilderHelperContract as QueryBuilderHelperContract;
 
-class QueryBuilder extends ArrayHelper implements QueryBuilderHelperContract
+class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContract
 {
     use TTConfigTrait, ErrorConstantsTrait, ArrayHelperTrait;
 

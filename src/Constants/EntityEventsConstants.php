@@ -8,9 +8,7 @@
 
 namespace TempestTools\Crud\Constants;
 
-
-
-class EntityEvents{
+class EntityEventsConstants{
     const PRE_SET_FIELD = 'preSetField';
     const PRE_PROCESS_ASSOCIATION_PARAMS = 'preProcessAssociationParams';
     const PRE_PERSIST = 'prePersist';

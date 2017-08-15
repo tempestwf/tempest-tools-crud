@@ -4,7 +4,7 @@ namespace TempestTools\Crud\Contracts;
 
 use TempestTools\Common\Contracts\ArrayHelper;
 
-interface EntityArrayHelper extends ArrayHelper
+interface EntityArrayHelperContract extends ArrayHelper
 {
 
     /**
@@ -127,8 +127,8 @@ interface EntityArrayHelper extends ArrayHelper
     public function enforceField(string $fieldName, $value, array $params, array $fieldSettings = null, bool $noisy = true): bool;
 
     /**
-     * @param Entity $entity
+     * @param EntityHelperContract $entity
      * @throws \RuntimeException
      */
-    public function processPrePersist(Entity $entity);
+    public function processPrePersist(EntityHelperContract $entity);
 }

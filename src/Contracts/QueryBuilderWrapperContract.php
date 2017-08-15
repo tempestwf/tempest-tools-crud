@@ -9,7 +9,7 @@
 namespace TempestTools\Crud\Contracts;
 
 
-interface QueryBuilderWrapper
+interface QueryBuilderWrapperContract
 {
 
     /** @noinspection MoreThanThreeArgumentsInspection */

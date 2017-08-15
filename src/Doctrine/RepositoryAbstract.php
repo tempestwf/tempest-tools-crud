@@ -10,15 +10,15 @@ use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\EvmTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
-use TempestTools\Crud\Constants\RepositoryEvents;
-use TempestTools\Crud\Contracts\Entity;
-use TempestTools\Crud\Contracts\QueryBuilderHelper as QueryHelperContract;
-use TempestTools\Crud\Contracts\DataBindHelper as DataBindHelperContract;
+use TempestTools\Crud\Constants\RepositoryEventsConstants;
+use TempestTools\Crud\Contracts\EntityHelperContract;
+use TempestTools\Crud\Contracts\QueryBuilderHelperContract;
+use TempestTools\Crud\Contracts\DataBindHelperContract;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
-use TempestTools\Crud\Doctrine\Helper\DataBind;
-use TempestTools\Crud\Doctrine\Helper\QueryBuilder as QueryBuilderHelper;
+use TempestTools\Crud\Orm\Helper\DataBindHelper;
+use TempestTools\Crud\Orm\Helper\QueryBuilderHelper;
 use TempestTools\Common\Contracts\ArrayHelper as ArrayHelperContract;
-use TempestTools\Crud\Doctrine\Wrapper\QueryBuilder as QueryBuilderWrapper;
+use TempestTools\Crud\Doctrine\Wrapper\QueryBuilderDqlWrapper as QueryBuilderWrapper;
 use Doctrine\ORM\QueryBuilder;
 
 abstract class RepositoryAbstract extends EntityRepository implements EventSubscriber {
@@ -77,7 +77,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      */
     protected function start(GenericEventArgs $eventArgs) {
         $evm = $this->getEvm();
-        $evm->dispatchEvent(RepositoryEvents::PRE_START, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::PRE_START, $eventArgs);
         $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
 
         $transaction = $this->findSetting($optionOverrides, 'transaction');
@@ -108,7 +108,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         }
 
         if ($force === true || $this->getDataBindHelper() === null) {
-            $this->setDataBindHelper(new DataBind($this->getEntityManager()));
+            $this->setDataBindHelper(new DataBindHelper($this->getEntityManager()));
         }
 
         if ($arrayHelper !== null && ($force === true || $this->getArrayHelper() === null)) {
@@ -149,9 +149,9 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         $eventArgs = $this->makeEventArgs($params, $optionOverrides, $frontEndOptions);
         $eventArgs->getArgs()['action'] = 'read';
         $evm = $this->getEvm();
-        $evm->dispatchEvent(RepositoryEvents::PRE_READ, $eventArgs);
-        $evm->dispatchEvent(RepositoryEvents::VALIDATE_READ, $eventArgs);
-        $evm->dispatchEvent(RepositoryEvents::VERIFY_READ, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::PRE_READ, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::VALIDATE_READ, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::VERIFY_READ, $eventArgs);
         /** @var array $params */
         $params = $eventArgs->getArgs()['params'];
         $this->checkQueryMaxParams($params, $optionOverrides);
@@ -160,8 +160,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         /** @noinspection NullPointerExceptionInspection */
         $eventArgs->getArgs()['results'] = $this->getConfigArrayHelper()->read($qbWrapper, $params, $frontEndOptions, $this->getOptions(), $optionOverrides);
 
-        $evm->dispatchEvent(RepositoryEvents::PROCESS_RESULTS_READ, $eventArgs);
-        $evm->dispatchEvent(RepositoryEvents::POST_READ, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::PROCESS_RESULTS_READ, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::POST_READ, $eventArgs);
 
         return $eventArgs->getArgs()['results'];
     }
@@ -218,7 +218,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      */
     protected function stop($failure = false, GenericEventArgs $eventArgs) {
         $evm = $this->getEvm();
-        $evm->dispatchEvent(RepositoryEvents::PRE_STOP, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::PRE_STOP, $eventArgs);
         $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
 
         $transaction = $this->findSetting($optionOverrides, 'transaction');
@@ -286,7 +286,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
 
         try {
             $eventArgs->getArgs()['batchParams'] = $eventArgs->getArgs()['params'];
-            $evm->dispatchEvent(RepositoryEvents::PRE_CREATE_BATCH, $eventArgs);
+            $evm->dispatchEvent(RepositoryEventsConstants::PRE_CREATE_BATCH, $eventArgs);
             /** @var array $params */
             $params = $eventArgs->getArgs()['params'];
             $this->checkBatchMax($params, $optionOverrides);
@@ -295,7 +295,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
                 /** @noinspection DisconnectedForeachInstructionInspection */
                 $this->doCreate($eventArgs);
             }
-            $evm->dispatchEvent(RepositoryEvents::POST_CREATE_BATCH, $eventArgs);
+            $evm->dispatchEvent(RepositoryEventsConstants::POST_CREATE_BATCH, $eventArgs);
         } catch (Exception $e) {
             $this->stop(true, $eventArgs);
             throw $e;
@@ -315,18 +315,18 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      */
     protected function doCreate (GenericEventArgs $eventArgs) {
         $evm = $this->getEvm();
-        $evm->dispatchEvent(RepositoryEvents::PRE_CREATE, $eventArgs);
-        $evm->dispatchEvent(RepositoryEvents::VALIDATE_CREATE, $eventArgs);
-        $evm->dispatchEvent(RepositoryEvents::VERIFY_CREATE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::PRE_CREATE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::VALIDATE_CREATE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::VERIFY_CREATE, $eventArgs);
         $result = $this->doCreateSingle($eventArgs);
         $eventArgs->getArgs()['results'][] = $result;
-        $evm->dispatchEvent(RepositoryEvents::PROCESS_RESULTS_CREATE, $eventArgs);
-        $evm->dispatchEvent(RepositoryEvents::POST_CREATE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::PROCESS_RESULTS_CREATE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::POST_CREATE, $eventArgs);
     }
 
     /**
      * @param GenericEventArgs $eventArgs
-     * @return Entity
+     * @return EntityHelperContract
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws Exception
@@ -334,10 +334,10 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    protected function doCreateSingle(GenericEventArgs $eventArgs): Entity
+    protected function doCreateSingle(GenericEventArgs $eventArgs): EntityHelperContract
     {
         $className = $this->getClassName();
-        /** @var EntityAbstract $entity */
+        /** @var EntityHelperAbstract $entity */
         return $this->processSingleEntity($eventArgs, new $className());
     }
 
@@ -366,20 +366,20 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
 
         try {
             $eventArgs->getArgs()['batchParams'] = $eventArgs->getArgs()['params'];
-            $evm->dispatchEvent(RepositoryEvents::PRE_UPDATE_BATCH, $eventArgs);
+            $evm->dispatchEvent(RepositoryEventsConstants::PRE_UPDATE_BATCH, $eventArgs);
             /** @var array $params */
             $params = $eventArgs->getArgs()['params'];
             $this->checkBatchMax($params, $optionOverrides);
             /** @noinspection NullPointerExceptionInspection */
             $entities = $this->getDataBindHelper()->findEntitiesFromArrayKeys($params, $this);
-            /** @var EntityAbstract $entity */
+            /** @var EntityHelperAbstract $entity */
             foreach ($entities as $entity) {
                 $batchParams = $entity->getBindParams();
                 $eventArgs->getArgs()['params'] = $batchParams;
                 /** @noinspection DisconnectedForeachInstructionInspection */
                 $this->doUpdate($eventArgs, $entity);
             }
-            $evm->dispatchEvent(RepositoryEvents::POST_UPDATE_BATCH, $eventArgs);
+            $evm->dispatchEvent(RepositoryEventsConstants::POST_UPDATE_BATCH, $eventArgs);
         } catch (Exception $e) {
             $this->stop(true, $eventArgs);
             throw $e;
@@ -390,7 +390,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
 
     /**
      * @param GenericEventArgs $eventArgs
-     * @param Entity $entity
+     * @param EntityHelperContract $entity
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Doctrine\DBAL\ConnectionException
@@ -398,15 +398,15 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    protected function doUpdate (GenericEventArgs $eventArgs, Entity $entity) {
+    protected function doUpdate (GenericEventArgs $eventArgs, EntityHelperContract $entity) {
         $evm = $this->getEvm();
-        $evm->dispatchEvent(RepositoryEvents::PRE_UPDATE, $eventArgs);
-        $evm->dispatchEvent(RepositoryEvents::VALIDATE_UPDATE, $eventArgs);
-        $evm->dispatchEvent(RepositoryEvents::VERIFY_UPDATE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::PRE_UPDATE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::VALIDATE_UPDATE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::VERIFY_UPDATE, $eventArgs);
         $result = $this->processSingleEntity($eventArgs, $entity);
         $eventArgs->getArgs()['results'][] = $result;
-        $evm->dispatchEvent(RepositoryEvents::PROCESS_RESULTS_UPDATE, $eventArgs);
-        $evm->dispatchEvent(RepositoryEvents::POST_UPDATE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::PROCESS_RESULTS_UPDATE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::POST_UPDATE, $eventArgs);
     }
 
     /**
@@ -433,20 +433,20 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
 
         try {
             $eventArgs->getArgs()['batchParams'] = $eventArgs->getArgs()['params'];
-            $evm->dispatchEvent(RepositoryEvents::PRE_DELETE_BATCH, $eventArgs);
+            $evm->dispatchEvent(RepositoryEventsConstants::PRE_DELETE_BATCH, $eventArgs);
             /** @var array $params */
             $params = $eventArgs->getArgs()['params'];
             $this->checkBatchMax($params, $optionOverrides);
             /** @noinspection NullPointerExceptionInspection */
             $entities = $this->getDataBindHelper()->findEntitiesFromArrayKeys($params, $this);
-            /** @var EntityAbstract $entity */
+            /** @var EntityHelperAbstract $entity */
             foreach ($entities as $entity) {
                 $batchParams = $entity->getBindParams();
                 $eventArgs->getArgs()['params'] = $batchParams;
                 /** @noinspection DisconnectedForeachInstructionInspection */
                 $this->doDelete($eventArgs, $entity);
             }
-            $evm->dispatchEvent(RepositoryEvents::POST_DELETE_BATCH, $eventArgs);
+            $evm->dispatchEvent(RepositoryEventsConstants::POST_DELETE_BATCH, $eventArgs);
         } catch (Exception $e) {
             $this->stop(true, $eventArgs);
             throw $e;
@@ -457,7 +457,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
 
     /**
      * @param GenericEventArgs $eventArgs
-     * @param Entity $entity
+     * @param EntityHelperContract $entity
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Doctrine\DBAL\ConnectionException
@@ -465,22 +465,22 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    protected function doDelete (GenericEventArgs $eventArgs, Entity $entity) {
+    protected function doDelete (GenericEventArgs $eventArgs, EntityHelperContract $entity) {
         $evm = $this->getEvm();
-        $evm->dispatchEvent(RepositoryEvents::PRE_DELETE, $eventArgs);
-        $evm->dispatchEvent(RepositoryEvents::VALIDATE_DELETE, $eventArgs);
-        $evm->dispatchEvent(RepositoryEvents::VERIFY_DELETE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::PRE_DELETE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::VALIDATE_DELETE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::VERIFY_DELETE, $eventArgs);
         $result = $this->processSingleEntity($eventArgs, $entity, true);
         $eventArgs->getArgs()['results'][] = $result;
-        $evm->dispatchEvent(RepositoryEvents::PROCESS_RESULTS_DELETE, $eventArgs);
-        $evm->dispatchEvent(RepositoryEvents::POST_DELETE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::PROCESS_RESULTS_DELETE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::POST_DELETE, $eventArgs);
     }
 
     /**
      * @param GenericEventArgs $eventArgs
-     * @param Entity $entity
+     * @param EntityHelperContract $entity
      * @param bool $remove
-     * @return Entity
+     * @return EntityHelperContract
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws Exception
@@ -488,7 +488,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    protected function processSingleEntity (GenericEventArgs $eventArgs, Entity $entity, bool $remove=false): Entity
+    protected function processSingleEntity (GenericEventArgs $eventArgs, EntityHelperContract $entity, bool $remove=false): EntityHelperContract
     {
         $entitiesShareConfigs = $eventArgs->getArgs()['entitiesShareConfigs'];
         if ($entitiesShareConfigs === true) {
@@ -550,7 +550,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      */
     public function getSubscribedEvents():array
     {
-        $all = RepositoryEvents::getAll();
+        $all = RepositoryEventsConstants::getAll();
         $subscribe = [];
         foreach ($all as $event) {
             if (method_exists ($this, $event)) {
@@ -600,17 +600,17 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
 
 
     /**
-     * @return NULL|QueryHelperContract
+     * @return NULL|QueryBuilderHelperContract
      */
-    public function getConfigArrayHelper():?QueryHelperContract
+    public function getConfigArrayHelper():?QueryBuilderHelperContract
     {
         return $this->configArrayHelper;
     }
 
     /**
-     * @param QueryHelperContract $configArrayHelper
+     * @param QueryBuilderHelperContract $configArrayHelper
      */
-    public function setConfigArrayHelper(QueryHelperContract $configArrayHelper)
+    public function setConfigArrayHelper(QueryBuilderHelperContract $configArrayHelper)
     {
         $this->configArrayHelper = $configArrayHelper;
     }

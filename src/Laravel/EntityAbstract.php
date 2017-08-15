@@ -11,8 +11,9 @@ namespace TempestTools\Crud\Laravel;
 use TempestTools\Common\Laravel\Validation\ValidationFactoryHelper;
 use TempestTools\Common\Utility\ValidationFactoryTrait;
 use \Illuminate\Contracts\Validation\Factory;
+use TempestTools\Crud\Doctrine\EntityHelperAbstract;
 
-abstract class EntityAbstract extends \TempestTools\Crud\Doctrine\EntityAbstract
+abstract class EntityAbstract extends EntityHelperAbstract
 {
     use ValidationFactoryTrait;
 

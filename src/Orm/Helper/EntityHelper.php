@@ -1,5 +1,5 @@
 <?php
-namespace TempestTools\Crud\Doctrine\Helper;
+namespace TempestTools\Crud\Orm\Helper;
 
 
 use RuntimeException;
@@ -7,10 +7,10 @@ use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
-use TempestTools\Crud\Contracts\Entity as EntityContract;
-use TempestTools\Crud\Contracts\EntityArrayHelper as EntityArrayHelperContract;
+use TempestTools\Crud\Contracts\EntityHelperContract as EntityContract;
+use TempestTools\Crud\Contracts\EntityArrayHelperContract as EntityArrayHelperContract;
 
-class Entity extends ArrayHelper implements EntityArrayHelperContract{
+class EntityHelper extends ArrayHelper implements EntityArrayHelperContract{
     use TTConfigTrait, ErrorConstantsTrait, ArrayHelperTrait;
 
     const ERRORS = [

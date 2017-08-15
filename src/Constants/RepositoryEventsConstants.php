@@ -10,7 +10,7 @@ namespace TempestTools\Crud\Constants;
 
 
 
-class RepositoryEvents{
+class RepositoryEventsConstants{
 
     const PRE_START = 'preStart';
     const PRE_STOP = 'preStop';
