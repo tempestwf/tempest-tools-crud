@@ -5,7 +5,7 @@ use Doctrine\Common\EventManager;
 use Doctrine\Common\EventSubscriber;
 use RuntimeException;
 use TempestTools\AclMiddleware\Contracts\HasId;
-use TempestTools\Common\Contracts\ArrayHelper as ArrayHelperContract;
+use TempestTools\Common\Contracts\ArrayHelperContract;
 use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\AccessorMethodNameTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;

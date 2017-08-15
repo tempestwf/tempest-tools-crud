@@ -3,8 +3,7 @@
 namespace TempestTools\Crud\Contracts;
 
 use RuntimeException;
-use TempestTools\Common\Contracts\ArrayHelper as ArrayHelperContract;
-use TempestTools\Crud\Contracts\EntityArrayHelperContract as EntityArrayHelperContract;
+use TempestTools\Common\Contracts\ArrayHelperContract;
 use Doctrine\ORM\Mapping as ORM;
 
 interface EntityHelperContract

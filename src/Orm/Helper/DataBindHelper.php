@@ -11,7 +11,7 @@ use TempestTools\Crud\Contracts\DataBindHelperContract;
 use TempestTools\Crud\Contracts\EntityHelperContract;
 use TempestTools\Crud\Doctrine\EntityHelperAbstract;
 use TempestTools\Crud\Doctrine\RepositoryAbstract;
-use TempestTools\Common\Contracts\ArrayHelper as ArrayHelperContract;
+use TempestTools\Common\Contracts\ArrayHelperContract as ArrayHelperContract;
 
 class DataBindHelper implements DataBindHelperContract {
     use EmTrait, ArrayHelperTrait, TTConfigTrait, ErrorConstantsTrait;

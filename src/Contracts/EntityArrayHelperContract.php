@@ -2,9 +2,9 @@
 
 namespace TempestTools\Crud\Contracts;
 
-use TempestTools\Common\Contracts\ArrayHelper;
+use TempestTools\Common\Contracts\ArrayHelperContract;
 
-interface EntityArrayHelperContract extends ArrayHelper
+interface EntityArrayHelperContract extends ArrayHelperContract
 {
 
     /**

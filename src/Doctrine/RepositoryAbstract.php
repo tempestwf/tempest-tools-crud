@@ -17,7 +17,7 @@ use TempestTools\Crud\Contracts\DataBindHelperContract;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
 use TempestTools\Crud\Orm\Helper\DataBindHelper;
 use TempestTools\Crud\Orm\Helper\QueryBuilderHelper;
-use TempestTools\Common\Contracts\ArrayHelper as ArrayHelperContract;
+use TempestTools\Common\Contracts\ArrayHelperContract;
 use TempestTools\Crud\Doctrine\Wrapper\QueryBuilderDqlWrapper as QueryBuilderWrapper;
 use Doctrine\ORM\QueryBuilder;
 

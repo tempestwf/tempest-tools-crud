@@ -6,8 +6,8 @@ use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
-use \TempestTools\Crud\Contracts\QueryBuilderWrapperContract as QueryBuilderWrapperContract;
-use \TempestTools\Crud\Contracts\QueryBuilderHelperContract as QueryBuilderHelperContract;
+use \TempestTools\Crud\Contracts\QueryBuilderWrapperContract;
+use \TempestTools\Crud\Contracts\QueryBuilderHelperContract;
 
 class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContract
 {

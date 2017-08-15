@@ -2,7 +2,7 @@
 namespace TempestTools\Crud\Contracts;
 
 use Doctrine\ORM\EntityManager;
-use TempestTools\Common\Contracts\ArrayHelper as ArrayHelperContract;
+use TempestTools\Common\Contracts\ArrayHelperContract as ArrayHelperContract;
 use TempestTools\Crud\Doctrine\RepositoryAbstract;
 
 interface DataBindHelperContract {

@@ -2,11 +2,10 @@
 namespace TempestTools\Crud\Contracts;
 
 use RuntimeException;
-use TempestTools\Common\Contracts\ArrayHelper;
+use TempestTools\Common\Contracts\ArrayHelperContract;
 use Doctrine\ORM\QueryBuilder;
-use \TempestTools\Crud\Contracts\QueryBuilderWrapperContract as QueryBuilderWrapperContract;
 
-interface QueryBuilderHelperContract extends ArrayHelper {
+interface QueryBuilderHelperContract extends ArrayHelperContract {
 
     /** @noinspection MoreThanThreeArgumentsInspection */
 
