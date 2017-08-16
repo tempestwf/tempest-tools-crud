@@ -599,10 +599,10 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         return $subscribe;
     }
 
-    public function getTTConfig(): array
-    {
-        return [];
-    }
+    /**
+     * @return array
+     */
+    abstract public function getTTConfig(): array;
 
     /**
      * @return array|NULL

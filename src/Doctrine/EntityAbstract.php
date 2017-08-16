@@ -34,12 +34,6 @@ abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityC
         'closureFails' => [
             'message' => 'Error: A validation closure did not pass.',
         ],
-        'validateFactoryNotIncluded' => [
-            'message' => 'Error: Validation factory is not included on this class.',
-        ],
-        'validateNotIncluded' => [
-            'message' => 'Error: Validation is not included on this class. It was passed these param: %s',
-        ],
         'prePersistValidatorFails' => [
             'message' => 'Error: Validation failed on pre-persist.',
         ],
@@ -250,10 +244,7 @@ abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityC
      *
      * @throws \RuntimeException
      */
-    public function getValidationFactory()
-    {
-        throw new RuntimeException($this->getErrorFromConstant('validateFactoryNotIncluded')['message']);
-    }
+    abstract public function getValidationFactory();
 
     /** @noinspection MoreThanThreeArgumentsInspection */
 
@@ -265,11 +256,7 @@ abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityC
      * @param array $customAttributes
      * @throws \RuntimeException
      */
-    public function validate(array $values, array $rules, array $messages = [], array $customAttributes = []):void
-    {
-        $string = json_encode(['values'=>$values, 'rules'=>$rules, 'messages'=>$messages, 'customAttributes'=>$customAttributes]);
-        throw new RuntimeException(sprintf($this->getErrorFromConstant('validateFactoryNotIncluded')['message'], $string));
-    }
+    abstract public function validate(array $values, array $rules, array $messages = [], array $customAttributes = []):void;
 
 
 
