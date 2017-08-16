@@ -32,6 +32,21 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
         'operatorNotSafe'=>[
             'message'=>'Error: Requested operator is not safe to use. operator = %s',
         ],
+        'countRequiresPaginator'=>[
+            'message'=>'Error: Getting a count requires use of the paginator',
+        ],
+        'paginationNotCompatible'=>[
+            'message'=>'Error: Pagination is not compatible with this type of query',
+        ],
+        'hydrationNotCompatible'=>[
+            'message'=>'Error: Hydration is not compatible with this type of query',
+        ],
+        'cacheNotCompatible'=>[
+            'message'=>'Error: Caching is not compatible with this type of query',
+        ],
+        'indexByNotCompatible'=>[
+            'message'=>'Error: indexBy is not compatible with this type of query',
+        ],
     ];
 
     /**
@@ -70,6 +85,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
      * @param int|null $hydrationType
      * @param bool $fetchJoin
      * @return mixed
+     * @throws \RuntimeException
      */
     public function getResult(bool $paginate=false, bool $returnCount=true, int $hydrationType=1, bool $fetchJoin = false)
     {
@@ -80,6 +96,9 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
             $count = $returnCount?count($paginator, $fetchJoin):null;
             $result = $paginator->getIterator()->getArrayCopy();
         } else {
+            if ($count === true) {
+                throw new RuntimeException($this->getErrorFromConstant('countRequiresPaginator')['message']);
+            }
             $this->getQueryBuilder()->getQuery()->setHydrationMode($hydrationType);
             $result = $this->getQueryBuilder()->getQuery()->getResult();
         }

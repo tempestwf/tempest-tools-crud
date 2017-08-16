@@ -14,13 +14,15 @@ use TempestTools\Crud\Constants\RepositoryEventsConstants;
 use TempestTools\Crud\Contracts\EntityContract;
 use TempestTools\Crud\Contracts\QueryBuilderHelperContract;
 use TempestTools\Crud\Contracts\DataBindHelperContract;
+use TempestTools\Crud\Contracts\QueryBuilderWrapperContract;
 use TempestTools\Crud\Contracts\RepositoryContract;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
 use TempestTools\Crud\Doctrine\Wrapper\EntityManagerWrapper;
+use TempestTools\Crud\Doctrine\Wrapper\QueryBuilderSqlWrapper;
 use TempestTools\Crud\Orm\Helper\DataBindHelper;
 use TempestTools\Crud\Orm\Helper\QueryBuilderHelper;
 use TempestTools\Common\Contracts\ArrayHelperContract;
-use TempestTools\Crud\Doctrine\Wrapper\QueryBuilderDqlWrapper as QueryBuilderWrapper;
+use TempestTools\Crud\Doctrine\Wrapper\QueryBuilderDqlWrapper;
 
 abstract class RepositoryAbstract extends EntityRepository implements EventSubscriber, RepositoryContract
 {
@@ -38,14 +40,17 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
             'message'=>'Error: Entity to bind not found.',
         ],
         'moreRowsRequestedThanBatchMax'=>[
-            'message'=>'Error: More rows requested than batch max allows. count = %2, max = %s',
+            'message'=>'Error: More rows requested than batch max allows. count = %s, max = %s',
         ],
         'wrongTypeOfRepo'=>[
             'message'=>'Error: Wrong type of repo used with chaining.',
         ],
         'moreQueryParamsThanMax'=>[
-            'message'=>'Error: More query params than passed than permitted. count = %2, max = %s'
-        ]
+            'message'=>'Error: More query params than passed than permitted. count = %s, max = %s'
+        ],
+        'queryTypeNotRecognized'=>[
+            'message'=>'Error: Query type from configuration not recognized. query type = %s'
+        ],
     ];
 
     /**
@@ -159,8 +164,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         /** @var array $params */
         $params = $eventArgs->getArgs()['params'];
         $this->checkQueryMaxParams($params, $optionOverrides);
-        $qb = $this->createQueryBuilder($this->getEntityAlias());
-        $qbWrapper = new QueryBuilderWrapper($qb);
+        $qbWrapper = $this->createQueryWrapper($this->getEntityAlias());
         /** @noinspection NullPointerExceptionInspection */
         $eventArgs->getArgs()['results'] = $this->getConfigArrayHelper()->read($qbWrapper, $params, $frontEndOptions, $this->getOptions(), $optionOverrides);
 
@@ -168,6 +172,28 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         $evm->dispatchEvent(RepositoryEventsConstants::POST_READ, $eventArgs);
 
         return $eventArgs->getArgs()['results'];
+    }
+
+    /**
+     * @param string $entityAlias
+     * @return QueryBuilderWrapperContract
+     * @throws \RuntimeException
+     */
+    public function createQueryWrapper(string $entityAlias):QueryBuilderWrapperContract
+    {
+        /** @noinspection NullPointerExceptionInspection */
+        $queryType = $this->getConfigArrayHelper()->getArray()['settings']['queryType'] ?? 'dql';
+        if ($queryType === 'dql') {
+            $qb = $this->createQueryBuilder($entityAlias);
+            $qbWrapper = new QueryBuilderDqlWrapper($qb);
+        } else if ($queryType === 'sql') {
+            $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $qbWrapper = new QueryBuilderSqlWrapper($qb);
+        } else {
+            throw new \RuntimeException(sprintf($this->getErrorFromConstant('queryTypeNotRecognized')['message'], $queryType));
+        }
+
+        return $qbWrapper;
     }
 
     /**

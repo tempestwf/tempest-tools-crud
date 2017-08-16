@@ -53,6 +53,7 @@ $readInfo = [
         ],
     ],
     'settings'=>[
+        'queryType'=>'<dql or sql>', // Defaults to DQL, if SQL is used then Doctrine DBAL query is used instead of an ORM query. Design your syntax accordingly
         'cache'=>[
             'useQueryCache'=>'<true or false>',
             'useResultCache'=>'<true or false>',
