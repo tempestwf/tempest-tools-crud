@@ -241,7 +241,6 @@ class DataBindHelper implements DataBindHelperContract {
         $repo = $this->getEm()->getRepository($targetClass);
         $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack(), false);
 
-        // TODO: Use a contract here instead
         if (!$repo instanceof RepositoryContract) {
             throw new \RuntimeException($this->getErrorFromConstant('wrongTypeOfRepo'));
         }

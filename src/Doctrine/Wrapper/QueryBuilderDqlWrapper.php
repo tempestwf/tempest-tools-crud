@@ -8,6 +8,7 @@
 
 namespace TempestTools\Crud\Doctrine\Wrapper;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\QueryBuilder as BaseQueryBuilder;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -46,6 +47,9 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
         ],
         'indexByNotCompatible'=>[
             'message'=>'Error: indexBy is not compatible with this type of query',
+        ],
+        'parameterTypeNotSupported'=>[
+            'message'=>'Error: Parameter type is not supported. type = %s',
         ],
     ];
 
@@ -178,9 +182,13 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
      * @param string $placeholderName
      * @param $argument
      * @param null $type
+     * @throws \RuntimeException
      */
     public function setParameter(string $placeholderName, $argument, $type=null):void
     {
+        if ($type !== null && Type::hasType($type) !== true) {
+            throw new RuntimeException(sprintf($this->getErrorFromConstant('parameterTypeNotSupported')['message'],$type));
+        }
         $this->getQueryBuilder()->setParameter($placeholderName, $argument, $type);
     }
     /** @noinspection MoreThanThreeArgumentsInspection */
