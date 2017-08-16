@@ -518,7 +518,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
                             if (isset($value['type'])) {
                                 $qb->where($value['type'], $where);
                             } else {
-                                $qb->where($value['type'], $where, false);
+                                $qb->where(null, $where, false);
                             }
                             break;
                         case 'having':
@@ -527,7 +527,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
                             if (isset($value['type'])) {
                                 $qb->having($value['type'], $having);
                             } else {
-                                $qb->having($value['type'], $having, false);
+                                $qb->having(null, $having, false);
                             }
                             break;
                         case 'orderBy':

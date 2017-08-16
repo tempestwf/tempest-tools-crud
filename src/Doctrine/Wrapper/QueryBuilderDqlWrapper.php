@@ -192,7 +192,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
      * @param string $string
      * @param bool $add
      */
-    public function select (string $string, bool $add = false):void
+    public function select (string $string, bool $add = true):void
     {
         if ($add === false) {
             $this->getQueryBuilder()->select($string);
