@@ -61,6 +61,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
     {
         $this->setQueryBuilder($queryBuilder);
     }
+
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
