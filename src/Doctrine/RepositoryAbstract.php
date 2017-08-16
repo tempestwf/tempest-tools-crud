@@ -11,7 +11,7 @@ use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\EvmTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
 use TempestTools\Crud\Constants\RepositoryEventsConstants;
-use TempestTools\Crud\Contracts\EntityHelperContract;
+use TempestTools\Crud\Contracts\EntityContract;
 use TempestTools\Crud\Contracts\QueryBuilderHelperContract;
 use TempestTools\Crud\Contracts\DataBindHelperContract;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
@@ -326,7 +326,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
 
     /**
      * @param GenericEventArgs $eventArgs
-     * @return EntityHelperContract
+     * @return EntityContract
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws Exception
@@ -334,10 +334,10 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    protected function doCreateSingle(GenericEventArgs $eventArgs): EntityHelperContract
+    protected function doCreateSingle(GenericEventArgs $eventArgs): EntityContract
     {
         $className = $this->getClassName();
-        /** @var EntityHelperAbstract $entity */
+        /** @var EntityAbstract $entity */
         return $this->processSingleEntity($eventArgs, new $className());
     }
 
@@ -372,7 +372,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
             $this->checkBatchMax($params, $optionOverrides);
             /** @noinspection NullPointerExceptionInspection */
             $entities = $this->getDataBindHelper()->findEntitiesFromArrayKeys($params, $this);
-            /** @var EntityHelperAbstract $entity */
+            /** @var EntityAbstract $entity */
             foreach ($entities as $entity) {
                 $batchParams = $entity->getBindParams();
                 $eventArgs->getArgs()['params'] = $batchParams;
@@ -390,7 +390,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
 
     /**
      * @param GenericEventArgs $eventArgs
-     * @param EntityHelperContract $entity
+     * @param EntityContract $entity
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Doctrine\DBAL\ConnectionException
@@ -398,7 +398,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    protected function doUpdate (GenericEventArgs $eventArgs, EntityHelperContract $entity) {
+    protected function doUpdate (GenericEventArgs $eventArgs, EntityContract $entity) {
         $evm = $this->getEvm();
         $evm->dispatchEvent(RepositoryEventsConstants::PRE_UPDATE, $eventArgs);
         $evm->dispatchEvent(RepositoryEventsConstants::VALIDATE_UPDATE, $eventArgs);
@@ -439,7 +439,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
             $this->checkBatchMax($params, $optionOverrides);
             /** @noinspection NullPointerExceptionInspection */
             $entities = $this->getDataBindHelper()->findEntitiesFromArrayKeys($params, $this);
-            /** @var EntityHelperAbstract $entity */
+            /** @var EntityAbstract $entity */
             foreach ($entities as $entity) {
                 $batchParams = $entity->getBindParams();
                 $eventArgs->getArgs()['params'] = $batchParams;
@@ -457,7 +457,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
 
     /**
      * @param GenericEventArgs $eventArgs
-     * @param EntityHelperContract $entity
+     * @param EntityContract $entity
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Doctrine\DBAL\ConnectionException
@@ -465,7 +465,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    protected function doDelete (GenericEventArgs $eventArgs, EntityHelperContract $entity) {
+    protected function doDelete (GenericEventArgs $eventArgs, EntityContract $entity) {
         $evm = $this->getEvm();
         $evm->dispatchEvent(RepositoryEventsConstants::PRE_DELETE, $eventArgs);
         $evm->dispatchEvent(RepositoryEventsConstants::VALIDATE_DELETE, $eventArgs);
@@ -478,9 +478,9 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
 
     /**
      * @param GenericEventArgs $eventArgs
-     * @param EntityHelperContract $entity
+     * @param EntityContract $entity
      * @param bool $remove
-     * @return EntityHelperContract
+     * @return EntityContract
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws Exception
@@ -488,7 +488,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    protected function processSingleEntity (GenericEventArgs $eventArgs, EntityHelperContract $entity, bool $remove=false): EntityHelperContract
+    protected function processSingleEntity (GenericEventArgs $eventArgs, EntityContract $entity, bool $remove=false): EntityContract
     {
         $entitiesShareConfigs = $eventArgs->getArgs()['entitiesShareConfigs'];
         if ($entitiesShareConfigs === true) {

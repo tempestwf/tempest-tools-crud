@@ -7,10 +7,10 @@ use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
-use TempestTools\Crud\Contracts\EntityHelperContract as EntityContract;
+use TempestTools\Crud\Contracts\EntityContract;
 use TempestTools\Crud\Contracts\EntityArrayHelperContract;
 
-class EntityHelper extends ArrayHelper implements EntityArrayHelperContract{
+class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract{
     use TTConfigTrait, ErrorConstantsTrait, ArrayHelperTrait;
 
     const ERRORS = [

@@ -8,10 +8,10 @@ use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
 use TempestTools\Crud\Contracts\DataBindHelperContract;
-use TempestTools\Crud\Contracts\EntityHelperContract;
-use TempestTools\Crud\Doctrine\EntityHelperAbstract;
+use TempestTools\Crud\Contracts\EntityContract;
+use TempestTools\Crud\Doctrine\EntityAbstract;
 use TempestTools\Crud\Doctrine\RepositoryAbstract;
-use TempestTools\Common\Contracts\ArrayHelperContract as ArrayHelperContract;
+use TempestTools\Common\Contracts\ArrayHelperContract;
 
 class DataBindHelper implements DataBindHelperContract {
     use EmTrait, ArrayHelperTrait, TTConfigTrait, ErrorConstantsTrait;
@@ -58,9 +58,9 @@ class DataBindHelper implements DataBindHelperContract {
     }
 
     /**
-     * @param EntityHelper $entity
+     * @param EntityContract $entity
      * @param array $params
-     * @return EntityHelper
+     * @return EntityContract
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \RuntimeException
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -68,7 +68,7 @@ class DataBindHelper implements DataBindHelperContract {
      * @throws \InvalidArgumentException
      * @throws \Exception
      */
-    public function bind(EntityHelperContract $entity, array $params): EntityHelperContract
+    public function bind(EntityContract $entity, array $params): EntityContract
     {
         /** @noinspection NullPointerExceptionInspection */
         $entity->allowed();
@@ -107,7 +107,7 @@ class DataBindHelper implements DataBindHelperContract {
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
-     * @param EntityHelper $entity
+     * @param EntityContract $entity
      * @param string $associationName
      * @param array $params
      * @param string $targetClass
@@ -118,7 +118,7 @@ class DataBindHelper implements DataBindHelperContract {
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Exception
      */
-    public function bindAssociation(EntityHelperContract $entity, string $associationName, array $params = NULL, string $targetClass): void
+    public function bindAssociation(EntityContract $entity, string $associationName, array $params = NULL, string $targetClass): void
     {
         $repo = $this->getRepoForRelation($targetClass);
         $chainOverrides = ['transaction'=>false, 'flush'=>false, 'batchMax'=>null];
@@ -138,11 +138,11 @@ class DataBindHelper implements DataBindHelperContract {
 
     /**
      * @param array $entities
-     * @param EntityHelper $targetEntity
+     * @param EntityContract $targetEntity
      * @param string $associationName
      * @throws \RuntimeException
      */
-    public function bindEntities (array $entities, EntityHelperContract $targetEntity, string $associationName): void
+    public function bindEntities (array $entities, EntityContract $targetEntity, string $associationName): void
     {
         foreach ($entities as $foundEntity) {
             $params = $foundEntity->getBindParams();
@@ -168,7 +168,7 @@ class DataBindHelper implements DataBindHelperContract {
      */
     protected function processChaining (string $chainType, array $params, array $chainOverrides, RepositoryAbstract $repo):?array {
         $foundEntities = null;
-        /** @var EntityHelperAbstract $foundEntity */
+        /** @var EntityAbstract $foundEntity */
         if ($chainType !== null) {
             switch ($chainType) {
                 case 'create':
@@ -188,13 +188,13 @@ class DataBindHelper implements DataBindHelperContract {
         return $foundEntities;
     }
     /**
-     * @param EntityHelper $entity
+     * @param EntityContract $entity
      * @param string $associationName
      * @param array $paramsForEntities
      * @return array
      * @throws \RuntimeException
      */
-    protected function prepareAssociationParams (EntityHelperContract $entity, string $associationName, array $paramsForEntities):array {
+    protected function prepareAssociationParams (EntityContract $entity, string $associationName, array $paramsForEntities):array {
         /** @var array $paramsForEntities */
         foreach ($paramsForEntities as $key=>$paramsForEntity) {
             $paramsForEntities[$key] = $entity->processAssociationParams($associationName, $paramsForEntity);
@@ -210,7 +210,7 @@ class DataBindHelper implements DataBindHelperContract {
     public function findEntitiesFromArrayKeys (array $array, RepositoryAbstract $repo):array {
         $keys = array_keys($array);
         $entities = $repo->findIn('id', $keys)->getQuery()->getResult();
-        /** @var EntityHelperAbstract $entity */
+        /** @var EntityAbstract $entity */
         foreach ($entities as $entity) {
             $entity->setBindParams($array[$entity->getId()]);
         }

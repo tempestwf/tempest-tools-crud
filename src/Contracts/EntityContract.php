@@ -6,7 +6,7 @@ use RuntimeException;
 use TempestTools\Common\Contracts\ArrayHelperContract;
 use Doctrine\ORM\Mapping as ORM;
 
-interface EntityHelperContract
+interface EntityContract
 {
 
     /** @noinspection MoreThanThreeArgumentsInspection */
@@ -42,11 +42,11 @@ interface EntityHelperContract
     /**
      * @param string $assignType
      * @param string $associationName
-     * @param EntityHelperContract $entity
+     * @param EntityContract $entity
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function bindAssociation(string $assignType, string $associationName, EntityHelperContract $entity = null, $force = false);
+    public function bindAssociation(string $assignType, string $associationName, EntityContract $entity = null, $force = false);
 
 
     /**

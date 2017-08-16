@@ -12,14 +12,14 @@ use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\EvmTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
 use TempestTools\Crud\Constants\EntityEventsConstants;
-use TempestTools\Crud\Contracts\EntityHelperContract;
+use TempestTools\Crud\Contracts\EntityContract;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
-use TempestTools\Crud\Orm\Helper\EntityHelper;
+use TempestTools\Crud\Orm\Helper\EntityArrayHelper;
 use TempestTools\Crud\Contracts\EntityArrayHelperContract;
 use Doctrine\ORM\Mapping as ORM;
 
 
-abstract class EntityHelperAbstract implements EventSubscriber, HasIdContract, EntityHelperContract
+abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityContract
 {
 
     use ArrayHelperTrait, ErrorConstantsTrait, TTConfigTrait, EvmTrait, AccessorMethodNameTrait;
@@ -103,7 +103,7 @@ abstract class EntityHelperAbstract implements EventSubscriber, HasIdContract, E
         }
 
         if ($force === true || $this->getConfigArrayHelper() === null || $mode !== $this->getLastMode() || $startPath !== $this->getTTPath() || $startFallback !== $this->getTTFallBack()) {
-            $entityArrayHelper = new EntityHelper();
+            $entityArrayHelper = new EntityArrayHelper();
             $entityArrayHelper->setArrayHelper($this->getArrayHelper());
             $this->parseTTConfig($entityArrayHelper);
         }
@@ -173,11 +173,11 @@ abstract class EntityHelperAbstract implements EventSubscriber, HasIdContract, E
     /**
      * @param string $assignType
      * @param string $associationName
-     * @param EntityHelperContract $entity
+     * @param EntityContract $entity
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function bindAssociation(string $assignType=null, string $associationName, EntityHelperContract $entity = null, $force = false)
+    public function bindAssociation(string $assignType=null, string $associationName, EntityContract $entity = null, $force = false)
     {
         if ($force === false) {
             /** @noinspection NullPointerExceptionInspection */
