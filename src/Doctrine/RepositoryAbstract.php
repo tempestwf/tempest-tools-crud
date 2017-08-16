@@ -14,14 +14,16 @@ use TempestTools\Crud\Constants\RepositoryEventsConstants;
 use TempestTools\Crud\Contracts\EntityContract;
 use TempestTools\Crud\Contracts\QueryBuilderHelperContract;
 use TempestTools\Crud\Contracts\DataBindHelperContract;
+use TempestTools\Crud\Contracts\RepositoryContract;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
+use TempestTools\Crud\Doctrine\Wrapper\EntityManagerWrapper;
 use TempestTools\Crud\Orm\Helper\DataBindHelper;
 use TempestTools\Crud\Orm\Helper\QueryBuilderHelper;
 use TempestTools\Common\Contracts\ArrayHelperContract;
 use TempestTools\Crud\Doctrine\Wrapper\QueryBuilderDqlWrapper as QueryBuilderWrapper;
-use Doctrine\ORM\QueryBuilder;
 
-abstract class RepositoryAbstract extends EntityRepository implements EventSubscriber {
+abstract class RepositoryAbstract extends EntityRepository implements EventSubscriber, RepositoryContract
+{
 
     use ArrayHelperTrait, ErrorConstantsTrait, TTConfigTrait, EvmTrait;
 
@@ -75,7 +77,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @internal param array $optionOverrides
      * @throws \RuntimeException
      */
-    protected function start(GenericEventArgs $eventArgs) {
+    protected function start(GenericEventArgs $eventArgs):void
+    {
         $evm = $this->getEvm();
         $evm->dispatchEvent(RepositoryEventsConstants::PRE_START, $eventArgs);
         $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
@@ -97,7 +100,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function init( ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL, bool $force= true)
+    public function init( ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL, bool $force= true):void
     {
         $startPath = $this->getTTPath();
         $startFallback = $this->getTTFallBack();
@@ -108,7 +111,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         }
 
         if ($force === true || $this->getDataBindHelper() === null) {
-            $this->setDataBindHelper(new DataBindHelper($this->getEntityManager()));
+            $this->setDataBindHelper(new DataBindHelper(new EntityManagerWrapper($this->getEntityManager())));
         }
 
         if ($arrayHelper !== null && ($force === true || $this->getArrayHelper() === null)) {
@@ -140,11 +143,12 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @param array $params
      * @param array $optionOverrides
      * @param array $frontEndOptions
-     * @return mixed
+     * @return array
      * @throws \RuntimeException
      * @throws \Doctrine\ORM\ORMException
      */
-    public function read (array $params=[], array $frontEndOptions=[], array $optionOverrides = []) {
+    public function read (array $params=[], array $frontEndOptions=[], array $optionOverrides = []):array
+    {
         /** @noinspection NullPointerExceptionInspection */
         $eventArgs = $this->makeEventArgs($params, $optionOverrides, $frontEndOptions);
         $eventArgs->getArgs()['action'] = 'read';
@@ -181,7 +185,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @param array $optionOverrides
      * @throws \RuntimeException
      */
-    protected function checkQueryMaxParams(array $values, array $optionOverrides) {
+    protected function checkQueryMaxParams(array $values, array $optionOverrides):void
+    {
         $maxBatch = $this->findSetting($optionOverrides, 'queryMaxParams');
         if ($maxBatch !== NULL) {
             $count = count($values, COUNT_RECURSIVE);
@@ -216,7 +221,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \RuntimeException
      */
-    protected function stop($failure = false, GenericEventArgs $eventArgs) {
+    protected function stop($failure = false, GenericEventArgs $eventArgs):void
+    {
         $evm = $this->getEvm();
         $evm->dispatchEvent(RepositoryEventsConstants::PRE_STOP, $eventArgs);
         $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
@@ -266,7 +272,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @param array $params
      * @param array $optionOverrides
      * @param array $frontEndOptions
-     * @return mixed
+     * @return array
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \InvalidArgumentException
@@ -274,7 +280,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws Exception
      */
-    public function create(array $params, array $optionOverrides = [], array $frontEndOptions=[]){
+    public function create(array $params, array $optionOverrides = [], array $frontEndOptions=[]):array
+    {
 
         /** @noinspection NullPointerExceptionInspection */
         $this->getArrayHelper()->wrapArray($params);
@@ -313,7 +320,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    protected function doCreate (GenericEventArgs $eventArgs) {
+    protected function doCreate (GenericEventArgs $eventArgs):void
+    {
         $evm = $this->getEvm();
         $evm->dispatchEvent(RepositoryEventsConstants::PRE_CREATE, $eventArgs);
         $evm->dispatchEvent(RepositoryEventsConstants::VALIDATE_CREATE, $eventArgs);
@@ -346,7 +354,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @param array $params
      * @param array $optionOverrides
      * @param array $frontEndOptions
-     * @return mixed
+     * @return array
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \InvalidArgumentException
@@ -354,7 +362,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws Exception
      */
-    public function update(array $params, array $optionOverrides = [], array $frontEndOptions=[]){
+    public function update(array $params, array $optionOverrides = [], array $frontEndOptions=[]):array
+    {
 
         /** @noinspection NullPointerExceptionInspection */
         $this->getArrayHelper()->wrapArray($params);
@@ -398,7 +407,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    protected function doUpdate (GenericEventArgs $eventArgs, EntityContract $entity) {
+    protected function doUpdate (GenericEventArgs $eventArgs, EntityContract $entity):void
+    {
         $evm = $this->getEvm();
         $evm->dispatchEvent(RepositoryEventsConstants::PRE_UPDATE, $eventArgs);
         $evm->dispatchEvent(RepositoryEventsConstants::VALIDATE_UPDATE, $eventArgs);
@@ -413,7 +423,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @param array $params
      * @param array $optionOverrides
      * @param array $frontEndOptions
-     * @return mixed
+     * @return array
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \InvalidArgumentException
@@ -421,7 +431,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws Exception
      */
-    public function delete(array $params, array $optionOverrides = [], array $frontEndOptions=[]){
+    public function delete(array $params, array $optionOverrides = [], array $frontEndOptions=[]):array
+    {
 
         /** @noinspection NullPointerExceptionInspection */
         $this->getArrayHelper()->wrapArray($params);
@@ -465,7 +476,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    protected function doDelete (GenericEventArgs $eventArgs, EntityContract $entity) {
+    protected function doDelete (GenericEventArgs $eventArgs, EntityContract $entity):void
+    {
         $evm = $this->getEvm();
         $evm->dispatchEvent(RepositoryEventsConstants::PRE_DELETE, $eventArgs);
         $evm->dispatchEvent(RepositoryEventsConstants::VALIDATE_DELETE, $eventArgs);
@@ -518,7 +530,8 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @param array $optionOverrides
      * @throws \RuntimeException
      */
-    protected function checkBatchMax(array $values, array $optionOverrides) {
+    protected function checkBatchMax(array $values, array $optionOverrides):void
+    {
         $maxBatch = $this->findSetting($optionOverrides, 'batchMax');
         if ($maxBatch !== NULL) {
             $count = count($values, COUNT_RECURSIVE);
@@ -532,9 +545,9 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     /**
      * @param string $fieldName
      * @param array $values
-     * @return QueryBuilder
+     * @return mixed
      */
-    public function findIn(string $fieldName, array $values): QueryBuilder
+    public function findIn(string $fieldName, array $values)
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('e')
@@ -576,7 +589,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     /**
      * @param array|NULL $options
      */
-    public function setOptions($options)
+    public function setOptions($options):void
     {
         $this->options = $options;
     }
@@ -592,7 +605,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     /**
      * @param DataBindHelperContract $dataBindHelper
      */
-    public function setDataBindHelper(DataBindHelperContract $dataBindHelper)
+    public function setDataBindHelper(DataBindHelperContract $dataBindHelper):void
     {
         $this->dataBindHelper = $dataBindHelper;
     }
@@ -610,7 +623,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     /**
      * @param QueryBuilderHelperContract $configArrayHelper
      */
-    public function setConfigArrayHelper(QueryBuilderHelperContract $configArrayHelper)
+    public function setConfigArrayHelper(QueryBuilderHelperContract $configArrayHelper):void
     {
         $this->configArrayHelper = $configArrayHelper;
     }

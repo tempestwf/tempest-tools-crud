@@ -1,12 +1,9 @@
 <?php
 namespace TempestTools\Crud\Contracts;
 
-use Doctrine\ORM\EntityManager;
 use TempestTools\Common\Contracts\ArrayHelperContract;
-use TempestTools\Crud\Doctrine\RepositoryAbstract;
 
 interface DataBindHelperContract {
-    public function __construct(EntityManager $entityManager);
 
 
     /** @noinspection MoreThanThreeArgumentsInspection
@@ -42,16 +39,16 @@ interface DataBindHelperContract {
 
     /**
      * @param array $array
-     * @param RepositoryAbstract $repo
+     * @param RepositoryContract $repo
      * @return array
      */
-    public function findEntitiesFromArrayKeys (array $array, RepositoryAbstract $repo):array;
+    public function findEntitiesFromArrayKeys (array $array, RepositoryContract $repo):array;
     /**
      * @param string $targetClass
      * @throws \RuntimeException
-     * @return RepositoryAbstract
+     * @return RepositoryContract
      */
-    public function getRepoForRelation(string $targetClass):RepositoryAbstract;
+    public function getRepoForRelation(string $targetClass):RepositoryContract;
 
 }
 ?>

@@ -1,20 +1,19 @@
 <?php
 namespace TempestTools\Crud\Orm\Helper;
 
-
-use Doctrine\ORM\EntityManager;
-use TempestTools\Common\Doctrine\Utility\EmTrait;
+use TempestTools\AclMiddleware\Contracts\HasIdContract;
 use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
 use TempestTools\Crud\Contracts\DataBindHelperContract;
 use TempestTools\Crud\Contracts\EntityContract;
+use TempestTools\Crud\Contracts\EntityManagerWrapperContract;
+use TempestTools\Crud\Contracts\RepositoryContract;
 use TempestTools\Crud\Doctrine\EntityAbstract;
-use TempestTools\Crud\Doctrine\RepositoryAbstract;
 use TempestTools\Common\Contracts\ArrayHelperContract;
 
 class DataBindHelper implements DataBindHelperContract {
-    use EmTrait, ArrayHelperTrait, TTConfigTrait, ErrorConstantsTrait;
+    use ArrayHelperTrait, TTConfigTrait, ErrorConstantsTrait;
 
     const ERRORS = [
         'noArrayHelper'=>[
@@ -24,7 +23,17 @@ class DataBindHelper implements DataBindHelperContract {
 
     const IGNORE_KEYS = ['assignType'];
 
-    public function __construct(EntityManager $entityManager)
+    /**
+     * @var EntityManagerWrapperContract $em
+     */
+    protected $em;
+
+    /**
+     * DataBindHelper constructor.
+     *
+     * @param EntityManagerWrapperContract $entityManager
+     */
+    public function __construct(EntityManagerWrapperContract $entityManager)
     {
         $this->setEm($entityManager);
     }
@@ -75,11 +84,14 @@ class DataBindHelper implements DataBindHelperContract {
         $entity->setArrayHelper($this->getArrayHelper());
         $entity->setBindParams($params);
         /** @noinspection NullPointerExceptionInspection */
-        $metadata = $this->getEm()->getClassMetadata(get_class($entity));
-        $associateNames = $metadata->getAssociationNames();
+        $entityName = get_class($entity);
+        /** @noinspection NullPointerExceptionInspection */
+        $associateNames = $this->getEm()->getAssociationNames($entityName);
         foreach ($params as $fieldName => $value) {
             if (in_array($fieldName, $associateNames, true)) {
-                $targetClass = $metadata->getAssociationTargetClass($fieldName);
+
+                /** @noinspection NullPointerExceptionInspection */
+                $targetClass = $this->getEm()->getAssociationTargetClass($entityName, $fieldName);
                 $value = $this->fixScalarAssociationValue($value);
                 $this->bindAssociation($entity, $fieldName, $value, $targetClass);
             } else if (!in_array($fieldName, static::IGNORE_KEYS, true)) {
@@ -157,7 +169,7 @@ class DataBindHelper implements DataBindHelperContract {
      * @param string $chainType
      * @param array $params
      * @param array $chainOverrides
-     * @param RepositoryAbstract $repo
+     * @param RepositoryContract $repo
      * @return array|null
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
@@ -166,7 +178,7 @@ class DataBindHelper implements DataBindHelperContract {
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \Exception
      */
-    protected function processChaining (string $chainType, array $params, array $chainOverrides, RepositoryAbstract $repo):?array {
+    protected function processChaining (string $chainType, array $params, array $chainOverrides, RepositoryContract $repo):?array {
         $foundEntities = null;
         /** @var EntityAbstract $foundEntity */
         if ($chainType !== null) {
@@ -204,13 +216,14 @@ class DataBindHelper implements DataBindHelperContract {
 
     /**
      * @param array $array
-     * @param RepositoryAbstract $repo
+     * @param RepositoryContract $repo
      * @return array
      */
-    public function findEntitiesFromArrayKeys (array $array, RepositoryAbstract $repo):array {
+    public function findEntitiesFromArrayKeys (array $array, RepositoryContract $repo):array {
         $keys = array_keys($array);
+        /** @var EntityContract|HasIdContract[] $entities */
         $entities = $repo->findIn('id', $keys)->getQuery()->getResult();
-        /** @var EntityAbstract $entity */
+        /** @var EntityContract|HasIdContract $entity */
         foreach ($entities as $entity) {
             $entity->setBindParams($array[$entity->getId()]);
         }
@@ -220,19 +233,35 @@ class DataBindHelper implements DataBindHelperContract {
     /**
      * @param string $targetClass
      * @throws \RuntimeException
-     * @return RepositoryAbstract
+     * @return RepositoryContract
      */
-    public function getRepoForRelation(string $targetClass):RepositoryAbstract {
-        /** @var RepositoryAbstract $repo */
+    public function getRepoForRelation(string $targetClass):RepositoryContract {
+        /** @var RepositoryContract $repo */
         /** @noinspection NullPointerExceptionInspection */
         $repo = $this->getEm()->getRepository($targetClass);
         $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack(), false);
 
         // TODO: Use a contract here instead
-        if (!$repo instanceof RepositoryAbstract) {
+        if (!$repo instanceof RepositoryContract) {
             throw new \RuntimeException($this->getErrorFromConstant('wrongTypeOfRepo'));
         }
         return $repo;
+    }
+
+    /**
+     * @param EntityManagerWrapperContract $em
+     */
+    public function setEm(EntityManagerWrapperContract $em): void
+    {
+        $this->em = $em;
+    }
+
+    /**
+     * @return EntityManagerWrapperContract
+     */
+    public function getEm(): ?EntityManagerWrapperContract
+    {
+        return $this->em;
     }
 }
 ?>
