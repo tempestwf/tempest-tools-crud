@@ -7,7 +7,6 @@ use TempestTools\Crud\Contracts\RepositoryContract;
 
 abstract class RepositoryAbstract extends EntityRepository implements EventSubscriber, RepositoryContract
 {
-
     use  /** @noinspection TraitsPropertiesConflictsInspection */ RepositoryTrait;
 
     /**
