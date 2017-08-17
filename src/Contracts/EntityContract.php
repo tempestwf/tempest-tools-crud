@@ -19,7 +19,7 @@ interface EntityContract
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function init(string $mode, ArrayHelperContract $arrayHelper = null, array $path = null, array $fallBack = null, bool $force = true);
+    public function init(string $mode, ArrayHelperContract $arrayHelper = null, array $path = null, array $fallBack = null, bool $force = true):void;
 
 
     /**
@@ -27,7 +27,7 @@ interface EntityContract
      * @param $value
      * @throws RuntimeException
      */
-    public function setField(string $fieldName, $value);
+    public function setField(string $fieldName, $value):void;
 
     /**
      * @param string $associationName
@@ -46,7 +46,7 @@ interface EntityContract
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function bindAssociation(string $assignType, string $associationName, EntityContract $entity = null, $force = false);
+    public function bindAssociation(string $assignType, string $associationName, EntityContract $entity = null, $force = false):void;
 
 
     /**
@@ -62,7 +62,7 @@ interface EntityContract
      * @ORM\PrePersist
      * @throws \RuntimeException
      */
-    public function ttPrePersist();
+    public function ttPrePersist():void;
 
 
     /**
@@ -85,7 +85,7 @@ interface EntityContract
     /**
      * @param array $bindParams
      */
-    public function setBindParams(array $bindParams);
+    public function setBindParams(array $bindParams):void;
     /**
      * @param bool $nosey
      * @return bool
@@ -101,7 +101,7 @@ interface EntityContract
     /**
      * @param EntityArrayHelperContract $configArrayHelper
      */
-    public function setConfigArrayHelper(EntityArrayHelperContract $configArrayHelper);
+    public function setConfigArrayHelper(EntityArrayHelperContract $configArrayHelper):void;
 
     /**
      * @param string $verb
@@ -113,7 +113,7 @@ interface EntityContract
     /**
      * @param null|ArrayHelperContract $arrayHelper
      */
-    public function setArrayHelper(ArrayHelperContract $arrayHelper);
+    public function setArrayHelper(ArrayHelperContract $arrayHelper):void;
 
     /** @noinspection MoreThanThreeArgumentsInspection */
 
