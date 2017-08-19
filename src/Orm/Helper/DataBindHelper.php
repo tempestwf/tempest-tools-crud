@@ -15,7 +15,12 @@ class DataBindHelper implements DataBindHelperContract
     use ErrorConstantsTrait;
 
     const ERRORS = [
-
+        'wrongTypeOfRepo'=>[
+            'message'=>'Error: Wrong type of repo used with chaining.',
+        ],
+        'moreRowsRequestedThanBatchMax'=>[
+            'message'=>'Error: More rows requested than batch max allows. count = %s, max = %s',
+        ],
     ];
 
     const IGNORE_KEYS = ['assignType'];
