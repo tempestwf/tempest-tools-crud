@@ -85,7 +85,7 @@ interface RepositoryContract
      * @param array $values
      * @return mixed
      */
-    public function findIn(string $fieldName, array $values);
+    public function findIn(string $fieldName, array $values):array;
 
     public function getTTConfig(): array;
 

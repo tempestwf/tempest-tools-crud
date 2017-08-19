@@ -268,7 +268,7 @@ class DataBindHelper implements DataBindHelperContract
     public function findEntitiesFromArrayKeys (array $array, RepositoryContract $repo):array {
         $keys = array_keys($array);
         /** @var EntityContract|HasIdContract[] $entities */
-        $entities = $repo->findIn('id', $keys)->getQuery()->getResult();
+        $entities = $repo->findIn('id', $keys);
         /** @var EntityContract|HasIdContract $entity */
         foreach ($entities as $entity) {
             $entity->setBindParams($array[$entity->getId()]);
