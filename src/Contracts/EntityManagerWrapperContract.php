@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: Will
- * Date: 8/15/2017
- * Time: 6:12 PM
+ * Date: 8/18/2017
+ * Time: 8:46 PM
  */
 
 namespace TempestTools\Crud\Contracts;
@@ -12,12 +12,11 @@ namespace TempestTools\Crud\Contracts;
 
 interface EntityManagerWrapperContract
 {
-
     /**
      * @param string $entityName
      * @return array
      */
-    public function getAssociationNames(string $entityName):array;
+    public function getAssociationNames(string $entityName): array;
 
     /**
      * @param string $entityName
@@ -25,7 +24,7 @@ interface EntityManagerWrapperContract
      * @return string
      * @throws \InvalidArgumentException
      */
-    public function getAssociationTargetClass(string $entityName, string $fieldName):string;
+    public function getAssociationTargetClass(string $entityName, string $fieldName): string;
 
     /**
      * @param string $targetClass
@@ -36,32 +35,35 @@ interface EntityManagerWrapperContract
     /**
      *
      */
-    public function beginTransaction ():void;
+    public function beginTransaction(): void;
 
     /**
-     * @param null $entity
+     * @param EntityContract $entity
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function flush ($entity = null):void;
+    public function flush(EntityContract $entity = null): void;
 
     /**
      *
+     * @throws \Doctrine\DBAL\ConnectionException
      */
-    public function rollBack ():void;
+    public function rollBack(): void;
 
     /**
      *
+     * @throws \Doctrine\DBAL\ConnectionException
      */
-    public function commit ():void;
+    public function commit(): void;
 
     /**
      * @param EntityContract $entity
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      */
-    public function persist (EntityContract $entity):void;
+    public function persist(EntityContract $entity): void;
+
     /**
      * @param EntityContract $entity
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      */
-    public function remove (EntityContract $entity):void;
+    public function remove(EntityContract $entity): void;
 }

@@ -68,10 +68,10 @@ class EntityManagerWrapper implements EntityManagerWrapperContract
     }
 
     /**
-     * @param null $entity
+     * @param EntityContract $entity
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function flush ($entity = null):void
+    public function flush (EntityContract $entity = null):void
     {
         /** @noinspection NullPointerExceptionInspection */
         $this->getEm()->flush($entity);
