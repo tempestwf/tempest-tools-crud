@@ -25,7 +25,7 @@ interface RepositoryContract
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function init(ArrayHelperContract $arrayHelper = null, array $path = null, array $fallBack = null, bool $force = true);
+    public function init(ArrayHelperContract $arrayHelper = null, array $path = null, array $fallBack = null, bool $force = false);
 
     /**
      * @param array $params

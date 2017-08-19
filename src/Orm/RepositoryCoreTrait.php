@@ -45,7 +45,7 @@ trait RepositoryCoreTrait
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function init( ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL, bool $force= true):void
+    public function init( ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL, bool $force = false):void
     {
         $force = $this->coreInit($arrayHelper, $path, $fallBack, $force);
         $this->queryBuilderInit($force);

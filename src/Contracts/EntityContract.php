@@ -19,7 +19,7 @@ interface EntityContract
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function init(string $mode, ArrayHelperContract $arrayHelper = null, array $path = null, array $fallBack = null, bool $force = true):void;
+    public function init(string $mode, ArrayHelperContract $arrayHelper = null, array $path = null, array $fallBack = null, bool $force = false):void;
 
 
     /**
