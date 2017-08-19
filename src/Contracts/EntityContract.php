@@ -230,4 +230,10 @@ interface EntityContract
      */
     public function coreInit (ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL, bool $force= true, string $mode = null):bool;
 
+    /**
+     * @return EventManagerWrapperContract
+     * @throws \RuntimeException
+     */
+    public function createEventManagerWrapper ():EventManagerWrapperContract;
+
 }

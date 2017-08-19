@@ -5,20 +5,18 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use TempestTools\Crud\Contracts\EntityManagerWrapperContract;
-use TempestTools\Crud\Contracts\EventManagerWrapperContract;
 use TempestTools\Crud\Contracts\GenericEventArgsContract;
 use TempestTools\Crud\Contracts\QueryBuilderWrapperContract;
 use TempestTools\Crud\Contracts\RepositoryContract;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
 use TempestTools\Crud\Doctrine\Wrapper\EntityManagerWrapper;
-use TempestTools\Crud\Doctrine\Wrapper\EventManagerWrapper;
 use TempestTools\Crud\Doctrine\Wrapper\QueryBuilderDqlWrapper;
 use TempestTools\Crud\Doctrine\Wrapper\QueryBuilderSqlWrapper;
 use TempestTools\Crud\Orm\RepositoryCoreTrait;
 
 abstract class RepositoryAbstract extends EntityRepository implements EventSubscriber, RepositoryContract
 {
-    use  /** @noinspection TraitsPropertiesConflictsInspection */ RepositoryCoreTrait;
+    use RepositoryCoreTrait, CreateEventManagerWrapperTrait;
 
     /**
      * @var array|NULL $options;
@@ -62,14 +60,6 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         return new EntityManagerWrapper($this->getEntityManager());
     }
 
-    /**
-     * @return EventManagerWrapperContract
-     * @throws \RuntimeException
-     */
-    public function createEventManagerWrapper ():EventManagerWrapperContract
-    {
-        return new EventManagerWrapper();
-    }
 
 
     /** @noinspection MoreThanThreeArgumentsInspection */

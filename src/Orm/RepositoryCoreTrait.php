@@ -142,7 +142,7 @@ trait RepositoryCoreTrait
      * @return GenericEventArgsContract
      * @throws \RuntimeException
      */
-    abstract protected function makeEventArgs(array $params, array $options = [], array $optionOverrides = [], array $frontEndOptions=[]): GenericEventArgsContract;
+    abstract public function makeEventArgs(array $params, array $options = [], array $optionOverrides = [], array $frontEndOptions=[]): GenericEventArgsContract;
     /**
      * @return string
      * @throws \RuntimeException
@@ -304,7 +304,7 @@ trait RepositoryCoreTrait
     }
 
 
-    abstract protected function createEntityManagerWrapper():EntityManagerWrapperContract;
+    abstract public function createEntityManagerWrapper():EntityManagerWrapperContract;
 
 
 

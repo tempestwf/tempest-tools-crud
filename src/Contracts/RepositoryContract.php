@@ -81,11 +81,17 @@ interface RepositoryContract
     public function delete(array $params, array $optionOverrides = [], array $frontEndOptions = []): array;
 
     /**
+     * Subscribes to the available events that are present on the class
+     * @return array
+     */
+    public function getSubscribedEvents():array;
+
+    /**
      * @param string $fieldName
      * @param array $values
      * @return mixed
      */
-    public function findIn(string $fieldName, array $values):array;
+    public function findIn(string $fieldName, array $values): array;
 
     public function getTTConfig(): array;
 
@@ -128,7 +134,7 @@ interface RepositoryContract
      * @return array
      * @throws \RuntimeException
      */
-    public function parseTTConfig(ArrayHelperContract $substituteArrayHelper = NULL):array;
+    public function parseTTConfig(ArrayHelperContract $substituteArrayHelper = null): array;
 
     /**
      * @param array $ttPath
@@ -230,6 +236,11 @@ interface RepositoryContract
     public function setEventManager(EventManagerWrapperContract $eventManagerWrapper): void;
 
     /**
+     * @return string
+     */
+    public function getEntityNameBase(): string;
+
+    /**
      * @return EntityManagerWrapperContract
      */
     public function getEm(): EntityManagerWrapperContract;
@@ -255,17 +266,30 @@ interface RepositoryContract
     /**
      * @return string
      */
-    public function getClassNameBase():string;
+    public function getClassNameBase(): string;
 
     /**
      * @param string $entityAlias
      * @return QueryBuilderWrapperContract
      * @throws \RuntimeException
      */
-    public function createQueryWrapper(string $entityAlias=null):QueryBuilderWrapperContract;
+    public function createQueryWrapper(string $entityAlias = null): QueryBuilderWrapperContract;
 
     /**
      * @return string
      */
-    public function getEntityAlias():string;
+    public function getEntityAlias(): string;
+
+    /**
+     * @return EventManagerWrapperContract
+     * @throws \RuntimeException
+     */
+    public function createEventManagerWrapper(): EventManagerWrapperContract;
+
+    /**
+     * @return EntityManagerWrapperContract
+     */
+    public function createEntityManagerWrapper():EntityManagerWrapperContract;
+
+
 }
