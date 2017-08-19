@@ -6,7 +6,7 @@
  * Time: 5:59 PM
  */
 
-namespace TempestTools\Crud\Laravel;
+namespace TempestTools\Crud\Laravel\Doctrine;
 
 use TempestTools\Common\Laravel\Validation\ValidationFactoryHelper;
 use TempestTools\Common\Utility\ValidationFactoryTrait;

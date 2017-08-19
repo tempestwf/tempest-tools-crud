@@ -103,12 +103,6 @@ interface EntityContract
      */
     public function setConfigArrayHelper(EntityArrayHelperContract $configArrayHelper):void;
 
-    /**
-     * @param string $verb
-     * @param string $property
-     * @return string
-     */
-    public function accessorMethodName(string $verb, string $property): string;
 
     /**
      * @param null|ArrayHelperContract $arrayHelper
@@ -141,5 +135,99 @@ interface EntityContract
      * @param EventManagerWrapperContract $eventManagerWrapper
      */
     public function setEventManager(EventManagerWrapperContract $eventManagerWrapper):void;
+
+    /**
+     * Passes it's self to the extractor
+     *
+     * @return \ArrayObject
+     * @throws \RuntimeException
+     */
+    public function extractSelf (): \ArrayObject;
+
+    /**
+     * @return null|ArrayHelperContract
+     */
+    public function getArrayHelper():?ArrayHelperContract;
+
+    /**
+     * Gets existing array helper, or makes new one and then returns it
+     *
+     * @return null|ArrayHelperContract
+     */
+    public function arrayHelper():ArrayHelperContract;
+
+
+    /**
+     * Tags a config and a path, gets the element in the path in the config, and then uses an array helper to parse
+     * it's inheritance. Sets the result on parsedConfig property
+     *
+     * @param ArrayHelperContract|null $substituteArrayHelper
+     * @return array
+     * @throws \RuntimeException
+     */
+    public function parseTTConfig(ArrayHelperContract $substituteArrayHelper = NULL):array;
+
+    /**
+     * @return array
+     */
+    public function getTTConfig(): array;
+
+    /**
+     * @param array $ttPath
+     */
+    public function setTTPath(array $ttPath): void;
+
+    /**
+     * @param array $ttFallBack
+     */
+    public function setTTFallBack(array $ttFallBack): void;
+    /**
+     * @return NULL|array
+     */
+    public function getTTPath(): ?array;
+    /**
+     * @return NULL|array
+     */
+    public function getTTFallBack(): ?array;
+
+    /** @noinspection MoreThanThreeArgumentsInspection */
+    /**
+     * Common logic for checking if the permissive settings allow something to be don
+     * @param array|\ArrayObject $high
+     * @param array $low
+     * @param string $canDo
+     * @param string $target
+     * @return bool
+     */
+    public function permissivePermissionCheck ($high, array $low, string $canDo, string $target):bool;
+    /**
+     * @param array|\ArrayObject $high
+     * @param array $low
+     * @param string $setting
+     * @return bool|mixed|null
+     */
+    public function highLowSettingCheck($high, array $low = NULL, string $setting);
+
+    /** @noinspection MoreThanThreeArgumentsInspection */
+    /**
+     * Common logic for checking if the permissive settings allow something to be don
+     * @param array|\ArrayObject $high
+     * @param array $low
+     * @return bool
+     */
+    public function permissiveAllowedCheck ($high, array $low):bool;
+
+    /** @noinspection MoreThanThreeArgumentsInspection */
+
+    /**
+     * @param ArrayHelperContract|null $arrayHelper
+     * @param array|null $path
+     * @param array|null $fallBack
+     * @param bool $force
+     * @param string|null $mode
+     * @throws \RuntimeException
+     * @return bool
+     */
+    public function coreInit (ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL, bool $force= true, string $mode = null):bool;
 
 }

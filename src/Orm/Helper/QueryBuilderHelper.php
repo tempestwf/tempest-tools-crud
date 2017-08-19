@@ -3,17 +3,15 @@ namespace TempestTools\Crud\Orm\Helper;
 
 use RuntimeException;
 use TempestTools\Common\Helper\ArrayHelper;
-use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
-use TempestTools\Common\Utility\TTConfigTrait;
 use TempestTools\Crud\Constants\RepositoryEventsConstants;
 use \TempestTools\Crud\Contracts\QueryBuilderWrapperContract;
 use \TempestTools\Crud\Contracts\QueryBuilderHelperContract;
-use TempestTools\Crud\Contracts\RepositoryContract;
+use TempestTools\Crud\Orm\RepositoryTrait;
 
 class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContract
 {
-    use TTConfigTrait, ErrorConstantsTrait, ArrayHelperTrait;
+    use ErrorConstantsTrait, RepositoryTrait;
 
     /**
      * ERRORS
@@ -71,11 +69,6 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      */
     const DEFAULT_FETCH_JOIN = true;
 
-    /**
-     * @var RepositoryContract $repository
-     */
-    protected $repository;
-
 
     /**
      * @param array $params
@@ -109,21 +102,6 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         return $eventArgs->getArgs()['results'];
     }
 
-    /**
-     * @return RepositoryContract
-     */
-    public function getRepository(): RepositoryContract
-    {
-        return $this->repository;
-    }
-
-    /**
-     * @param RepositoryContract $repository
-     */
-    public function setRepository(RepositoryContract $repository)
-    {
-        $this->repository = $repository;
-    }
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
@@ -167,7 +145,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $config = $this->getArray()['permissions'] ?? [];
         $allowed = $config['allowed']?? true;
         /** @noinspection NullPointerExceptionInspection */
-        $allowed = $this->getArrayHelper()->parse($allowed, $extra);
+        $allowed = $this->getRepository()->getArrayHelper()->parse($allowed, $extra);
         if ($allowed === false) {
             throw new RuntimeException(sprintf($this->getErrorFromConstant('readRequestNotAllowed')['message']));
         }
@@ -227,7 +205,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     {
         $maxLimit = $this->getArray()['permissions']['maxLimit'] ?? static::DEFAULT_MAX_LIMIT;
         /** @noinspection NullPointerExceptionInspection */
-        $maxLimit = (int)$this->getArrayHelper()->parse($maxLimit, $extra);
+        $maxLimit = (int)$this->getRepository()->getArrayHelper()->parse($maxLimit, $extra);
         if ($limit > $maxLimit) {
             throw new RuntimeException(sprintf($this->getErrorFromConstant('maxLimitHit')['message'], $limit, $maxLimit));
         }
@@ -243,9 +221,9 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $params = $extra['params']??[];
         $groupBys = $params['query']['groupBy'] ?? [];
         /** @noinspection NullPointerExceptionInspection */
-        $permissions = $this->getArrayHelper()->parse($this->getArray()['permissions']['groupBy'] ?? [], $extra) ?? [];
+        $permissions = $this->getRepository()->getArrayHelper()->parse($this->getArray()['permissions']['groupBy'] ?? [], $extra) ?? [];
         foreach ($groupBys as $key => $value) {
-            $fastMode = $this->highLowSettingCheck($permissions, $permissions['fields'][$key] ?? [], 'fastMode');
+            $fastMode = $this->getRepository()->highLowSettingCheck($permissions, $permissions['fields'][$key] ?? [], 'fastMode');
             if ($fastMode !== true) {
                 $this->verifyFrontEndGroupBys($qb, $key, $permissions, $extra);
                 /** @noinspection PhpUnusedLocalVariableInspection */
@@ -271,9 +249,9 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $this->closurePermission($permissions, $extra);
         $qb->verifyFieldFormat($key);
 
-        $allowed = $this->permissiveAllowedCheck($permissions, $permissions['fields'][$key] ?? []);
+        $allowed = $this->getRepository()->permissiveAllowedCheck($permissions, $permissions['fields'][$key] ?? []);
         /** @noinspection NullPointerExceptionInspection */
-        $allowed = $this->getArrayHelper()->parse($allowed, $extra);
+        $allowed = $this->getRepository()->getArrayHelper()->parse($allowed, $extra);
         if ($allowed === false) {
             throw new RuntimeException(sprintf($this->getErrorFromConstant('groupByNotAllowed')['message'], $key));
         }
@@ -290,9 +268,9 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $params = $extra['params'];
         $orderBys = $params['query']['orderBy'] ?? [];
         /** @noinspection NullPointerExceptionInspection */
-        $permissions = $this->getArrayHelper()->parse($this->getArray()['permissions']['orderBy'] ?? [], $extra) ?? [];
+        $permissions = $this->getRepository()->getArrayHelper()->parse($this->getArray()['permissions']['orderBy'] ?? [], $extra) ?? [];
         foreach ($orderBys as $key => $value) {
-            $fastMode = $this->highLowSettingCheck($permissions, $permissions['fields'][$key] ?? [], 'fastMode');
+            $fastMode = $this->getRepository()->highLowSettingCheck($permissions, $permissions['fields'][$key] ?? [], 'fastMode');
             if ($fastMode !== true) {
                 $this->verifyFrontEndOrderBys($qb, $key, $value, $permissions, $extra);
                 /** @noinspection PhpUnusedLocalVariableInspection */
@@ -317,9 +295,9 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $qb->verifyFieldFormat($key);
         $fieldSettings = $permissions['fields'][$key]??[];
         $qb->verifyDirectionFormat($value);
-        $allowed = $this->permissivePermissionCheck($permissions, $fieldSettings, 'directions', $value);
+        $allowed = $this->getRepository()->permissivePermissionCheck($permissions, $fieldSettings, 'directions', $value);
         /** @noinspection NullPointerExceptionInspection */
-        $allowed = $this->getArrayHelper()->parse($allowed, $extra);
+        $allowed = $this->getRepository()->getArrayHelper()->parse($allowed, $extra);
         if ($allowed === false) {
             throw new RuntimeException(sprintf($this->getErrorFromConstant('orderByNotAllowed')['message'], $key, $value));
         }
@@ -335,7 +313,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     {
         $params = $extra['params'];
         /** @noinspection NullPointerExceptionInspection */
-        $permissions = $this->getArrayHelper()->parse($this->getArray()['permissions']['where']??[], $extra) ?? [];
+        $permissions = $this->getRepository()->getArrayHelper()->parse($this->getArray()['permissions']['where']??[], $extra) ?? [];
         $wheres = $params['query']['where'] ?? [];
         foreach ($wheres as $where) {
             $type = !isset($where['type'])?'where':null;
@@ -353,7 +331,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     public function addFrontEndHaving(QueryBuilderWrapperContract $qb, array $extra):void {
         $params = $extra['params'];
         /** @noinspection NullPointerExceptionInspection */
-        $permissions = $this->getArrayHelper()->parse($this->getArray()['permissions']['having'] ?? [], $extra);
+        $permissions = $this->getRepository()->getArrayHelper()->parse($this->getArray()['permissions']['having'] ?? [], $extra);
         $havings = $params['query']['having'] ?? [];
         foreach ($havings as $having) {
             $type = !isset($having['type'])?'having':null;
@@ -383,7 +361,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
             $string = $this->buildFilterFromFrontEnd($qb, $conditions, $permissions, $extra);
         } else {
             $arguments = $this->argumentsToPlaceholders($arguments, $extra);
-            $fastMode = $this->highLowSettingCheck($permissions, $fieldSettings, 'fastMode');
+            $fastMode = $this->getRepository()->highLowSettingCheck($permissions, $fieldSettings, 'fastMode');
             if ($fastMode !== true) {
                 $this->verifyFrontEndCondition($qb, $condition, $permissions);
                 /** @noinspection PhpUnusedLocalVariableInspection */
@@ -426,10 +404,10 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $fieldSettings = $permissions['fields'][$fieldName] ?? [];
         $this->closurePermission($fieldSettings, $extra);
         /** @noinspection NullPointerExceptionInspection */
-        $fieldSettings = $this->getArrayHelper()->parse($fieldSettings, $extra);
-        $allowed = $this->permissivePermissionCheck($permissions, $fieldSettings, 'operators', $operator);
+        $fieldSettings = $this->getRepository()->getArrayHelper()->parse($fieldSettings, $extra);
+        $allowed = $this->getRepository()->permissivePermissionCheck($permissions, $fieldSettings, 'operators', $operator);
         /** @noinspection NullPointerExceptionInspection */
-        $allowed = $this->getArrayHelper()->parse($allowed, $extra);
+        $allowed = $this->getRepository()->getArrayHelper()->parse($allowed, $extra);
         if ($allowed === false) {
             throw new RuntimeException(sprintf($this->getErrorFromConstant('operatorNotAllowed')['message'], $fieldName, $operator));
         }
@@ -448,12 +426,12 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $options = $extra['options']['placeholders'] ?? [];
         $overridePlaceholders = $extra['optionOverrides']['placeholders'] ?? [];
         /** @noinspection NullPointerExceptionInspection */
-        $permissions = $this->getArrayHelper()->parse($this->getArray()['permissions']['placeholders'] ?? [], $extra);
+        $permissions = $this->getRepository()->getArrayHelper()->parse($this->getArray()['permissions']['placeholders'] ?? [], $extra);
         $placeholders = array_replace($queryPlaceholders, $options, $overridePlaceholders);
         $keys = array_keys($placeholders);
         $placeholders = array_replace($frontEndPlaceholders, $placeholders);
         foreach ($placeholders as $key=>$value) {
-            $fastMode = $this->highLowSettingCheck($permissions, $permissions['fields'][$key] ?? [], 'fastMode');
+            $fastMode = $this->getRepository()->highLowSettingCheck($permissions, $permissions['fields'][$key] ?? [], 'fastMode');
             if ($fastMode !== true) {
                 $this->verifyPlaceholders($key, $value, $permissions, $extra);
                 /** @noinspection PhpUnusedLocalVariableInspection */
@@ -463,9 +441,9 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
             $value = $value['value'] ?? null;
             if (in_array($key, $keys, true)) {
                 /** @noinspection NullPointerExceptionInspection */
-                $type = $this->getArrayHelper()->parse($type, $extra);
+                $type = $this->getRepository()->getArrayHelper()->parse($type, $extra);
                 /** @noinspection NullPointerExceptionInspection */
-                $value = $this->getArrayHelper()->parse($value, $extra);
+                $value = $this->getRepository()->getArrayHelper()->parse($value, $extra);
             }
             $qb->setParameter($key, $value, $type);
         }
@@ -483,9 +461,9 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     protected function verifyPlaceholders (string $key, array $value, array $permissions , array $extra):void
     {
         $this->closurePermission($permissions, $extra);
-        $allowed = $this->permissiveAllowedCheck($permissions, $value);
+        $allowed = $this->getRepository()->permissiveAllowedCheck($permissions, $value);
         /** @noinspection NullPointerExceptionInspection */
-        $allowed = $this->getArrayHelper()->parse($allowed, $extra);
+        $allowed = $this->getRepository()->getArrayHelper()->parse($allowed, $extra);
         if ($allowed === false) {
             throw new RuntimeException(sprintf($this->getErrorFromConstant('placeholderNoAllowed')['message'], $key));
         }
@@ -511,13 +489,13 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $cacheId = $params['settings']['cacheId'] ?? null;
         if ($allowQueryCache === true) {
             /** @noinspection NullPointerExceptionInspection */
-            $useQueryCache = $this->getArrayHelper()->parse($useQueryCache, $extra);
+            $useQueryCache = $this->getRepository()->getArrayHelper()->parse($useQueryCache, $extra);
             /** @noinspection NullPointerExceptionInspection */
-            $useResultCache = $this->getArrayHelper()->parse($useResultCache, $extra);
+            $useResultCache = $this->getRepository()->getArrayHelper()->parse($useResultCache, $extra);
             /** @noinspection NullPointerExceptionInspection */
-            $timeToLive = $this->getArrayHelper()->parse($timeToLive, $extra);
+            $timeToLive = $this->getRepository()->getArrayHelper()->parse($timeToLive, $extra);
             /** @noinspection NullPointerExceptionInspection */
-            $cacheId = $this->getArrayHelper()->parse($cacheId, $extra);
+            $cacheId = $this->getRepository()->getArrayHelper()->parse($cacheId, $extra);
             $qb->setCacheSettings($useQueryCache, $useResultCache, $timeToLive, $cacheId, $queryCacheDriver, $resultCacheDriver);
         }
 
@@ -545,7 +523,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
                         case 'select':
                             /** @var string $value */
                             /** @noinspection NullPointerExceptionInspection */
-                            $value = $this->getArrayHelper()->parse($value, $extra);
+                            $value = $this->getRepository()->getArrayHelper()->parse($value, $extra);
                             if ($firstSelect === true) {
                                 $qb->select($value, false);
                                 $firstSelect = false;
@@ -571,7 +549,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
                             break;
                         case 'where':
                             /** @noinspection NullPointerExceptionInspection */
-                            $where = is_array($value['value']) && isset($value['value']['arguments'])?$this->processQueryPartExpr($value['value'], $qb, $extra):$this->getArrayHelper()->parse($value['value'], $extra);
+                            $where = is_array($value['value']) && isset($value['value']['arguments'])?$this->processQueryPartExpr($value['value'], $qb, $extra):$this->getRepository()->getArrayHelper()->parse($value['value'], $extra);
                             if (isset($value['type'])) {
                                 $qb->where($value['type'], $where);
                             } else {
@@ -580,7 +558,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
                             break;
                         case 'having':
                             /** @noinspection NullPointerExceptionInspection */
-                            $having = is_array($value['value']) && isset($value['value']['arguments'])?$this->processQueryPartExpr($value['value'], $qb, $extra):$this->getArrayHelper()->parse($value['value'], $extra);
+                            $having = is_array($value['value']) && isset($value['value']['arguments'])?$this->processQueryPartExpr($value['value'], $qb, $extra):$this->getRepository()->getArrayHelper()->parse($value['value'], $extra);
                             if (isset($value['type'])) {
                                 $qb->having($value['type'], $having);
                             } else {
@@ -593,7 +571,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
                             break;
                         case 'groupBy':
                             /** @noinspection NullPointerExceptionInspection */
-                            $value = $this->getArrayHelper()->parse($value, $extra);
+                            $value = $this->getRepository()->getArrayHelper()->parse($value, $extra);
                             /** @var string $value */
                             $qb->groupBy($value);
                             break;
@@ -618,7 +596,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     {
         foreach ($array as $key => $value) {
             /** @noinspection NullPointerExceptionInspection */
-            $array[$key] = is_array($value) && isset($value['arguments'])?$this->processQueryPartExpr($value, $qb, $extra):$array[$key] = $this->getArrayHelper()->parse($value, $extra);
+            $array[$key] = is_array($value) && isset($value['arguments'])?$this->processQueryPartExpr($value, $qb, $extra):$array[$key] = $this->getRepository()->getArrayHelper()->parse($value, $extra);
         }
         return array_replace($defaults, $array);
     }
@@ -688,7 +666,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
                 $argument = $this->processQueryPartExpr($argument, $qb, $extra);
             } else {
                 /** @noinspection NullPointerExceptionInspection */
-                $argument = $this->getArrayHelper()->parse($argument, $extra);
+                $argument = $this->getRepository()->getArrayHelper()->parse($argument, $extra);
             }
         }
         unset($argument);
@@ -708,7 +686,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $extra['key'] = $key;
         $extra['settings'] = $settings;
         /** @noinspection NullPointerExceptionInspection */
-        return isset($settings['mutate'])?$this->getArrayHelper()->parse($settings['mutate'], $extra):[$key, $settings];
+        return isset($settings['mutate'])?$this->getRepository()->getArrayHelper()->parse($settings['mutate'], $extra):[$key, $settings];
 
     }
 
@@ -722,7 +700,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     protected function closurePermission (array $permissions, array $extra, bool $noisy = true):bool
     {
         /** @noinspection NullPointerExceptionInspection */
-        $allowed = !(isset($permissions['closure']) && $this->getArrayHelper()->parse($permissions['closure'], $extra) === false);
+        $allowed = !(isset($permissions['closure']) && $this->getRepository()->getArrayHelper()->parse($permissions['closure'], $extra) === false);
 
         if ($allowed === false && $noisy === true) {
             throw new RuntimeException(sprintf($this->getErrorFromConstant('closureFails')['message']));

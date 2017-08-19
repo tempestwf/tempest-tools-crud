@@ -121,12 +121,6 @@ interface EntityArrayHelperContract extends ArrayHelperContract
     public function enforceField(string $fieldName, $value, array $params, array $fieldSettings = null, bool $noisy = true): bool;
 
     /**
-     * @param EntityContract $entity
-     * @throws \RuntimeException
-     */
-    public function processPrePersist(EntityContract $entity);
-
-    /**
      * @return EntityContract
      */
     public function getEntity(): EntityContract;

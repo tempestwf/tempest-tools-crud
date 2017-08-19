@@ -4,9 +4,11 @@ namespace TempestTools\Crud\Doctrine;
 use Doctrine\Common\EventSubscriber;
 use TempestTools\AclMiddleware\Contracts\HasIdContract;
 use TempestTools\Crud\Contracts\EntityContract;
+use TempestTools\Crud\Contracts\EventManagerWrapperContract;
 use TempestTools\Crud\Contracts\GenericEventArgsContract;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
-use TempestTools\Crud\Orm\EntityTrait;
+use TempestTools\Crud\Doctrine\Wrapper\EventManagerWrapper;
+use TempestTools\Crud\Orm\EntityCoreTrait;
 
 
 /** @noinspection PhpSuperClassIncompatibleWithInterfaceInspection
@@ -14,7 +16,7 @@ use TempestTools\Crud\Orm\EntityTrait;
  */
 abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityContract
 {
-    use EntityTrait;
+    use EntityCoreTrait;
     const ERRORS = [
         'noArrayHelper' => [
             'message' => 'Error: No array helper on entity.',
@@ -39,6 +41,15 @@ abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityC
     public function makeEventArgs(array $params): GenericEventArgsContract
     {
         return new GenericEventArgs(new \ArrayObject(['params' => $params, 'configArrayHelper' => $this->getConfigArrayHelper(), 'arrayHelper' => $this->getArrayHelper(), 'self' => $this]));
+    }
+
+    /**
+     * @return EventManagerWrapperContract
+     * @throws \RuntimeException
+     */
+    public function createEventManagerWrapper ():EventManagerWrapperContract
+    {
+        return new EventManagerWrapper();
     }
 }
 ?>

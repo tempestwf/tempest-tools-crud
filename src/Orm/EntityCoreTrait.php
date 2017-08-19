@@ -15,7 +15,7 @@ use TempestTools\Crud\Contracts\EntityArrayHelperContract;
 use Doctrine\ORM\Mapping as ORM;
 
 
-trait EntityTrait
+trait EntityCoreTrait
 {
     use ArrayHelperTrait, ErrorConstantsTrait, TTConfigTrait, EvmTrait, EventManagerWrapperTrait;
 
@@ -55,10 +55,9 @@ trait EntityTrait
     {
         if ($force === true || $this->getConfigArrayHelper() === null || $mode !== $this->getLastMode()) {
             $entityArrayHelper = new EntityArrayHelper();
-            $entityArrayHelper->setArrayHelper($this->getArrayHelper());
-            $this->parseTTConfig($entityArrayHelper);
             /** @noinspection PhpParamsInspection */
             $entityArrayHelper->setEntity($this);
+            $this->parseTTConfig($entityArrayHelper);
         }
     }
 

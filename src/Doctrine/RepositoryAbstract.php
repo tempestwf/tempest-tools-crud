@@ -14,11 +14,11 @@ use TempestTools\Crud\Doctrine\Wrapper\EntityManagerWrapper;
 use TempestTools\Crud\Doctrine\Wrapper\EventManagerWrapper;
 use TempestTools\Crud\Doctrine\Wrapper\QueryBuilderDqlWrapper;
 use TempestTools\Crud\Doctrine\Wrapper\QueryBuilderSqlWrapper;
-use TempestTools\Crud\Orm\RepositoryTrait;
+use TempestTools\Crud\Orm\RepositoryCoreTrait;
 
 abstract class RepositoryAbstract extends EntityRepository implements EventSubscriber, RepositoryContract
 {
-    use  /** @noinspection TraitsPropertiesConflictsInspection */ RepositoryTrait;
+    use  /** @noinspection TraitsPropertiesConflictsInspection */ RepositoryCoreTrait;
 
     /**
      * @var array|NULL $options;

@@ -9,10 +9,11 @@ use TempestTools\Crud\Contracts\EntityContract;
 use TempestTools\Crud\Contracts\GenericEventArgsContract;
 use TempestTools\Crud\Contracts\RepositoryContract;
 use TempestTools\Crud\Doctrine\EntityAbstract;
+use TempestTools\Crud\Orm\RepositoryTrait;
 
 class DataBindHelper implements DataBindHelperContract
 {
-    use ErrorConstantsTrait;
+    use ErrorConstantsTrait, RepositoryTrait;
 
     const ERRORS = [
         'wrongTypeOfRepo'=>[
@@ -26,10 +27,6 @@ class DataBindHelper implements DataBindHelperContract
     const IGNORE_KEYS = ['assignType'];
 
 
-    /**
-     * @var RepositoryContract $repository
-     */
-    protected $repository;
 
 
 
@@ -582,21 +579,6 @@ class DataBindHelper implements DataBindHelperContract
         }
     }
 
-    /**
-     * @return RepositoryContract
-     */
-    public function getRepository(): RepositoryContract
-    {
-        return $this->repository;
-    }
-
-    /**
-     * @param RepositoryContract $repository
-     */
-    public function setRepository(RepositoryContract $repository)
-    {
-        $this->repository = $repository;
-    }
 
 
 }
