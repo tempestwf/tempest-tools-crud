@@ -2,67 +2,111 @@
 namespace TempestTools\Crud\Orm\Helper;
 
 use TempestTools\AclMiddleware\Contracts\HasIdContract;
-use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
-use TempestTools\Common\Utility\TTConfigTrait;
+use TempestTools\Crud\Constants\RepositoryEventsConstants;
 use TempestTools\Crud\Contracts\DataBindHelperContract;
 use TempestTools\Crud\Contracts\EntityContract;
-use TempestTools\Crud\Contracts\EntityManagerWrapperContract;
+use TempestTools\Crud\Contracts\GenericEventArgsContract;
 use TempestTools\Crud\Contracts\RepositoryContract;
 use TempestTools\Crud\Doctrine\EntityAbstract;
-use TempestTools\Common\Contracts\ArrayHelperContract;
 
-class DataBindHelper implements DataBindHelperContract {
-    use ArrayHelperTrait, TTConfigTrait, ErrorConstantsTrait;
+class DataBindHelper implements DataBindHelperContract
+{
+    use ErrorConstantsTrait;
 
     const ERRORS = [
-        'noArrayHelper'=>[
-            'message'=>'Error: No array helper set on DataBindHelper.',
-        ],
+
     ];
 
     const IGNORE_KEYS = ['assignType'];
 
+
     /**
-     * @var EntityManagerWrapperContract $em
+     * @var RepositoryContract $repository
      */
-    protected $em;
+    protected $repository;
+
+
 
     /**
      * DataBindHelper constructor.
      *
-     * @param EntityManagerWrapperContract $entityManager
+     * @param RepositoryContract $repository
      */
-    public function __construct(EntityManagerWrapperContract $entityManager)
+    public function __construct(RepositoryContract $repository)
     {
-        $this->setEm($entityManager);
+        $this->setRepository($repository);
     }
 
-    /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
-     * @param ArrayHelperContract|null $arrayHelper
-     * @param array|null $path
-     * @param array|null $fallBack
-     * @param bool $force
+     * Makes sure the repo is ready to run
+     *
+     * @param GenericEventArgsContract $eventArgs
+     * @internal param array $optionOverrides
+     */
+    protected function start(GenericEventArgsContract $eventArgs):void
+    {
+        $this->getRepository()->getEventManager()->dispatchEvent(RepositoryEventsConstants::PRE_START, $eventArgs);
+        $options = $eventArgs->getArgs()['options'];
+        $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
+
+        /** @noinspection NullPointerExceptionInspection */
+        $transaction = $this->getRepository()->getArrayHelper()->findSetting([
+            $options,
+            $optionOverrides,
+        ], 'transaction');
+
+        if ($transaction !== false) {
+            /** @noinspection NullPointerExceptionInspection */
+            $this->getRepository()->getEm()->beginTransaction();
+        }
+    }
+
+    /**
+     * Makes sure every wraps up
+     *
+     * @param bool $failure
+     * @param GenericEventArgsContract $eventArgs
+     * @internal param array $optionOverrides
+     * @throws \Doctrine\DBAL\ConnectionException
+     * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \RuntimeException
      */
-    public function init( ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL, bool $force= true): void
+    protected function stop($failure = false, GenericEventArgsContract $eventArgs):void
     {
-        if ($arrayHelper !== NULL && ($force === true || $this->getArrayHelper() === NULL)) {
-            $this->setArrayHelper($arrayHelper);
+        $this->getRepository()->getEventManager()->dispatchEvent(RepositoryEventsConstants::PRE_STOP, $eventArgs);
+        $options = $eventArgs->getArgs()['options'];
+        $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
+
+        /** @noinspection NullPointerExceptionInspection */
+        $transaction = $this->getRepository()->getArrayHelper()->findSetting([
+            $options,
+            $optionOverrides,
+        ], 'transaction');
+
+        /** @noinspection NullPointerExceptionInspection */
+        $flush = $this->getRepository()->getArrayHelper()->findSetting([
+            $options,
+            $optionOverrides,
+        ], 'flush');
+
+
+        if ($failure === false && $flush === true) {
+            /** @noinspection NullPointerExceptionInspection */
+            $this->getRepository()->getEm()->flush();
         }
 
-        if ($path !== null && ($force === true || $this->getTTPath() === null || $path !== $this->getTTPath())) {
-            $this->setTTPath($path);
-        }
-
-        if ($fallBack !== null && ($force === true || $this->getTTFallBack() === null || $fallBack !== $this->getTTFallBack() )) {
-            $this->setTTFallBack($fallBack);
-        }
-
-        if (!$this->getArrayHelper() instanceof ArrayHelperContract) {
-            throw new \RuntimeException($this->getErrorFromConstant('noArrayHelper'));
+        if (
+            $transaction !== false
+        ) {
+            if ($failure === true) {
+                /** @noinspection NullPointerExceptionInspection */
+                $this->getRepository()->getEm()->rollBack();
+            } else {
+                /** @noinspection NullPointerExceptionInspection */
+                $this->getRepository()->getEm()->commit();
+            }
         }
     }
 
@@ -81,17 +125,17 @@ class DataBindHelper implements DataBindHelperContract {
     {
         /** @noinspection NullPointerExceptionInspection */
         $entity->allowed();
-        $entity->setArrayHelper($this->getArrayHelper());
+        $entity->setArrayHelper($this->getRepository()->getArrayHelper());
         $entity->setBindParams($params);
         /** @noinspection NullPointerExceptionInspection */
         $entityName = get_class($entity);
         /** @noinspection NullPointerExceptionInspection */
-        $associateNames = $this->getEm()->getAssociationNames($entityName);
+        $associateNames = $this->getRepository()->getEm()->getAssociationNames($entityName);
         foreach ($params as $fieldName => $value) {
             if (in_array($fieldName, $associateNames, true)) {
 
                 /** @noinspection NullPointerExceptionInspection */
-                $targetClass = $this->getEm()->getAssociationTargetClass($entityName, $fieldName);
+                $targetClass = $this->getRepository()->getEm()->getAssociationTargetClass($entityName, $fieldName);
                 $value = $this->fixScalarAssociationValue($value);
                 $this->bindAssociation($entity, $fieldName, $value, $targetClass);
             } else if (!in_array($fieldName, static::IGNORE_KEYS, true)) {
@@ -238,8 +282,8 @@ class DataBindHelper implements DataBindHelperContract {
     public function getRepoForRelation(string $targetClass):RepositoryContract {
         /** @var RepositoryContract $repo */
         /** @noinspection NullPointerExceptionInspection */
-        $repo = $this->getEm()->getRepository($targetClass);
-        $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack(), false);
+        $repo = $this->getRepository()->getEm()->getRepository($targetClass);
+        $repo->init($this->getRepository()->getArrayHelper(), $this->getRepository()->getTTPath(), $this->getRepository()->getTTFallBack(), false);
 
         if (!$repo instanceof RepositoryContract) {
             throw new \RuntimeException($this->getErrorFromConstant('wrongTypeOfRepo'));
@@ -247,20 +291,308 @@ class DataBindHelper implements DataBindHelperContract {
         return $repo;
     }
 
+
     /**
-     * @param EntityManagerWrapperContract $em
+     * @param array $params
+     * @param array $optionOverrides
+     * @param array $frontEndOptions
+     * @return array
+     * @throws \Exception
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \Doctrine\DBAL\ConnectionException
+     * @throws \Exception
      */
-    public function setEm(EntityManagerWrapperContract $em): void
+    public function create(array $params, array $optionOverrides = [], array $frontEndOptions=[]):array
     {
-        $this->em = $em;
+        $evm = $this->getRepository()->getEventManager();
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getRepository()->getArrayHelper()->wrapArray($params);
+        $eventArgs = $this->getRepository()->makeEventArgs($params, $optionOverrides, $frontEndOptions);
+        $eventArgs->getArgs()['action'] = 'create';
+
+        $this->start($eventArgs);
+
+        try {
+            $eventArgs->getArgs()['batchParams'] = $eventArgs->getArgs()['params'];
+            $evm->dispatchEvent(RepositoryEventsConstants::PRE_CREATE_BATCH, $eventArgs);
+            /** @var array $params */
+            $params = $eventArgs->getArgs()['params'];
+            $options = $eventArgs->getArgs()['$options'];
+            $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
+            $this->checkBatchMax($params, $options, $optionOverrides);
+            foreach ($params as $batchParams) {
+                $eventArgs->getArgs()['params'] = $batchParams;
+                /** @noinspection DisconnectedForeachInstructionInspection */
+                $this->doCreate($eventArgs);
+            }
+            $evm->dispatchEvent(RepositoryEventsConstants::POST_CREATE_BATCH, $eventArgs);
+        } catch (\Exception $e) {
+            $this->stop(true, $eventArgs);
+            throw $e;
+        }
+        $this->stop(false, $eventArgs);
+        return $eventArgs->getArgs()['results'];
     }
 
     /**
-     * @return EntityManagerWrapperContract
+     * @param GenericEventArgsContract $eventArgs
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \Doctrine\DBAL\ConnectionException
+     * @throws \Exception
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function getEm(): ?EntityManagerWrapperContract
+    protected function doCreate (GenericEventArgsContract $eventArgs):void
     {
-        return $this->em;
+        $evm = $this->getRepository()->getEventManager();
+        $evm->dispatchEvent(RepositoryEventsConstants::PRE_CREATE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::VALIDATE_CREATE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::VERIFY_CREATE, $eventArgs);
+        $result = $this->doCreateSingle($eventArgs);
+        $eventArgs->getArgs()['results'][] = $result;
+        $evm->dispatchEvent(RepositoryEventsConstants::PROCESS_RESULTS_CREATE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::POST_CREATE, $eventArgs);
     }
+
+    /**
+     * @param GenericEventArgsContract $eventArgs
+     * @return EntityContract
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     * @throws \Exception
+     * @throws \Doctrine\DBAL\ConnectionException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     */
+    protected function doCreateSingle(GenericEventArgsContract $eventArgs): EntityContract
+    {
+        $className = $this->getRepository()->getClassNameBase();
+        /** @var EntityAbstract $entity */
+        return $this->processSingleEntity($eventArgs, new $className());
+    }
+
+    /**
+     * @param array $params
+     * @param array $optionOverrides
+     * @param array $frontEndOptions
+     * @return array
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \Doctrine\DBAL\ConnectionException
+     * @throws \Exception
+     */
+    public function update(array $params, array $optionOverrides = [], array $frontEndOptions=[]):array
+    {
+        $evm = $this->getRepository()->getEventManager();
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getRepository()->getArrayHelper()->wrapArray($params);
+        $eventArgs = $this->getRepository()->makeEventArgs($params, $optionOverrides, $frontEndOptions);
+        $eventArgs->getArgs()['action'] = 'update';
+
+        $this->start($eventArgs);
+
+        try {
+            $eventArgs->getArgs()['batchParams'] = $eventArgs->getArgs()['params'];
+            $evm->dispatchEvent(RepositoryEventsConstants::PRE_UPDATE_BATCH, $eventArgs);
+            /** @var array $params */
+            $params = $eventArgs->getArgs()['params'];
+            $options = $eventArgs->getArgs()['$options'];
+            $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
+            $this->checkBatchMax($params, $options, $optionOverrides);
+            /** @noinspection NullPointerExceptionInspection */
+            /** @noinspection PhpParamsInspection */
+            $entities = $this->findEntitiesFromArrayKeys($params, $this);
+            /** @var EntityAbstract $entity */
+            foreach ($entities as $entity) {
+                $batchParams = $entity->getBindParams();
+                $eventArgs->getArgs()['params'] = $batchParams;
+                /** @noinspection DisconnectedForeachInstructionInspection */
+                $this->doUpdate($eventArgs, $entity);
+            }
+            $evm->dispatchEvent(RepositoryEventsConstants::POST_UPDATE_BATCH, $eventArgs);
+        } catch (\Exception $e) {
+            $this->stop(true, $eventArgs);
+            throw $e;
+        }
+        $this->stop(false, $eventArgs);
+        return $eventArgs->getArgs()['results'];
+    }
+
+    /**
+     * @param GenericEventArgsContract $eventArgs
+     * @param EntityContract $entity
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \Doctrine\DBAL\ConnectionException
+     * @throws \Exception
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    protected function doUpdate (GenericEventArgsContract $eventArgs, EntityContract $entity):void
+    {
+        $evm = $this->getRepository()->getEventManager();
+        $evm->dispatchEvent(RepositoryEventsConstants::PRE_UPDATE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::VALIDATE_UPDATE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::VERIFY_UPDATE, $eventArgs);
+        $result = $this->processSingleEntity($eventArgs, $entity);
+        $eventArgs->getArgs()['results'][] = $result;
+        $evm->dispatchEvent(RepositoryEventsConstants::PROCESS_RESULTS_UPDATE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::POST_UPDATE, $eventArgs);
+    }
+
+
+    /**
+     * @param array $params
+     * @param array $optionOverrides
+     * @param array $frontEndOptions
+     * @return array
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \Doctrine\DBAL\ConnectionException
+     * @throws \Exception
+     */
+    public function delete(array $params, array $optionOverrides = [], array $frontEndOptions=[]):array
+    {
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getRepository()->getArrayHelper()->wrapArray($params);
+        $eventArgs = $this->getRepository()->makeEventArgs($params, $optionOverrides, $frontEndOptions);
+        $eventArgs->getArgs()['action'] = 'delete';
+        $evm = $this->getRepository()->getEventManager();
+
+        $this->start($eventArgs);
+
+        try {
+            $eventArgs->getArgs()['batchParams'] = $eventArgs->getArgs()['params'];
+            $evm->dispatchEvent(RepositoryEventsConstants::PRE_DELETE_BATCH, $eventArgs);
+            /** @var array $params */
+            $params = $eventArgs->getArgs()['params'];
+            $options = $eventArgs->getArgs()['$options'];
+            $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
+            $this->checkBatchMax($params, $options, $optionOverrides);
+            /** @noinspection NullPointerExceptionInspection */
+            /** @noinspection PhpParamsInspection */
+            $entities = $this->findEntitiesFromArrayKeys($params, $this);
+            /** @var EntityAbstract $entity */
+            foreach ($entities as $entity) {
+                $batchParams = $entity->getBindParams();
+                $eventArgs->getArgs()['params'] = $batchParams;
+                /** @noinspection DisconnectedForeachInstructionInspection */
+                $this->doDelete($eventArgs, $entity);
+            }
+            $evm->dispatchEvent(RepositoryEventsConstants::POST_DELETE_BATCH, $eventArgs);
+        } catch (\Exception $e) {
+            $this->stop(true, $eventArgs);
+            throw $e;
+        }
+        $this->stop(false, $eventArgs);
+        return $eventArgs->getArgs()['results'];
+    }
+
+    /**
+     * @param GenericEventArgsContract $eventArgs
+     * @param EntityContract $entity
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \Doctrine\DBAL\ConnectionException
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Exception
+     */
+    protected function doDelete (GenericEventArgsContract $eventArgs, EntityContract $entity):void
+    {
+        $evm = $this->getRepository()->getEventManager();
+        $evm->dispatchEvent(RepositoryEventsConstants::PRE_DELETE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::VALIDATE_DELETE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::VERIFY_DELETE, $eventArgs);
+        $result = $this->processSingleEntity($eventArgs, $entity, true);
+        $eventArgs->getArgs()['results'][] = $result;
+        $evm->dispatchEvent(RepositoryEventsConstants::PROCESS_RESULTS_DELETE, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::POST_DELETE, $eventArgs);
+    }
+
+    /**
+     * @param GenericEventArgsContract $eventArgs
+     * @param EntityContract $entity
+     * @param bool $remove
+     * @return EntityContract
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     * @throws \Exception
+     * @throws \Doctrine\DBAL\ConnectionException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     */
+    protected function processSingleEntity (GenericEventArgsContract $eventArgs, EntityContract $entity, bool $remove=false): EntityContract
+    {
+        $entitiesShareConfigs = $eventArgs->getArgs()['entitiesShareConfigs'];
+        if ($entitiesShareConfigs === true) {
+            if (isset($eventArgs->getArgs()['sharedConfig'])) {
+                $sharedConfig = $eventArgs->getArgs()['sharedConfig'];
+                $entity->setConfigArrayHelper($sharedConfig);
+            }
+        }
+        $entity->init($eventArgs->getArgs()['action'] , $this->getRepository()->getArrayHelper(), $this->getRepository()->getTTPath(), $this->getRepository()->getTTFallBack());
+        if ($entitiesShareConfigs === true) {
+            $eventArgs->getArgs()['sharedConfig'] = $entity->getConfigArrayHelper();
+        }
+        /** @noinspection NullPointerExceptionInspection */
+        $this->bind($entity, $eventArgs->getArgs()['params']);
+        if ($remove === true) {
+            $this->getRepository()->getEm()->remove($entity);
+        } else {
+            $this->getRepository()->getEm()->persist($entity);
+        }
+        return $entity;
+    }
+
+
+    /**
+     * @param array $values
+     * @param array $options
+     * @param array $optionOverrides
+     * @throws \RuntimeException
+     */
+    protected function checkBatchMax(array $values, array $options, array $optionOverrides):void
+    {
+        /** @noinspection NullPointerExceptionInspection */
+        $maxBatch = $this->getRepository()->getArrayHelper()->findSetting([
+            $options,
+            $optionOverrides,
+        ], 'batchMax');
+
+        if ($maxBatch !== NULL) {
+            $count = count($values, COUNT_RECURSIVE);
+
+            if ($count > $maxBatch) {
+                throw new \RuntimeException(sprintf($this->getErrorFromConstant('moreRowsRequestedThanBatchMax')['message'], $count, $maxBatch));
+            }
+        }
+    }
+
+    /**
+     * @return RepositoryContract
+     */
+    public function getRepository(): RepositoryContract
+    {
+        return $this->repository;
+    }
+
+    /**
+     * @param RepositoryContract $repository
+     */
+    public function setRepository(RepositoryContract $repository)
+    {
+        $this->repository = $repository;
+    }
+
+
 }
 ?>

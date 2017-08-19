@@ -6,8 +6,10 @@ use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Common\Helper\ArrayHelperTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
+use TempestTools\Crud\Constants\RepositoryEventsConstants;
 use \TempestTools\Crud\Contracts\QueryBuilderWrapperContract;
 use \TempestTools\Crud\Contracts\QueryBuilderHelperContract;
+use TempestTools\Crud\Contracts\RepositoryContract;
 
 class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContract
 {
@@ -38,6 +40,9 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         'readRequestNotAllowed' => [
             'message' => 'Error: Read request not allowed.',
         ],
+        'moreQueryParamsThanMax'=>[
+            'message'=>'Error: More query params than passed than permitted. count = %s, max = %s'
+        ],
 
     ];
 
@@ -66,7 +71,59 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      */
     const DEFAULT_FETCH_JOIN = true;
 
+    /**
+     * @var RepositoryContract $repository
+     */
+    protected $repository;
 
+
+    /**
+     * @param array $params
+     * @param array $frontEndOptions
+     * @param array $optionOverrides
+     * @return array
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \RuntimeException
+     */
+    public function read (array $params=[], array $frontEndOptions=[], array $optionOverrides = []):array
+    {
+        /** @noinspection NullPointerExceptionInspection */
+        $eventArgs = $this->getRepository()->makeEventArgs($params, $optionOverrides, $frontEndOptions);
+        $eventArgs->getArgs()['action'] = 'read';
+        $evm = $this->getRepository()->getEventManager();
+        $evm->dispatchEvent(RepositoryEventsConstants::PRE_READ, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::VALIDATE_READ, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::VERIFY_READ, $eventArgs);
+        /** @var array $params */
+        $params = $eventArgs->getArgs()['params'];
+        $options = $eventArgs->getArgs()['$options'];
+        $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
+        $this->checkQueryMaxParams($params, $options, $optionOverrides);
+        $qbWrapper = $this->getRepository()->createQueryWrapper();
+        /** @noinspection NullPointerExceptionInspection */
+        $eventArgs->getArgs()['results'] = $this->readCore($qbWrapper, $params, $frontEndOptions, $options, $optionOverrides);
+
+        $evm->dispatchEvent(RepositoryEventsConstants::PROCESS_RESULTS_READ, $eventArgs);
+        $evm->dispatchEvent(RepositoryEventsConstants::POST_READ, $eventArgs);
+
+        return $eventArgs->getArgs()['results'];
+    }
+
+    /**
+     * @return RepositoryContract
+     */
+    public function getRepository(): RepositoryContract
+    {
+        return $this->repository;
+    }
+
+    /**
+     * @param RepositoryContract $repository
+     */
+    public function setRepository(RepositoryContract $repository)
+    {
+        $this->repository = $repository;
+    }
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
@@ -79,7 +136,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      * @throws RuntimeException
      * @throws \Doctrine\ORM\ORMException
      */
-    public function read(QueryBuilderWrapperContract $qb, array $params, array $frontEndOptions, array $options, array $optionOverrides):array
+    protected function readCore(QueryBuilderWrapperContract $qb, array $params, array $frontEndOptions, array $options, array $optionOverrides):array
     {
         $extra = [
             'params'=>$params,
@@ -674,10 +731,28 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     }
 
 
+    /**
+     * @param array $values
+     * @param array $options
+     * @param array $optionOverrides
+     * @throws \RuntimeException
+     */
+    protected function checkQueryMaxParams(array $values, array $options, array $optionOverrides):void
+    {
+        /** @noinspection NullPointerExceptionInspection */
+        $maxBatch = $this->getRepository()->getArrayHelper()->findSetting([
+            $options,
+            $optionOverrides,
+        ], 'queryMaxParams');
 
+        if ($maxBatch !== NULL) {
+            $count = count($values, COUNT_RECURSIVE);
 
-
-
+            if ($count > $maxBatch) {
+                throw new \RuntimeException(sprintf($this->getErrorFromConstant('moreQueryParamsThanMax')['message'], $count, $maxBatch));
+            }
+        }
+    }
 
 }
 ?>

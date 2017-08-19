@@ -20,7 +20,6 @@ abstract class EntityAbstract extends EntityAbstractBase
     public function __construct()
     {
         $this->setValidationFactoryHelper(new ValidationFactoryHelper());
-        parent::__construct();
     }
 
     /**

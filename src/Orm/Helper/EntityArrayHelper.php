@@ -5,13 +5,15 @@ namespace TempestTools\Crud\Orm\Helper;
 use RuntimeException;
 use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Common\Helper\ArrayHelperTrait;
+use TempestTools\Common\Utility\AccessorMethodNameTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
+use TempestTools\Crud\Constants\EntityEventsConstants;
 use TempestTools\Crud\Contracts\EntityContract;
 use TempestTools\Crud\Contracts\EntityArrayHelperContract;
 
 class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract{
-    use TTConfigTrait, ErrorConstantsTrait, ArrayHelperTrait;
+    use TTConfigTrait, ErrorConstantsTrait, ArrayHelperTrait, AccessorMethodNameTrait;
 
     const ERRORS = [
         'chainTypeNotAllow'=>[
@@ -33,6 +35,12 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
             'message' => 'Error: Assign type must be set, add or remove. assignType = %s',
         ],
     ];
+
+    /**
+     * @var EntityContract $entity
+     */
+    protected $entity;
+
 
     /**
      * @param string $fieldName
@@ -230,7 +238,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @throws RuntimeException
      * @return array
      */
-    public function processAssociationParams(array $params):array {
+    protected function processAssociationParamsCore(array $params):array {
         $associationName = $params['associationName'];
         $values = $params['values'];
 
@@ -452,6 +460,133 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
                 throw new RuntimeException(sprintf($this->getErrorFromConstant('enforcementFails')['message'], $result, $value));
             }
         }
+    }
+
+
+    /**
+     * @param string $fieldName
+     * @param $value
+     * @throws RuntimeException
+     */
+    public function setField(string $fieldName, $value):void
+    {
+        /** @noinspection NullPointerExceptionInspection */
+        $fastMode = $this->checkFastMode($fieldName);
+        if ($fastMode !== true) {
+            $params = ['fieldName' => $fieldName, 'value' => $value, 'configArrayHelper' => $this, 'self' => $this->getEntity()];
+            $eventArgs = $this->getEntity()->makeEventArgs($params);
+
+            // Give event listeners a chance to do something then pull out the args again
+            /** @noinspection NullPointerExceptionInspection */
+            $this->getEntity()->getEventManager()->dispatchEvent(EntityEventsConstants::PRE_SET_FIELD, $eventArgs);
+
+            $processedParams = $eventArgs->getArgs()['params'];
+            $value = $this->processSetField($processedParams);
+
+        }
+        // All is ok so set it
+        $setName = $this->accessorMethodName('set', $fieldName);
+        $this->getEntity()->$setName($value);
+    }
+
+    /**
+     * @param string $associationName
+     * @param array $values
+     * @return array
+     * @throws \RuntimeException
+     */
+    public function processAssociationParams(string $associationName, array $values): array
+    {
+        /** @noinspection NullPointerExceptionInspection */
+        $fastMode = $this->checkFastMode($associationName);
+        if ($fastMode !== true) {
+
+            $params = ['associationName' => $associationName, 'values' => $values, 'configArrayHelper' => $this, 'self' => $this->getEntity()];
+            $eventArgs = $this->getEntity()->makeEventArgs($params);
+            // Give event listeners a chance to do something and pull the args out again after wards
+            /** @noinspection NullPointerExceptionInspection */
+            $this->getEntity()->getEventManager()->dispatchEvent(EntityEventsConstants::PRE_PROCESS_ASSOCIATION_PARAMS, $eventArgs);
+
+            $processedParams = $eventArgs->getArgs()['params'];
+            /** @noinspection NullPointerExceptionInspection */
+            $values = $this->processAssociationParamsCore($processedParams);
+
+        }
+        return $values;
+
+    }
+
+    /** @noinspection MoreThanThreeArgumentsInspection */
+
+    /**
+     * @param string $assignType
+     * @param string $associationName
+     * @param EntityContract $entity
+     * @param bool $force
+     * @throws \RuntimeException
+     */
+    public function bindAssociation(string $assignType=null, string $associationName, EntityContract $entity = null, $force = false):void
+    {
+        if ($force === false) {
+            /** @noinspection NullPointerExceptionInspection */
+            $this->canAssign($associationName, $assignType);
+        }
+
+        if ($assignType !== null) {
+            $methodName = $this->accessorMethodName($assignType, $associationName);
+            $this->getEntity()->$methodName($entity);
+        }
+    }
+
+    /**
+     * On an entity with HasLifecycleCallbacks it will run the special features of tt entities before persist
+     *
+     * @throws \RuntimeException
+     */
+    public function ttPrePersist():void
+    {
+        $eventArgs = $this->getEntity()->makeEventArgs([]);
+
+        // Give event listeners a chance to do something then pull out the args again
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getEntity()->getEventManager()->dispatchEvent(EntityEventsConstants::PRE_PERSIST, $eventArgs);
+
+        /** @noinspection PhpParamsInspection */
+        $this->processPrePersist($this->getEntity());
+
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getEntity()->getEventManager()->dispatchEvent(EntityEventsConstants::POST_PERSIST, $eventArgs);
+    }
+
+    /**
+     * @param array $fields
+     * @return array
+     */
+    public function getValuesOfFields(array $fields = []): array
+    {
+        $result = [];
+        foreach ($fields as $field) {
+            $methodName = $this->accessorMethodName('get', $field);
+            $value = $this->getEntity()->$methodName();
+            $result[$field] = $value;
+        }
+        return $result;
+    }
+
+    /**
+     * @return EntityContract
+     */
+    public function getEntity(): EntityContract
+    {
+        return $this->entity;
+    }
+
+    /**
+     * @param EntityContract $entity
+     */
+    public function setEntity(EntityContract $entity):void
+    {
+        $this->entity = $entity;
     }
 }
 ?>

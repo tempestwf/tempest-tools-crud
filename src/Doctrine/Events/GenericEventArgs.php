@@ -10,8 +10,9 @@ namespace TempestTools\Crud\Doctrine\Events;
 
 
 use Doctrine\Common\EventArgs;
+use TempestTools\Crud\Contracts\GenericEventArgsContract;
 
-class GenericEventArgs extends EventArgs
+class GenericEventArgs extends EventArgs implements GenericEventArgsContract
 {
     /** @var \ArrayObject */
     public $args;
@@ -26,9 +27,9 @@ class GenericEventArgs extends EventArgs
     }
     /**
      * @param \ArrayObject $args
-     * @return GenericEventArgs
+     * @return GenericEventArgsContract
      */
-    public function setArgs(\ArrayObject $args): GenericEventArgs
+    public function setArgs(\ArrayObject $args): GenericEventArgsContract
     {
         $this->args = $args;
         return $this;

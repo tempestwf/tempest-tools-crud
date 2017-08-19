@@ -127,4 +127,19 @@ interface EntityContract
      */
     public function validate(array $values, array $rules, array $messages = [], array $customAttributes = []):void;
 
+    /**
+     * @param array $params
+     * @return GenericEventArgsContract
+     */
+    public function makeEventArgs(array $params): GenericEventArgsContract;
+
+    /**
+     * @return EventManagerWrapperContract
+     */
+    public function getEventManager(): EventManagerWrapperContract;
+    /**
+     * @param EventManagerWrapperContract $eventManagerWrapper
+     */
+    public function setEventManager(EventManagerWrapperContract $eventManagerWrapper):void;
+
 }

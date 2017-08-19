@@ -4,6 +4,9 @@ namespace TempestTools\Crud\Doctrine;
 use Doctrine\Common\EventSubscriber;
 use TempestTools\AclMiddleware\Contracts\HasIdContract;
 use TempestTools\Crud\Contracts\EntityContract;
+use TempestTools\Crud\Contracts\GenericEventArgsContract;
+use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
+use TempestTools\Crud\Orm\EntityTrait;
 
 
 /** @noinspection PhpSuperClassIncompatibleWithInterfaceInspection
@@ -27,5 +30,15 @@ abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityC
         ],
     ];
 
+    /**
+     * Makes event args to use
+     *
+     * @param array $params
+     * @return GenericEventArgsContract
+     */
+    public function makeEventArgs(array $params): GenericEventArgsContract
+    {
+        return new GenericEventArgs(new \ArrayObject(['params' => $params, 'configArrayHelper' => $this->getConfigArrayHelper(), 'arrayHelper' => $this->getArrayHelper(), 'self' => $this]));
+    }
 }
 ?>

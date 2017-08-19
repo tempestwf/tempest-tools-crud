@@ -10,6 +10,7 @@ namespace TempestTools\Crud\Doctrine\Wrapper;
 
 use Doctrine\ORM\EntityManager;
 use TempestTools\Common\Doctrine\Utility\EmTrait;
+use TempestTools\Crud\Contracts\EntityContract;
 use TempestTools\Crud\Contracts\EntityManagerWrapperContract;
 use TempestTools\Crud\Contracts\RepositoryContract;
 
@@ -55,6 +56,65 @@ class EntityManagerWrapper implements EntityManagerWrapperContract
     {
         /** @noinspection NullPointerExceptionInspection */
         return $this->getEm()->getRepository($targetClass);
+    }
+
+    /**
+     *
+     */
+    public function beginTransaction ():void
+    {
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getEm()->getConnection()->beginTransaction();
+    }
+
+    /**
+     * @param null $entity
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function flush ($entity = null):void
+    {
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getEm()->flush($entity);
+    }
+
+    /**
+     *
+     * @throws \Doctrine\DBAL\ConnectionException
+     */
+    public function rollBack ():void
+    {
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getEm()->getConnection()->rollBack();
+    }
+
+    /**
+     *
+     * @throws \Doctrine\DBAL\ConnectionException
+     */
+    public function commit ():void
+    {
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getEm()->getConnection()->commit();
+    }
+
+    /**
+     * @param EntityContract $entity
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     */
+    public function persist (EntityContract $entity):void
+    {
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getEm()->persist($entity);
+    }
+
+    /**
+     * @param EntityContract $entity
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     */
+    public function remove (EntityContract $entity):void
+    {
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getEm()->remove($entity);
     }
 
 

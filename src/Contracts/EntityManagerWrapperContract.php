@@ -32,4 +32,36 @@ interface EntityManagerWrapperContract
      * @return \Doctrine\ORM\EntityRepository|RepositoryContract
      */
     public function getRepository(string $targetClass);
+
+    /**
+     *
+     */
+    public function beginTransaction ():void;
+
+    /**
+     * @param null $entity
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function flush ($entity = null):void;
+
+    /**
+     *
+     */
+    public function rollBack ():void;
+
+    /**
+     *
+     */
+    public function commit ():void;
+
+    /**
+     * @param EntityContract $entity
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     */
+    public function persist (EntityContract $entity):void;
+    /**
+     * @param EntityContract $entity
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     */
+    public function remove (EntityContract $entity):void;
 }

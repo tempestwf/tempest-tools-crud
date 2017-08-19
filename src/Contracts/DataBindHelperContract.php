@@ -1,18 +1,8 @@
 <?php
 namespace TempestTools\Crud\Contracts;
 
-use TempestTools\Common\Contracts\ArrayHelperContract;
 
 interface DataBindHelperContract {
-
-
-    /** @noinspection MoreThanThreeArgumentsInspection
-     * @param ArrayHelperContract|null $arrayHelper
-     * @param array|null $path
-     * @param array|null $fallBack
-     * @param bool $force
-     */
-    public function init(ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL, bool $force= true):void;
 
     /**
      * @param EntityContract $entity
@@ -49,6 +39,49 @@ interface DataBindHelperContract {
      * @return RepositoryContract
      */
     public function getRepoForRelation(string $targetClass):RepositoryContract;
+
+    /**
+     * @param array $params
+     * @param array $optionOverrides
+     * @param array $frontEndOptions
+     * @return array
+     * @throws \Exception
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \Doctrine\DBAL\ConnectionException
+     * @throws \Exception
+     */
+    public function create(array $params, array $optionOverrides = [], array $frontEndOptions=[]):array;
+
+    /**
+     * @param array $params
+     * @param array $optionOverrides
+     * @param array $frontEndOptions
+     * @return array
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \Doctrine\DBAL\ConnectionException
+     * @throws \Exception
+     */
+    public function update(array $params, array $optionOverrides = [], array $frontEndOptions=[]):array;
+
+    /**
+     * @param array $params
+     * @param array $optionOverrides
+     * @param array $frontEndOptions
+     * @return array
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \Doctrine\DBAL\ConnectionException
+     * @throws \Exception
+     */
+    public function delete(array $params, array $optionOverrides = [], array $frontEndOptions=[]):array;
 
 }
 ?>

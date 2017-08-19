@@ -3,29 +3,22 @@ namespace TempestTools\Crud\Contracts;
 
 use RuntimeException;
 use TempestTools\Common\Contracts\ArrayHelperContract;
-use Doctrine\ORM\QueryBuilder;
 
 interface QueryBuilderHelperContract extends ArrayHelperContract {
 
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
-     * @param QueryBuilderWrapperContract $qb
      * @param array $params
      * @param array $frontEndOptions
-     * @param array $options
      * @param array $optionOverrides
      * @return array
-     * @throws RuntimeException
      * @throws \Doctrine\ORM\ORMException
-     */
-    public function read(QueryBuilderWrapperContract $qb, array $params, array $frontEndOptions, array $options, array $optionOverrides):array;
-    /**
-     * @param QueryBuilder $qb
-     * @param array $extra
-     * @return array
      * @throws \RuntimeException
      */
+    public function read (array $params=[], array $frontEndOptions=[], array $optionOverrides = []):array;
+
+
     /**
      * @param QueryBuilderWrapperContract $qb
      * @param array $extra
@@ -69,7 +62,6 @@ interface QueryBuilderHelperContract extends ArrayHelperContract {
      */
     public function addFrontEndHaving(QueryBuilderWrapperContract $qb, array $extra):void;
 
-
     /**
      * @param QueryBuilderWrapperContract $qb
      * @param array $extra
@@ -90,8 +82,6 @@ interface QueryBuilderHelperContract extends ArrayHelperContract {
      * @param array $extra
      */
     public function buildBaseQuery(QueryBuilderWrapperContract $qb, array $extra):void;
-
-
 
 }
 ?>
