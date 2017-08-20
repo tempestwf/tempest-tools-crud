@@ -4,12 +4,12 @@ namespace TempestTools\Crud\Orm\Helper;
 use TempestTools\AclMiddleware\Contracts\HasIdContract;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Crud\Constants\RepositoryEventsConstants;
-use TempestTools\Crud\Contracts\DataBindHelperContract;
-use TempestTools\Crud\Contracts\EntityContract;
-use TempestTools\Crud\Contracts\GenericEventArgsContract;
-use TempestTools\Crud\Contracts\RepositoryContract;
+use TempestTools\Crud\Contracts\Orm\Helper\DataBindHelperContract;
+use TempestTools\Crud\Contracts\Orm\EntityContract;
+use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
+use TempestTools\Crud\Contracts\Orm\RepositoryContract;
 use TempestTools\Crud\Doctrine\EntityAbstract;
-use TempestTools\Crud\Orm\RepositoryTrait;
+use TempestTools\Crud\Orm\Utility\RepositoryTrait;
 
 class DataBindHelper implements DataBindHelperContract
 {
@@ -33,7 +33,7 @@ class DataBindHelper implements DataBindHelperContract
     /**
      * DataBindHelper constructor.
      *
-     * @param RepositoryContract $repository
+     * @param \TempestTools\Crud\Contracts\Orm\RepositoryContract $repository
      */
     public function __construct(RepositoryContract $repository)
     {
@@ -113,9 +113,9 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
-     * @param EntityContract $entity
+     * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
      * @param array $params
-     * @return EntityContract
+     * @return \TempestTools\Crud\Contracts\Orm\EntityContract
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \RuntimeException
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -165,7 +165,7 @@ class DataBindHelper implements DataBindHelperContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
-     * @param EntityContract $entity
+     * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
      * @param string $associationName
      * @param array $params
      * @param string $targetClass
@@ -196,7 +196,7 @@ class DataBindHelper implements DataBindHelperContract
 
     /**
      * @param array $entities
-     * @param EntityContract $targetEntity
+     * @param \TempestTools\Crud\Contracts\Orm\EntityContract $targetEntity
      * @param string $associationName
      * @throws \RuntimeException
      */
@@ -215,7 +215,7 @@ class DataBindHelper implements DataBindHelperContract
      * @param string $chainType
      * @param array $params
      * @param array $chainOverrides
-     * @param RepositoryContract $repo
+     * @param \TempestTools\Crud\Contracts\Orm\RepositoryContract $repo
      * @return array|null
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
@@ -246,7 +246,7 @@ class DataBindHelper implements DataBindHelperContract
         return $foundEntities;
     }
     /**
-     * @param EntityContract $entity
+     * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
      * @param string $associationName
      * @param array $paramsForEntities
      * @return array
@@ -267,9 +267,9 @@ class DataBindHelper implements DataBindHelperContract
      */
     public function findEntitiesFromArrayKeys (array $array, RepositoryContract $repo):array {
         $keys = array_keys($array);
-        /** @var EntityContract|HasIdContract[] $entities */
+        /** @var \TempestTools\Crud\Contracts\Orm\EntityContract|HasIdContract[] $entities */
         $entities = $repo->findIn('id', $keys);
-        /** @var EntityContract|HasIdContract $entity */
+        /** @var \TempestTools\Crud\Contracts\Orm\EntityContract|HasIdContract $entity */
         foreach ($entities as $entity) {
             $entity->setBindParams($array[$entity->getId()]);
         }
@@ -282,7 +282,7 @@ class DataBindHelper implements DataBindHelperContract
      * @return RepositoryContract
      */
     public function getRepoForRelation(string $targetClass):RepositoryContract {
-        /** @var RepositoryContract $repo */
+        /** @var \TempestTools\Crud\Contracts\Orm\RepositoryContract $repo */
         /** @noinspection NullPointerExceptionInspection */
         $repo = $this->getRepository()->getEm()->getRepository($targetClass);
         $repo->init($this->getRepository()->getArrayHelper(), $this->getRepository()->getTTPath(), $this->getRepository()->getTTFallBack());
@@ -361,8 +361,8 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
-     * @param GenericEventArgsContract $eventArgs
-     * @return EntityContract
+     * @param \TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract $eventArgs
+     * @return \TempestTools\Crud\Contracts\Orm\EntityContract
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Exception
@@ -427,8 +427,8 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
-     * @param GenericEventArgsContract $eventArgs
-     * @param EntityContract $entity
+     * @param \TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract $eventArgs
+     * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Doctrine\DBAL\ConnectionException
@@ -499,8 +499,8 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
-     * @param GenericEventArgsContract $eventArgs
-     * @param EntityContract $entity
+     * @param \TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract $eventArgs
+     * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Doctrine\DBAL\ConnectionException
@@ -522,9 +522,9 @@ class DataBindHelper implements DataBindHelperContract
 
     /**
      * @param GenericEventArgsContract $eventArgs
-     * @param EntityContract $entity
+     * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
      * @param bool $remove
-     * @return EntityContract
+     * @return \TempestTools\Crud\Contracts\Orm\EntityContract
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Exception

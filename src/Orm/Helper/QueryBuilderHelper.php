@@ -5,9 +5,9 @@ use RuntimeException;
 use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Crud\Constants\RepositoryEventsConstants;
-use \TempestTools\Crud\Contracts\QueryBuilderWrapperContract;
-use \TempestTools\Crud\Contracts\QueryBuilderHelperContract;
-use TempestTools\Crud\Orm\RepositoryTrait;
+use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
+use TempestTools\Crud\Contracts\Orm\Helper\QueryBuilderHelperContract;
+use TempestTools\Crud\Orm\Utility\RepositoryTrait;
 
 class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContract
 {
@@ -105,7 +105,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
-     * @param QueryBuilderWrapperContract $qb
+     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $params
      * @param array $frontEndOptions
      * @param array $options
@@ -237,7 +237,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
 
 
     /**
-     * @param QueryBuilderWrapperContract $qb
+     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param string $key
      * @param array $permissions
      * @param array $extra
@@ -282,7 +282,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
-     * @param QueryBuilderWrapperContract $qb
+     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param string $key
      * @param string $value
      * @param array $permissions
@@ -342,7 +342,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
-     * @param QueryBuilderWrapperContract $qb
+     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $condition
      * @param array $permissions
      * @param array $extra
@@ -374,7 +374,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     }
 
     /**
-     * @param QueryBuilderWrapperContract $qb
+     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $arguments
      * @return array
      */
@@ -415,7 +415,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
 
 
     /**
-     * @param QueryBuilderWrapperContract $qb
+     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws \RuntimeException
      */
@@ -470,7 +470,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     }
 
     /**
-     * @param QueryBuilderWrapperContract $qb
+     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws RuntimeException
      * @throws \Doctrine\ORM\ORMException
@@ -503,7 +503,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     }
 
     /**
-     * @param QueryBuilderWrapperContract $qb
+     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $extra
      */
     public function buildBaseQuery(QueryBuilderWrapperContract $qb, array $extra):void
@@ -603,7 +603,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
 
     /**
      * @param array $array
-     * @param QueryBuilderWrapperContract $qb
+     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $extra
      * @return array
      */
@@ -654,7 +654,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
 
     /**
      * @param $value
-     * @param QueryBuilderWrapperContract $qb
+     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $extra
      * @return string|null
      */

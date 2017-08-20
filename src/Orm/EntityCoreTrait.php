@@ -8,11 +8,12 @@ use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\EvmTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
 use TempestTools\Crud\Constants\EntityEventsConstants;
-use TempestTools\Crud\Contracts\EntityContract;
-use TempestTools\Crud\Contracts\GenericEventArgsContract;
+use TempestTools\Crud\Contracts\Orm\EntityContract;
+use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
 use TempestTools\Crud\Orm\Helper\EntityArrayHelper;
-use TempestTools\Crud\Contracts\EntityArrayHelperContract;
+use TempestTools\Crud\Contracts\Orm\Helper\EntityArrayHelperContract;
 use Doctrine\ORM\Mapping as ORM;
+use TempestTools\Crud\Orm\Utility\EventManagerWrapperTrait;
 
 
 trait EntityCoreTrait
@@ -104,7 +105,7 @@ trait EntityCoreTrait
      * Makes event args to use
      *
      * @param array $params
-     * @return GenericEventArgsContract
+     * @return \TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract
      */
     abstract public function makeEventArgs(array $params): GenericEventArgsContract;
 
@@ -197,7 +198,7 @@ trait EntityCoreTrait
     }
 
     /**
-     * @return NULL|EntityArrayHelperContract
+     * @return NULL|\TempestTools\Crud\Contracts\Orm\Helper\EntityArrayHelperContract
      */
     public function getConfigArrayHelper():?EntityArrayHelperContract
     {

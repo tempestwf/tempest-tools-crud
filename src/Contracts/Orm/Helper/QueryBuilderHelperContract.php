@@ -1,8 +1,9 @@
 <?php
-namespace TempestTools\Crud\Contracts;
+namespace TempestTools\Crud\Contracts\Orm\Helper;
 
 use RuntimeException;
 use TempestTools\Common\Contracts\ArrayHelperContract;
+use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
 
 interface QueryBuilderHelperContract extends ArrayHelperContract {
 
@@ -34,7 +35,7 @@ interface QueryBuilderHelperContract extends ArrayHelperContract {
     public function addLimitAndOffset(QueryBuilderWrapperContract $qb, array $extra):void;
 
     /**
-     * @param QueryBuilderWrapperContract $qb
+     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws \RuntimeException
      */
@@ -49,7 +50,7 @@ interface QueryBuilderHelperContract extends ArrayHelperContract {
     public function addFrontEndOrderBys(QueryBuilderWrapperContract $qb, array $extra):void;
 
     /**
-     * @param QueryBuilderWrapperContract $qb
+     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws \RuntimeException
      */
@@ -70,7 +71,7 @@ interface QueryBuilderHelperContract extends ArrayHelperContract {
     public function addPlaceholders(QueryBuilderWrapperContract $qb, array $extra):void;
 
     /**
-     * @param QueryBuilderWrapperContract $qb
+     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws RuntimeException
      * @throws \Doctrine\ORM\ORMException

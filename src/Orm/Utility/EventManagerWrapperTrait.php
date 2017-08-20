@@ -6,10 +6,10 @@
  * Time: 6:37 PM
  */
 
-namespace TempestTools\Crud\Orm;
+namespace TempestTools\Crud\Orm\Utility;
 
 
-use TempestTools\Crud\Contracts\EventManagerWrapperContract;
+use TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract;
 
 trait EventManagerWrapperTrait
 {
@@ -25,7 +25,7 @@ trait EventManagerWrapperTrait
     }
 
     /**
-     * @param EventManagerWrapperContract $eventManagerWrapper
+     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract $eventManagerWrapper
      */
     public function setEventManager(EventManagerWrapperContract $eventManagerWrapper):void
     {
@@ -46,7 +46,7 @@ trait EventManagerWrapperTrait
     }
 
     /**
-     * @return EventManagerWrapperContract
+     * @return \TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract
      * @throws \RuntimeException
      */
     abstract protected function createEventManagerWrapper ():EventManagerWrapperContract;

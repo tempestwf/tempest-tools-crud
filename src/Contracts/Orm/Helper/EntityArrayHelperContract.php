@@ -1,8 +1,9 @@
 <?php
 
-namespace TempestTools\Crud\Contracts;
+namespace TempestTools\Crud\Contracts\Orm\Helper;
 
 use TempestTools\Common\Contracts\ArrayHelperContract;
+use TempestTools\Crud\Contracts\Orm\EntityContract;
 
 interface EntityArrayHelperContract extends ArrayHelperContract
 {

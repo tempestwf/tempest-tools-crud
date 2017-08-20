@@ -6,9 +6,12 @@
  * Time: 8:46 PM
  */
 
-namespace TempestTools\Crud\Contracts;
+namespace TempestTools\Crud\Contracts\Orm\Wrapper;
 
 
+
+use TempestTools\Crud\Contracts\Orm\EntityContract;
+use TempestTools\Crud\Contracts\Orm\RepositoryContract;
 
 interface EntityManagerWrapperContract
 {

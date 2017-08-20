@@ -6,11 +6,17 @@
  * Time: 6:12 PM
  */
 
-namespace TempestTools\Crud\Contracts;
+namespace TempestTools\Crud\Contracts\Orm;
 
 use \Exception;
 
 use TempestTools\Common\Contracts\ArrayHelperContract;
+use TempestTools\Crud\Contracts\Orm\Wrapper\EntityManagerWrapperContract;
+use TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract;
+use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
+use TempestTools\Crud\Contracts\Orm\Helper\DataBindHelperContract;
+use TempestTools\Crud\Contracts\Orm\Helper\QueryBuilderHelperContract;
+use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
 
 
 interface RepositoryContract
@@ -226,12 +232,12 @@ interface RepositoryContract
     public function arrayHelper(): ArrayHelperContract;
 
     /**
-     * @return EventManagerWrapperContract
+     * @return \TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract
      */
     public function getEventManager(): EventManagerWrapperContract;
 
     /**
-     * @param EventManagerWrapperContract $eventManagerWrapper
+     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract $eventManagerWrapper
      */
     public function setEventManager(EventManagerWrapperContract $eventManagerWrapper): void;
 
@@ -241,12 +247,12 @@ interface RepositoryContract
     public function getEntityNameBase(): string;
 
     /**
-     * @return EntityManagerWrapperContract
+     * @return \TempestTools\Crud\Contracts\Orm\Wrapper\EntityManagerWrapperContract
      */
     public function getEm(): EntityManagerWrapperContract;
 
     /**
-     * @param EntityManagerWrapperContract $em
+     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\EntityManagerWrapperContract $em
      */
     public function setEm(EntityManagerWrapperContract $em): void;
 
@@ -281,7 +287,7 @@ interface RepositoryContract
     public function getEntityAlias(): string;
 
     /**
-     * @return EventManagerWrapperContract
+     * @return \TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract
      * @throws \RuntimeException
      */
     public function createEventManagerWrapper(): EventManagerWrapperContract;

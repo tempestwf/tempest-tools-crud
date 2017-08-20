@@ -4,14 +4,15 @@ namespace TempestTools\Crud\Orm;
 use \Exception;
 use TempestTools\Common\Utility\TTConfigTrait;
 use TempestTools\Crud\Constants\RepositoryEventsConstants;
-use TempestTools\Crud\Contracts\EntityManagerWrapperContract;
-use TempestTools\Crud\Contracts\GenericEventArgsContract;
-use TempestTools\Crud\Contracts\QueryBuilderHelperContract;
-use TempestTools\Crud\Contracts\DataBindHelperContract;
-use TempestTools\Crud\Contracts\QueryBuilderWrapperContract;
+use TempestTools\Crud\Contracts\Orm\Wrapper\EntityManagerWrapperContract;
+use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
+use TempestTools\Crud\Contracts\Orm\Helper\QueryBuilderHelperContract;
+use TempestTools\Crud\Contracts\Orm\Helper\DataBindHelperContract;
+use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
 use TempestTools\Crud\Orm\Helper\DataBindHelper;
 use TempestTools\Crud\Orm\Helper\QueryBuilderHelper;
 use TempestTools\Common\Contracts\ArrayHelperContract;
+use TempestTools\Crud\Orm\Utility\EventManagerWrapperTrait;
 
 trait RepositoryCoreTrait
 {

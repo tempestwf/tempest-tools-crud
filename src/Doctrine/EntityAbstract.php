@@ -3,9 +3,10 @@ namespace TempestTools\Crud\Doctrine;
 
 use Doctrine\Common\EventSubscriber;
 use TempestTools\AclMiddleware\Contracts\HasIdContract;
-use TempestTools\Crud\Contracts\EntityContract;
-use TempestTools\Crud\Contracts\GenericEventArgsContract;
+use TempestTools\Crud\Contracts\Orm\EntityContract;
+use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
+use TempestTools\Crud\Doctrine\Utility\CreateEventManagerWrapperTrait;
 use TempestTools\Crud\Orm\EntityCoreTrait;
 
 

@@ -11,8 +11,8 @@ namespace TempestTools\Crud\Doctrine\Wrapper;
 use Doctrine\Common\EventManager;
 use Doctrine\Common\EventSubscriber;
 use TempestTools\Common\Utility\EvmTrait;
-use TempestTools\Crud\Contracts\EventManagerWrapperContract;
-use TempestTools\Crud\Contracts\GenericEventArgsContract;
+use TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract;
+use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
 
 
 class EventManagerWrapper implements EventManagerWrapperContract

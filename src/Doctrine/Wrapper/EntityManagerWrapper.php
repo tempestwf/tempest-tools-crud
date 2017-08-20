@@ -10,9 +10,9 @@ namespace TempestTools\Crud\Doctrine\Wrapper;
 
 use Doctrine\ORM\EntityManager;
 use TempestTools\Common\Doctrine\Utility\EmTrait;
-use TempestTools\Crud\Contracts\EntityContract;
-use TempestTools\Crud\Contracts\EntityManagerWrapperContract;
-use TempestTools\Crud\Contracts\RepositoryContract;
+use TempestTools\Crud\Contracts\Orm\EntityContract;
+use TempestTools\Crud\Contracts\Orm\Wrapper\EntityManagerWrapperContract;
+use TempestTools\Crud\Contracts\Orm\RepositoryContract;
 
 class EntityManagerWrapper implements EntityManagerWrapperContract
 {

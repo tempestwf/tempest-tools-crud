@@ -6,10 +6,10 @@
  * Time: 8:28 PM
  */
 
-namespace TempestTools\Crud\Doctrine;
+namespace TempestTools\Crud\Doctrine\Utility;
 
 
-use TempestTools\Crud\Contracts\EventManagerWrapperContract;
+use TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract;
 use TempestTools\Crud\Doctrine\Wrapper\EventManagerWrapper;
 
 trait CreateEventManagerWrapperTrait

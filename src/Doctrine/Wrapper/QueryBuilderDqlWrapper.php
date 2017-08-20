@@ -14,7 +14,7 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use RuntimeException;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
-use \TempestTools\Crud\Contracts\QueryBuilderWrapperContract;
+use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
 
 class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
 {

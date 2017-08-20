@@ -4,11 +4,12 @@ namespace TempestTools\Crud\Doctrine;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
-use TempestTools\Crud\Contracts\EntityManagerWrapperContract;
-use TempestTools\Crud\Contracts\GenericEventArgsContract;
-use TempestTools\Crud\Contracts\QueryBuilderWrapperContract;
-use TempestTools\Crud\Contracts\RepositoryContract;
+use TempestTools\Crud\Contracts\Orm\Wrapper\EntityManagerWrapperContract;
+use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
+use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
+use TempestTools\Crud\Contracts\Orm\RepositoryContract;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
+use TempestTools\Crud\Doctrine\Utility\CreateEventManagerWrapperTrait;
 use TempestTools\Crud\Doctrine\Wrapper\EntityManagerWrapper;
 use TempestTools\Crud\Doctrine\Wrapper\QueryBuilderDqlWrapper;
 use TempestTools\Crud\Doctrine\Wrapper\QueryBuilderSqlWrapper;
@@ -71,7 +72,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @param array $options
      * @param array $optionOverrides
      * @param array $frontEndOptions
-     * @return GenericEventArgsContract
+     * @return \TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract
      */
     public function makeEventArgs(array $params, array $options = [], array $optionOverrides = [], array $frontEndOptions=[]): GenericEventArgsContract
     {

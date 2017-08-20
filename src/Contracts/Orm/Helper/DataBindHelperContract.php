@@ -1,13 +1,16 @@
 <?php
-namespace TempestTools\Crud\Contracts;
+namespace TempestTools\Crud\Contracts\Orm\Helper;
 
+
+use TempestTools\Crud\Contracts\Orm\EntityContract;
+use TempestTools\Crud\Contracts\Orm\RepositoryContract;
 
 interface DataBindHelperContract {
 
     /**
-     * @param EntityContract $entity
+     * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
      * @param array $params
-     * @return EntityContract
+     * @return \TempestTools\Crud\Contracts\Orm\EntityContract
      */
     public function bind(EntityContract $entity, array $params): EntityContract;
 
@@ -29,14 +32,14 @@ interface DataBindHelperContract {
 
     /**
      * @param array $array
-     * @param RepositoryContract $repo
+     * @param \TempestTools\Crud\Contracts\Orm\RepositoryContract $repo
      * @return array
      */
     public function findEntitiesFromArrayKeys (array $array, RepositoryContract $repo):array;
     /**
      * @param string $targetClass
      * @throws \RuntimeException
-     * @return RepositoryContract
+     * @return \TempestTools\Crud\Contracts\Orm\RepositoryContract
      */
     public function getRepoForRelation(string $targetClass):RepositoryContract;
 

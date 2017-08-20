@@ -6,20 +6,20 @@
  * Time: 6:37 PM
  */
 
-namespace TempestTools\Crud\Orm;
+namespace TempestTools\Crud\Orm\Utility;
 
 
-use TempestTools\Crud\Contracts\RepositoryContract;
+use TempestTools\Crud\Contracts\Orm\RepositoryContract;
 
 trait RepositoryTrait
 {
     /**
-     * @var RepositoryContract $repository
+     * @var \TempestTools\Crud\Contracts\Orm\RepositoryContract $repository
      */
     protected $repository;
 
     /**
-     * @return RepositoryContract
+     * @return \TempestTools\Crud\Contracts\Orm\RepositoryContract
      */
     public function getRepository(): RepositoryContract
     {

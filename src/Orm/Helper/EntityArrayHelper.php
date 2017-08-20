@@ -7,8 +7,8 @@ use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Common\Utility\AccessorMethodNameTrait;
 use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Crud\Constants\EntityEventsConstants;
-use TempestTools\Crud\Contracts\EntityContract;
-use TempestTools\Crud\Contracts\EntityArrayHelperContract;
+use TempestTools\Crud\Contracts\Orm\EntityContract;
+use TempestTools\Crud\Contracts\Orm\Helper\EntityArrayHelperContract;
 
 class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract{
     use ErrorConstantsTrait, AccessorMethodNameTrait;

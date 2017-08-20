@@ -6,9 +6,10 @@
  * Time: 8:48 PM
  */
 
-namespace TempestTools\Crud\Contracts;
+namespace TempestTools\Crud\Contracts\Orm\Wrapper;
 
 use Doctrine\Common\EventSubscriber;
+use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
 
 interface EventManagerWrapperContract
 {

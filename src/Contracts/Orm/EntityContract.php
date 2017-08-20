@@ -1,10 +1,13 @@
 <?php
 
-namespace TempestTools\Crud\Contracts;
+namespace TempestTools\Crud\Contracts\Orm;
 
 use RuntimeException;
 use TempestTools\Common\Contracts\ArrayHelperContract;
 use Doctrine\ORM\Mapping as ORM;
+use TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract;
+use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
+use TempestTools\Crud\Contracts\Orm\Helper\EntityArrayHelperContract;
 
 interface EntityContract
 {
@@ -132,7 +135,7 @@ interface EntityContract
      */
     public function getEventManager(): EventManagerWrapperContract;
     /**
-     * @param EventManagerWrapperContract $eventManagerWrapper
+     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract $eventManagerWrapper
      */
     public function setEventManager(EventManagerWrapperContract $eventManagerWrapper):void;
 
@@ -231,7 +234,7 @@ interface EntityContract
     public function coreInit (ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL, bool $force= true, string $mode = null):bool;
 
     /**
-     * @return EventManagerWrapperContract
+     * @return \TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract
      * @throws \RuntimeException
      */
     public function createEventManagerWrapper ():EventManagerWrapperContract;
