@@ -10,7 +10,7 @@ namespace TempestTools\Crud\Doctrine\Wrapper;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 
-use RuntimeException;
+use TempestTools\Crud\Exceptions\QueryBuilderWrapperException;
 
 
 class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
@@ -62,17 +62,17 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
      * @param int|null $hydrationType
      * @param bool $fetchJoin
      * @return mixed
-     * @throws \RuntimeException
+     * @throws QueryBuilderWrapperException
      */
     public function getResult(bool $paginate=false, bool $returnCount=true, int $hydrationType=null, bool $fetchJoin = false)
     {
         $count = null;
         if ($paginate === true) {
-            throw new RuntimeException($this->getErrorFromConstant('paginationNotCompatible')['message']);
+            throw QueryBuilderWrapperException::paginationNotCompatible();
         }
 
         if ($hydrationType === null) {
-            throw new RuntimeException($this->getErrorFromConstant('hydrationNotCompatible')['message']);
+            throw QueryBuilderWrapperException::hydrationNotCompatible();
         }
 
         $result = $this->getQueryBuilder()->execute();
@@ -93,12 +93,12 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
      * @param null $queryCacheDriver
      * @param null $resultCacheDriver
      * @throws \Doctrine\ORM\ORMException
-     * @throws \RuntimeException
+     * @throws QueryBuilderWrapperException
      */
     public function setCacheSettings (bool $useQueryCache=true, bool $useResultCache = false, int $timeToLive=null, string $cacheId = null, $queryCacheDriver= null, $resultCacheDriver = null):void
     {
         if ($useQueryCache === true || $useResultCache === true || $queryCacheDriver !== null || $resultCacheDriver !== null) {
-            throw new RuntimeException($this->getErrorFromConstant('cacheNotCompatible')['message']);
+            throw QueryBuilderWrapperException::cacheNotCompatible();
         }
 
     }
@@ -110,12 +110,12 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
      * @param string $alias
      * @param string|null $indexBy
      * @param bool $add
-     * @throws \RuntimeException
+     * @throws QueryBuilderWrapperException
      */
     public function from(string $className, string $alias, string $indexBy=null, bool $add=false): void
     {
         if ($indexBy !== null) {
-            throw new RuntimeException($this->getErrorFromConstant('indexByNotCompatible')['message']);
+            throw QueryBuilderWrapperException::indexByNotCompatible();
         }
 
         if ($add === false) {
@@ -135,12 +135,12 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
      * @param string|null $conditionType
      * @param string|null $condition
      * @param string|null $indexBy
-     * @throws \RuntimeException
+     * @throws QueryBuilderWrapperException
      */
     public function leftJoin(string $join, string $alias, string $conditionType = null, string $condition = null, string $indexBy = null):void
     {
         if ($indexBy !== null) {
-            throw new RuntimeException($this->getErrorFromConstant('indexByNotCompatible')['message']);
+            throw QueryBuilderWrapperException::indexByNotCompatible();
         }
         $this->getQueryBuilder()->leftJoin($join, $alias, $conditionType, $condition);
     }
@@ -151,12 +151,12 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
      * @param string|null $conditionType
      * @param string|null $condition
      * @param string|null $indexBy
-     * @throws \RuntimeException
+     * @throws QueryBuilderWrapperException
      */
     public function innerJoin(string $join, string $alias, string $conditionType = null, string $condition = null, string $indexBy = null):void
     {
         if ($indexBy !== null) {
-            throw new RuntimeException($this->getErrorFromConstant('indexByNotCompatible')['message']);
+            throw QueryBuilderWrapperException::indexByNotCompatible();
         }
         $this->getQueryBuilder()->innerJoin($join, $alias, $conditionType, $condition);
     }
@@ -164,12 +164,12 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
 
     /**
      * @param string $operator
-     * @throws \RuntimeException
+     * @throws QueryBuilderWrapperException
      */
     public function verifyOperatorAllowed(string $operator):void
     {
         if (!in_array($operator, static::SAFE_OPERATORS, true)) {
-            throw new RuntimeException(sprintf($this->getErrorFromConstant('operatorNotSafe')['message'], $operator));
+            throw QueryBuilderWrapperException::operatorNotSafe($operator);
         }
     }
 

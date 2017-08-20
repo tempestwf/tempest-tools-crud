@@ -13,6 +13,7 @@ use TempestTools\Crud\Doctrine\Utility\CreateEventManagerWrapperTrait;
 use TempestTools\Crud\Doctrine\Wrapper\EntityManagerWrapper;
 use TempestTools\Crud\Doctrine\Wrapper\QueryBuilderDqlWrapper;
 use TempestTools\Crud\Doctrine\Wrapper\QueryBuilderSqlWrapper;
+use TempestTools\Crud\Exceptions\RepositoryException;
 use TempestTools\Crud\Orm\RepositoryCoreTrait;
 
 abstract class RepositoryAbstract extends EntityRepository implements EventSubscriber, RepositoryContract
@@ -31,27 +32,6 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         'flush'=>true,
     ];
 
-
-    /**
-     * ERRORS
-     */
-    const ERRORS = [
-        'noArrayHelper'=>[
-            'message'=>'Error: No array helper set on repository.',
-        ],
-        'entityToBindNotFound'=>[
-            'message'=>'Error: Entity to bind not found.',
-        ],
-        'moreRowsRequestedThanBatchMax'=>[
-            'message'=>'Error: More rows requested than batch max allows. count = %s, max = %s',
-        ],
-        'wrongTypeOfRepo'=>[
-            'message'=>'Error: Wrong type of repo used with chaining.',
-        ],
-        'queryTypeNotRecognized'=>[
-            'message'=>'Error: Query type from configuration not recognized. query type = %s'
-        ],
-    ];
 
     /**
      * @return EntityManagerWrapperContract
@@ -97,7 +77,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     /**
      * @param string $entityAlias
      * @return QueryBuilderWrapperContract
-     * @throws \RuntimeException
+     * @throws RepositoryException
      */
     public function createQueryWrapper(string $entityAlias = null):QueryBuilderWrapperContract
     {
@@ -111,7 +91,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
             $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
             $qbWrapper = new QueryBuilderSqlWrapper($qb);
         } else {
-            throw new \RuntimeException(sprintf($this->getErrorFromConstant('queryTypeNotRecognized')['message'], $queryType));
+            throw RepositoryException::queryTypeNotRecognized($queryType);
         }
 
         return $qbWrapper;

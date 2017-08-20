@@ -5,34 +5,13 @@ namespace TempestTools\Crud\Orm\Helper;
 use RuntimeException;
 use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Common\Utility\AccessorMethodNameTrait;
-use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Crud\Constants\EntityEventsConstants;
 use TempestTools\Crud\Contracts\Orm\EntityContract;
 use TempestTools\Crud\Contracts\Orm\Helper\EntityArrayHelperContract;
+use TempestTools\Crud\Exceptions\EntityArrayHelperException;
 
 class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract{
-    use ErrorConstantsTrait, AccessorMethodNameTrait;
-
-    const ERRORS = [
-        'chainTypeNotAllow'=>[
-            'message'=>'Error: Requested chain type not permitted. chainType = %s, relationName = %s.',
-        ],
-        'assignTypeNotAllow'=>[
-            'message'=>'Error: Requested assign type not permitted. assignType = %s, fieldName = %s.',
-        ],
-        'actionNotAllow'=>[
-            'message'=>'Error: the requested action is not allowed on this entity for this request.'
-        ],
-        'enforcementFails' => [
-            'message' => 'Error: A field is not set to it\'s enforced value. fieldName = %s.',
-        ],
-        'closureFails' => [
-            'message' => 'Error: A validation closure did not pass. fieldName = %s.',
-        ],
-        'assignTypeMustBe' => [
-            'message' => 'Error: Assign type must be set, add or remove. assignType = %s',
-        ],
-    ];
+    use AccessorMethodNameTrait;
 
     /**
      * @var EntityContract $entity
@@ -56,7 +35,8 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param string $chainType
      * @param bool $nosey
      * @return bool
-     * @throws RuntimeException
+     * @throws \RuntimeException
+     * @throws EntityArrayHelperException
      */
     public function canChain (string $associationName, string $chainType, bool $nosey = true):bool
     {
@@ -72,7 +52,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $this->getEntity()->getArrayHelper()->parse($allowed, $extra);
         if ($nosey === true && $allowed === false) {
-            throw new RuntimeException(sprintf($this->getErrorFromConstant('chainTypeNotAllow')['message'], $chainType, $associationName));
+            throw EntityArrayHelperException::chainTypeNotAllow($chainType, $associationName);
         }
 
         return $allowed;
@@ -87,13 +67,14 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param bool $nosey
      * @return bool
      * @throws RuntimeException
+     * @throws EntityArrayHelperException
      */
     public function canAssign (string $associationName, string $assignType=null, array $fieldSettings = NULL, bool $nosey = true):bool
     {
         $extra = ['associationName'=>$associationName, 'assignType'=> $assignType, 'self'=>$this];
         $assignType = $assignType ?? 'null';
         if (!in_array($assignType, ['set', 'add', 'remove', 'setSingle', 'addSingle', 'removeSingle', 'null'], true)) {
-            throw new RuntimeException(sprintf($this->getErrorFromConstant('assignTypeMustBe')['message'], $assignType));
+            throw EntityArrayHelperException::assignTypeMustBe($assignType);
         }
 
         /** @noinspection NullPointerExceptionInspection */
@@ -106,7 +87,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $this->getEntity()->getArrayHelper()->parse($allowed, $extra);
         if ($nosey === true && $allowed === false) {
-            throw new RuntimeException(sprintf($this->getErrorFromConstant('assignTypeNotAllow')['message'], $assignType, $associationName));
+            throw EntityArrayHelperException::assignTypeNotAllow($assignType, $associationName);
         }
         return $allowed;
     }
@@ -115,6 +96,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param bool $nosey
      * @return bool
      * @throws RuntimeException
+     * @throws EntityArrayHelperException
      */
     public function allowed ($nosey = true):bool {
 
@@ -125,7 +107,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $this->getEntity()->getArrayHelper()->parse($allowed, ['self'=>$this]);
         if ($nosey === true && $allowed === false) {
-            throw new RuntimeException($this->getErrorFromConstant('actionNotAllow')['message']);
+            throw EntityArrayHelperException::actionNotAllow();
         }
         return $allowed;
     }
@@ -191,6 +173,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param array|null $fieldSettings
      * @param bool $nosey
      * @throws RuntimeException
+     * @throws EntityArrayHelperException
      */
     public function enforceRelation(string $fieldName, array $values, array $params = [], array $fieldSettings=NULL, bool $nosey = true) {
         // Get the settings for the field so we can do quick comparisons
@@ -205,7 +188,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $allowed = $this->getEntity()->getArrayHelper()->testEnforceValues($values, $enforce, $params);
 
         if ($allowed === false && $nosey === true) {
-            throw new RuntimeException(sprintf($this->getErrorFromConstant('enforcementFails')['message'], $fieldName));
+            throw EntityArrayHelperException::enforcementFails($fieldName);
         }
     }
 
@@ -299,6 +282,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param bool $noisy
      * @return bool
      * @throws RuntimeException
+     * @throws EntityArrayHelperException
      */
     public function closureOnField (string $fieldName, array $params, array $fieldSettings = NULL, bool $noisy = true):bool {
         // Get the settings for the field so we can do quick comparisons
@@ -308,7 +292,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $allowed = !(isset($fieldSettings['closure']) && $this->getEntity()->getArrayHelper()->parse($fieldSettings['closure'], $params) === false);
 
         if ($allowed === false && $noisy === true) {
-            throw new RuntimeException(sprintf($this->getErrorFromConstant('closureFails')['message'], $fieldName));
+            throw EntityArrayHelperException::closureFails($fieldName);
         }
         return $allowed;
     }
@@ -322,6 +306,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param bool $noisy
      * @return bool
      * @throws RuntimeException
+     * @throws EntityArrayHelperException
      */
     public function enforceField (string $fieldName, $value, array $params, array $fieldSettings = NULL, bool $noisy = true):bool {
         // Get the settings for the field so we can do quick comparisons
@@ -333,7 +318,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
 
         // Any validation failure error out
         if ($allowed === false && $noisy === true) {
-            throw new RuntimeException(sprintf($this->getErrorFromConstant('enforcementFails')['message'], $fieldName));
+            throw EntityArrayHelperException::enforcementFails($fieldName);
         }
 
         return $allowed;
@@ -403,6 +388,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     /**
      * @param callable $closure
      * @throws \RuntimeException
+     * @throws EntityArrayHelperException
      */
     protected function prePersistClosure(Callable $closure)
     {
@@ -410,7 +396,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $this->getEntity()->getArrayHelper()->parseClosure($closure, ['self' => $entity]);
         if ($allowed === false) {
-            throw new \RuntimeException($this->getErrorFromConstant('closureFails')['message']);
+            throw EntityArrayHelperException::closureFails();
         }
     }
 
@@ -432,6 +418,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     /**
      * @param array $values
      * @throws \RuntimeException
+     * @throws EntityArrayHelperException
      */
     protected function prePersistEnforce(array $values)
     {
@@ -450,11 +437,11 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
                     $methodName = $this->accessorMethodName('get', $key2);
                     $result2 = $result->$methodName();
                     if ($result2 !== $value2) {
-                        throw new RuntimeException(sprintf($this->getErrorFromConstant('enforcementFails')['message'], $result2, $value2));
+                        throw EntityArrayHelperException::enforcementFails();
                     }
                 }
             } else if ($result !== $value) {
-                throw new RuntimeException(sprintf($this->getErrorFromConstant('enforcementFails')['message'], $result, $value));
+                throw EntityArrayHelperException::enforcementFails();
             }
         }
     }

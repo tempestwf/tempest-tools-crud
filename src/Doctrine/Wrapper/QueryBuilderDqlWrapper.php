@@ -12,47 +12,11 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\QueryBuilder as BaseQueryBuilder;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use RuntimeException;
-use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
+use TempestTools\Crud\Exceptions\QueryBuilderWrapperException;
 
 class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
 {
-    use ErrorConstantsTrait;
-
-    /**
-     * ERRORS
-     */
-    const ERRORS = [
-        'fieldBadlyFormed'=>[
-            'message'=>'Error: Fields must be passed as [table alias].[field name]. field = %s',
-        ],
-        'directionNotAllow' => [
-            'message' => 'Error: Order by direction not allowed. direction = %s',
-        ],
-        'operatorNotSafe'=>[
-            'message'=>'Error: Requested operator is not safe to use. operator = %s',
-        ],
-        'countRequiresPaginator'=>[
-            'message'=>'Error: Getting a count requires use of the paginator',
-        ],
-        'paginationNotCompatible'=>[
-            'message'=>'Error: Pagination is not compatible with this type of query',
-        ],
-        'hydrationNotCompatible'=>[
-            'message'=>'Error: Hydration is not compatible with this type of query',
-        ],
-        'cacheNotCompatible'=>[
-            'message'=>'Error: Caching is not compatible with this type of query',
-        ],
-        'indexByNotCompatible'=>[
-            'message'=>'Error: indexBy is not compatible with this type of query',
-        ],
-        'parameterTypeNotSupported'=>[
-            'message'=>'Error: Parameter type is not supported. type = %s',
-        ],
-    ];
-
     /**
      * FIELD_REGEX
      */
@@ -89,7 +53,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
      * @param int|null $hydrationType
      * @param bool $fetchJoin
      * @return mixed
-     * @throws \RuntimeException
+     * @throws QueryBuilderWrapperException
      */
     public function getResult(bool $paginate=false, bool $returnCount=true, int $hydrationType=1, bool $fetchJoin = false)
     {
@@ -101,7 +65,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
             $result = $paginator->getIterator()->getArrayCopy();
         } else {
             if ($count === true) {
-                throw new RuntimeException($this->getErrorFromConstant('countRequiresPaginator')['message']);
+                throw QueryBuilderWrapperException::countRequiresPaginator();
             }
             $this->getQueryBuilder()->getQuery()->setHydrationMode($hydrationType);
             $result = $this->getQueryBuilder()->getQuery()->getResult();
@@ -182,12 +146,12 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
      * @param string $placeholderName
      * @param $argument
      * @param null $type
-     * @throws \RuntimeException
+     * @throws QueryBuilderWrapperException
      */
     public function setParameter(string $placeholderName, $argument, $type=null):void
     {
         if ($type !== null && Type::hasType($type) !== true) {
-            throw new RuntimeException(sprintf($this->getErrorFromConstant('parameterTypeNotSupported')['message'],$type));
+            throw QueryBuilderWrapperException::parameterTypeNotSupported($type);
         }
         $this->getQueryBuilder()->setParameter($placeholderName, $argument, $type);
     }
@@ -286,14 +250,14 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
      * @param string $field
      * @param bool $noisy
      * @return bool
-     * @throws \RuntimeException
+     * @throws QueryBuilderWrapperException
      */
     public function verifyFieldFormat (string $field, bool $noisy = true):bool
     {
         $fieldFormatOk = preg_match(static::FIELD_REGEX, $field);
         if ($fieldFormatOk === false) {
             if ($noisy === false) {
-                throw new RuntimeException(sprintf($this->getErrorFromConstant('fieldBadlyFormed')['message'], $field));
+                throw QueryBuilderWrapperException::fieldBadlyFormed($field);
             }
             return false;
         }
@@ -304,14 +268,14 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
      * @param string $direction
      * @param bool $noisy
      * @return bool
-     * @throws \RuntimeException
+     * @throws QueryBuilderWrapperException
      */
     public function verifyDirectionFormat (string $direction, bool $noisy = true):bool
     {
         $directionOk = in_array($direction, static::ORDER_BY_DIRECTIONS, true);
         if ($directionOk === false) {
             if ($noisy === false) {
-                throw new RuntimeException(sprintf($this->getErrorFromConstant('directionNotAllow')['message'], $direction));
+                throw QueryBuilderWrapperException::directionNotAllow($direction);
             }
             return false;
         }
@@ -320,12 +284,12 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
 
     /**
      * @param string $operator
-     * @throws \RuntimeException
+     * @throws QueryBuilderWrapperException
      */
     public function verifyOperatorAllowed(string $operator):void
     {
         if (!in_array($operator, static::SAFE_OPERATORS, true)) {
-            throw new RuntimeException(sprintf($this->getErrorFromConstant('operatorNotSafe')['message'], $operator));
+            throw QueryBuilderWrapperException::operatorNotSafe($operator);
         }
     }
 

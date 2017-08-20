@@ -3,46 +3,15 @@ namespace TempestTools\Crud\Orm\Helper;
 
 use RuntimeException;
 use TempestTools\Common\Helper\ArrayHelper;
-use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Crud\Constants\RepositoryEventsConstants;
 use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
 use TempestTools\Crud\Contracts\Orm\Helper\QueryBuilderHelperContract;
+use TempestTools\Crud\Exceptions\QueryBuilderHelperException;
 use TempestTools\Crud\Orm\Utility\RepositoryTrait;
 
 class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContract
 {
-    use ErrorConstantsTrait, RepositoryTrait;
-
-    /**
-     * ERRORS
-     */
-    const ERRORS = [
-        'placeholderNoAllowed'=>[
-            'message'=>'Error: You do not have access requested placeholder. placeholder = %s',
-        ],
-        'operatorNotAllowed'=>[
-            'message'=>'Error: Operator not allowed. field = %s, operator = %s',
-        ],
-        'orderByNotAllowed'=>[
-            'message'=>'Error: Order by not allowed. field = %s, direction = %s',
-        ],
-        'groupByNotAllowed'=>[
-            'message'=>'Error: Group by not allowed. field = %s',
-        ],
-        'maxLimitHit'=>[
-            'message'=>'Error: Requested limit greater than max. limit = %s, max = %s',
-        ],
-        'closureFails' => [
-            'message' => 'Error: A validation closure did not pass while building query.',
-        ],
-        'readRequestNotAllowed' => [
-            'message' => 'Error: Read request not allowed.',
-        ],
-        'moreQueryParamsThanMax'=>[
-            'message'=>'Error: More query params than passed than permitted. count = %s, max = %s'
-        ],
-
-    ];
+    use RepositoryTrait;
 
     /**
      * DEFAULT_LIMIT
@@ -75,6 +44,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      * @param array $frontEndOptions
      * @param array $optionOverrides
      * @return array
+     * @throws \TempestTools\Crud\Exceptions\QueryBuilderHelperException
      * @throws \Doctrine\ORM\ORMException
      * @throws \RuntimeException
      */
@@ -111,6 +81,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      * @param array $options
      * @param array $optionOverrides
      * @return array
+     * @throws \TempestTools\Crud\Exceptions\QueryBuilderHelperException
      * @throws RuntimeException
      * @throws \Doctrine\ORM\ORMException
      */
@@ -139,6 +110,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     /**
      * @param array $extra
      * @throws \RuntimeException
+     * @throws QueryBuilderHelperException
      */
     protected function verifyAllowed(array $extra):void
     {
@@ -147,7 +119,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $this->getRepository()->getArrayHelper()->parse($allowed, $extra);
         if ($allowed === false) {
-            throw new RuntimeException(sprintf($this->getErrorFromConstant('readRequestNotAllowed')['message']));
+            throw QueryBuilderHelperException::readRequestNotAllowed();
         }
     }
 
@@ -200,6 +172,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      * @internal param array $extra
      * @internal param array $extra
      * @throws \RuntimeException
+     * @throws QueryBuilderHelperException
      */
     protected function verifyLimitAndOffset (int $limit, array $extra):void
     {
@@ -207,7 +180,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         /** @noinspection NullPointerExceptionInspection */
         $maxLimit = (int)$this->getRepository()->getArrayHelper()->parse($maxLimit, $extra);
         if ($limit > $maxLimit) {
-            throw new RuntimeException(sprintf($this->getErrorFromConstant('maxLimitHit')['message'], $limit, $maxLimit));
+            throw QueryBuilderHelperException::maxLimitHit($limit, $maxLimit);
         }
     }
 
@@ -243,6 +216,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      * @param array $extra
      * @internal param array $extra
      * @throws \RuntimeException
+     * @throws QueryBuilderHelperException
      */
     protected function verifyFrontEndGroupBys (QueryBuilderWrapperContract $qb, string $key, array $permissions, array $extra):void
     {
@@ -253,7 +227,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $this->getRepository()->getArrayHelper()->parse($allowed, $extra);
         if ($allowed === false) {
-            throw new RuntimeException(sprintf($this->getErrorFromConstant('groupByNotAllowed')['message'], $key));
+            throw QueryBuilderHelperException::groupByNotAllowed($key);
         }
     }
 
@@ -288,6 +262,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      * @param array $permissions
      * @param $extra
      * @throws \RuntimeException
+     * @throws QueryBuilderHelperException
      */
     protected function verifyFrontEndOrderBys (QueryBuilderWrapperContract $qb, string $key, string $value, array $permissions, $extra):void
     {
@@ -299,7 +274,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $this->getRepository()->getArrayHelper()->parse($allowed, $extra);
         if ($allowed === false) {
-            throw new RuntimeException(sprintf($this->getErrorFromConstant('orderByNotAllowed')['message'], $key, $value));
+            throw QueryBuilderHelperException::orderByNotAllowed($key, $value);
         }
 
     }
@@ -394,6 +369,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      * @param array $condition
      * @param array $permissions
      * @throws \RuntimeException
+     * @throws QueryBuilderHelperException
      */
     protected function verifyFrontEndCondition (QueryBuilderWrapperContract $qb, array $condition, array $permissions):void
     {
@@ -409,7 +385,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $this->getRepository()->getArrayHelper()->parse($allowed, $extra);
         if ($allowed === false) {
-            throw new RuntimeException(sprintf($this->getErrorFromConstant('operatorNotAllowed')['message'], $fieldName, $operator));
+            throw QueryBuilderHelperException::operatorNotAllowed($fieldName, $operator);
         }
     }
 
@@ -457,6 +433,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      * @param array $extra
      * @internal param array $extra
      * @throws \RuntimeException
+     * @throws QueryBuilderHelperException
      */
     protected function verifyPlaceholders (string $key, array $value, array $permissions , array $extra):void
     {
@@ -465,7 +442,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $this->getRepository()->getArrayHelper()->parse($allowed, $extra);
         if ($allowed === false) {
-            throw new RuntimeException(sprintf($this->getErrorFromConstant('placeholderNoAllowed')['message'], $key));
+            throw QueryBuilderHelperException::placeholderNoAllowed($key);
         }
     }
 
@@ -696,6 +673,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      * @param bool $noisy
      * @return bool
      * @throws \RuntimeException
+     * @throws QueryBuilderHelperException
      */
     protected function closurePermission (array $permissions, array $extra, bool $noisy = true):bool
     {
@@ -703,7 +681,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $allowed = !(isset($permissions['closure']) && $this->getRepository()->getArrayHelper()->parse($permissions['closure'], $extra) === false);
 
         if ($allowed === false && $noisy === true) {
-            throw new RuntimeException(sprintf($this->getErrorFromConstant('closureFails')['message']));
+            throw QueryBuilderHelperException::closureFails();
         }
         return $allowed;
     }
@@ -714,6 +692,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      * @param array $options
      * @param array $optionOverrides
      * @throws \RuntimeException
+     * @throws QueryBuilderHelperException
      */
     protected function checkQueryMaxParams(array $values, array $options, array $optionOverrides):void
     {
@@ -727,7 +706,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
             $count = count($values, COUNT_RECURSIVE);
 
             if ($count > $maxBatch) {
-                throw new \RuntimeException(sprintf($this->getErrorFromConstant('moreQueryParamsThanMax')['message'], $count, $maxBatch));
+                throw QueryBuilderHelperException::moreQueryParamsThanMax($count, $maxBatch);
             }
         }
     }

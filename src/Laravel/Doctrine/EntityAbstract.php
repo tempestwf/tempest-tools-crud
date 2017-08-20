@@ -12,6 +12,7 @@ use TempestTools\Common\Laravel\Validation\ValidationFactoryHelper;
 use TempestTools\Common\Utility\ValidationFactoryTrait;
 use \Illuminate\Contracts\Validation\Factory;
 use TempestTools\Crud\Doctrine\EntityAbstract as EntityAbstractBase;
+use TempestTools\Crud\Exceptions\EntityException;
 
 abstract class EntityAbstract extends EntityAbstractBase
 {
@@ -41,6 +42,7 @@ abstract class EntityAbstract extends EntityAbstractBase
      * @param array $rules
      * @param array $messages
      * @param array $customAttributes
+     * @throws EntityException
      * @throws \RuntimeException
      */
     public function validate(array $values, array $rules, array $messages = [], array $customAttributes = []):void
@@ -52,7 +54,7 @@ abstract class EntityAbstract extends EntityAbstractBase
             $messages = $validator->getMessageBag()->all();
             $errorMessage = implode(' \n', $messages);
             $errorMessage = $errorMessage === ''?$this->getErrorFromConstant('prePersistValidatorFails')['message']:$errorMessage;
-            throw new \RuntimeException($errorMessage);
+            throw new EntityException($errorMessage);
         }
     }
 
