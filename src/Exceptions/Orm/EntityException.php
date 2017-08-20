@@ -6,7 +6,7 @@
  * Time: 6:52 PM
  */
 
-namespace TempestTools\Crud\Exceptions;
+namespace TempestTools\Crud\Exceptions\Orm;
 
 
 class EntityException extends \RunTimeException

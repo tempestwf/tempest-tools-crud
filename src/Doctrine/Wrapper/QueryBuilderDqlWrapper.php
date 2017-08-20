@@ -13,7 +13,7 @@ use Doctrine\ORM\QueryBuilder as BaseQueryBuilder;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
-use TempestTools\Crud\Exceptions\QueryBuilderWrapperException;
+use TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException;
 
 class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
 {
@@ -53,7 +53,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
      * @param int|null $hydrationType
      * @param bool $fetchJoin
      * @return mixed
-     * @throws QueryBuilderWrapperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
      */
     public function getResult(bool $paginate=false, bool $returnCount=true, int $hydrationType=1, bool $fetchJoin = false)
     {
@@ -146,7 +146,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
      * @param string $placeholderName
      * @param $argument
      * @param null $type
-     * @throws QueryBuilderWrapperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
      */
     public function setParameter(string $placeholderName, $argument, $type=null):void
     {
@@ -250,7 +250,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
      * @param string $field
      * @param bool $noisy
      * @return bool
-     * @throws QueryBuilderWrapperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
      */
     public function verifyFieldFormat (string $field, bool $noisy = true):bool
     {
@@ -268,7 +268,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
      * @param string $direction
      * @param bool $noisy
      * @return bool
-     * @throws QueryBuilderWrapperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
      */
     public function verifyDirectionFormat (string $direction, bool $noisy = true):bool
     {
@@ -284,7 +284,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
 
     /**
      * @param string $operator
-     * @throws QueryBuilderWrapperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
      */
     public function verifyOperatorAllowed(string $operator):void
     {

@@ -10,7 +10,7 @@ namespace TempestTools\Crud\Doctrine\Wrapper;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 
-use TempestTools\Crud\Exceptions\QueryBuilderWrapperException;
+use TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException;
 
 
 class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper

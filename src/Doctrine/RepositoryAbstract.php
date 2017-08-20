@@ -13,7 +13,7 @@ use TempestTools\Crud\Doctrine\Utility\CreateEventManagerWrapperTrait;
 use TempestTools\Crud\Doctrine\Wrapper\EntityManagerWrapper;
 use TempestTools\Crud\Doctrine\Wrapper\QueryBuilderDqlWrapper;
 use TempestTools\Crud\Doctrine\Wrapper\QueryBuilderSqlWrapper;
-use TempestTools\Crud\Exceptions\RepositoryException;
+use TempestTools\Crud\Exceptions\Orm\RepositoryException;
 use TempestTools\Crud\Orm\RepositoryCoreTrait;
 
 abstract class RepositoryAbstract extends EntityRepository implements EventSubscriber, RepositoryContract
@@ -77,7 +77,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     /**
      * @param string $entityAlias
      * @return QueryBuilderWrapperContract
-     * @throws RepositoryException
+     * @throws \TempestTools\Crud\Exceptions\Orm\RepositoryException
      */
     public function createQueryWrapper(string $entityAlias = null):QueryBuilderWrapperContract
     {

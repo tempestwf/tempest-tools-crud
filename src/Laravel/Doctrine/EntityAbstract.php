@@ -12,7 +12,7 @@ use TempestTools\Common\Laravel\Validation\ValidationFactoryHelper;
 use TempestTools\Common\Utility\ValidationFactoryTrait;
 use \Illuminate\Contracts\Validation\Factory;
 use TempestTools\Crud\Doctrine\EntityAbstract as EntityAbstractBase;
-use TempestTools\Crud\Exceptions\EntityException;
+use TempestTools\Crud\Exceptions\Orm\EntityException;
 
 abstract class EntityAbstract extends EntityAbstractBase
 {
@@ -42,7 +42,7 @@ abstract class EntityAbstract extends EntityAbstractBase
      * @param array $rules
      * @param array $messages
      * @param array $customAttributes
-     * @throws EntityException
+     * @throws \TempestTools\Crud\Exceptions\Orm\EntityException
      * @throws \RuntimeException
      */
     public function validate(array $values, array $rules, array $messages = [], array $customAttributes = []):void

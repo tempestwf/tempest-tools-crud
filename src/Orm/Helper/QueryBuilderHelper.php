@@ -6,7 +6,7 @@ use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Crud\Constants\RepositoryEventsConstants;
 use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
 use TempestTools\Crud\Contracts\Orm\Helper\QueryBuilderHelperContract;
-use TempestTools\Crud\Exceptions\QueryBuilderHelperException;
+use TempestTools\Crud\Exceptions\Orm\Helper\QueryBuilderHelperException;
 use TempestTools\Crud\Orm\Utility\RepositoryTrait;
 
 class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContract
@@ -44,7 +44,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      * @param array $frontEndOptions
      * @param array $optionOverrides
      * @return array
-     * @throws \TempestTools\Crud\Exceptions\QueryBuilderHelperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\QueryBuilderHelperException
      * @throws \Doctrine\ORM\ORMException
      * @throws \RuntimeException
      */
@@ -81,7 +81,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      * @param array $options
      * @param array $optionOverrides
      * @return array
-     * @throws \TempestTools\Crud\Exceptions\QueryBuilderHelperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\QueryBuilderHelperException
      * @throws RuntimeException
      * @throws \Doctrine\ORM\ORMException
      */
@@ -110,7 +110,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     /**
      * @param array $extra
      * @throws \RuntimeException
-     * @throws QueryBuilderHelperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\QueryBuilderHelperException
      */
     protected function verifyAllowed(array $extra):void
     {
@@ -172,7 +172,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      * @internal param array $extra
      * @internal param array $extra
      * @throws \RuntimeException
-     * @throws QueryBuilderHelperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\QueryBuilderHelperException
      */
     protected function verifyLimitAndOffset (int $limit, array $extra):void
     {

@@ -8,7 +8,7 @@ use TempestTools\Crud\Contracts\Orm\EntityContract;
 use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
 use TempestTools\Crud\Contracts\Orm\RepositoryContract;
 use TempestTools\Crud\Doctrine\EntityAbstract;
-use TempestTools\Crud\Exceptions\DataBindHelperException;
+use TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException;
 use TempestTools\Crud\Orm\Utility\RepositoryTrait;
 
 class DataBindHelper implements DataBindHelperContract
@@ -103,7 +103,7 @@ class DataBindHelper implements DataBindHelperContract
      * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
      * @param array $params
      * @return \TempestTools\Crud\Contracts\Orm\EntityContract
-     * @throws \TempestTools\Crud\Exceptions\DataBindHelperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \RuntimeException
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -163,7 +163,7 @@ class DataBindHelper implements DataBindHelperContract
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Exception
-     * @throws \TempestTools\Crud\Exceptions\DataBindHelperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException
      */
     public function bindAssociation(EntityContract $entity, string $associationName, array $params = NULL, string $targetClass): void
     {
@@ -337,7 +337,7 @@ class DataBindHelper implements DataBindHelperContract
      * @throws \Exception
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \TempestTools\Crud\Exceptions\DataBindHelperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException
      */
     protected function doCreate (GenericEventArgsContract $eventArgs):void
     {
@@ -354,7 +354,7 @@ class DataBindHelper implements DataBindHelperContract
     /**
      * @param \TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract $eventArgs
      * @return \TempestTools\Crud\Contracts\Orm\EntityContract
-     * @throws \TempestTools\Crud\Exceptions\DataBindHelperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Exception
@@ -427,7 +427,7 @@ class DataBindHelper implements DataBindHelperContract
      * @throws \Exception
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \TempestTools\Crud\Exceptions\DataBindHelperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException
      */
     protected function doUpdate (GenericEventArgsContract $eventArgs, EntityContract $entity):void
     {
@@ -500,7 +500,7 @@ class DataBindHelper implements DataBindHelperContract
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Exception
-     * @throws \TempestTools\Crud\Exceptions\DataBindHelperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException
      */
     protected function doDelete (GenericEventArgsContract $eventArgs, EntityContract $entity):void
     {
@@ -519,7 +519,7 @@ class DataBindHelper implements DataBindHelperContract
      * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
      * @param bool $remove
      * @return \TempestTools\Crud\Contracts\Orm\EntityContract
-     * @throws \TempestTools\Crud\Exceptions\DataBindHelperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Exception

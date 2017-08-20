@@ -8,7 +8,7 @@ use TempestTools\Common\Utility\AccessorMethodNameTrait;
 use TempestTools\Crud\Constants\EntityEventsConstants;
 use TempestTools\Crud\Contracts\Orm\EntityContract;
 use TempestTools\Crud\Contracts\Orm\Helper\EntityArrayHelperContract;
-use TempestTools\Crud\Exceptions\EntityArrayHelperException;
+use TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException;
 
 class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract{
     use AccessorMethodNameTrait;
@@ -36,7 +36,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param bool $nosey
      * @return bool
      * @throws \RuntimeException
-     * @throws EntityArrayHelperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
      */
     public function canChain (string $associationName, string $chainType, bool $nosey = true):bool
     {
@@ -67,7 +67,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param bool $nosey
      * @return bool
      * @throws RuntimeException
-     * @throws EntityArrayHelperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
      */
     public function canAssign (string $associationName, string $assignType=null, array $fieldSettings = NULL, bool $nosey = true):bool
     {
@@ -282,7 +282,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param bool $noisy
      * @return bool
      * @throws RuntimeException
-     * @throws EntityArrayHelperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
      */
     public function closureOnField (string $fieldName, array $params, array $fieldSettings = NULL, bool $noisy = true):bool {
         // Get the settings for the field so we can do quick comparisons
@@ -306,7 +306,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param bool $noisy
      * @return bool
      * @throws RuntimeException
-     * @throws EntityArrayHelperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
      */
     public function enforceField (string $fieldName, $value, array $params, array $fieldSettings = NULL, bool $noisy = true):bool {
         // Get the settings for the field so we can do quick comparisons
@@ -388,7 +388,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     /**
      * @param callable $closure
      * @throws \RuntimeException
-     * @throws EntityArrayHelperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
      */
     protected function prePersistClosure(Callable $closure)
     {
@@ -418,7 +418,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     /**
      * @param array $values
      * @throws \RuntimeException
-     * @throws EntityArrayHelperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
      */
     protected function prePersistEnforce(array $values)
     {
