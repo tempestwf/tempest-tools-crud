@@ -55,9 +55,7 @@ trait EntityCoreTrait
     protected function entityArrayHelperInit(bool $force = false, string $mode):void
     {
         if ($force === true || $this->getConfigArrayHelper() === null || $mode !== $this->getLastMode()) {
-            $entityArrayHelper = new EntityArrayHelper();
-            /** @noinspection PhpParamsInspection */
-            $entityArrayHelper->setEntity($this);
+            $entityArrayHelper = new EntityArrayHelper(null, $this);
             $this->parseTTConfig($entityArrayHelper);
         }
     }

@@ -2,6 +2,7 @@
 namespace TempestTools\Crud\Orm\Helper;
 
 
+use ArrayObject;
 use RuntimeException;
 use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Common\Utility\AccessorMethodNameTrait;
@@ -17,6 +18,18 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @var EntityContract $entity
      */
     protected $entity;
+
+    /**
+     * ArrayHelper constructor.
+     *
+     * @param ArrayObject|null $array
+     * @param EntityContract $entity
+     */
+    public function __construct(ArrayObject $array = NULL, /** @noinspection PhpHierarchyChecksInspection */ EntityContract $entity)
+    {
+        $this->setEntity($entity);
+        parent::__construct($array);
+    }
 
 
     /**

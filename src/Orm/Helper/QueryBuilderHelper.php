@@ -1,9 +1,11 @@
 <?php
 namespace TempestTools\Crud\Orm\Helper;
 
+use ArrayObject;
 use RuntimeException;
 use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Crud\Constants\RepositoryEventsConstants;
+use TempestTools\Crud\Contracts\Orm\RepositoryContract;
 use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
 use TempestTools\Crud\Contracts\Orm\Helper\QueryBuilderHelperContract;
 use TempestTools\Crud\Exceptions\Orm\Helper\QueryBuilderHelperException;
@@ -37,6 +39,19 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      * DEFAULT_FETCH_JOIN
      */
     const DEFAULT_FETCH_JOIN = true;
+
+
+    /**
+     * ArrayHelper constructor.
+     *
+     * @param ArrayObject|null $array
+     * @param RepositoryContract $repository
+     */
+    public function __construct(ArrayObject $array = NULL, /** @noinspection PhpHierarchyChecksInspection */ RepositoryContract $repository)
+    {
+        $this->setRepository($repository);
+        parent::__construct($array);
+    }
 
 
     /**
