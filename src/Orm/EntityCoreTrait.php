@@ -8,7 +8,6 @@ use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\EvmTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
 use TempestTools\Crud\Constants\EntityEventsConstants;
-use TempestTools\Crud\Contracts\Orm\EntityContract;
 use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
 use TempestTools\Crud\Orm\Helper\EntityArrayHelper;
 use TempestTools\Crud\Contracts\Orm\Helper\EntityArrayHelperContract;
@@ -55,7 +54,7 @@ trait EntityCoreTrait
     protected function entityArrayHelperInit(bool $force = false, string $mode):void
     {
         if ($force === true || $this->getConfigArrayHelper() === null || $mode !== $this->getLastMode()) {
-            $entityArrayHelper = new EntityArrayHelper(null, $this);
+            $entityArrayHelper = new EntityArrayHelper();
             $this->parseTTConfig($entityArrayHelper);
         }
     }
@@ -68,7 +67,8 @@ trait EntityCoreTrait
     public function setField(string $fieldName, $value):void
     {
         /** @noinspection NullPointerExceptionInspection */
-        $this->getConfigArrayHelper()->setField($fieldName, $value);
+        /** @noinspection PhpParamsInspection */
+        $this->getConfigArrayHelper()->setField($this, $fieldName, $value);
     }
 
 
@@ -81,7 +81,8 @@ trait EntityCoreTrait
     public function processAssociationParams(string $associationName, array $values): array
     {
         /** @noinspection NullPointerExceptionInspection */
-        return $this->getConfigArrayHelper()->processAssociationParams($associationName, $values);
+        /** @noinspection PhpParamsInspection */
+        return $this->getConfigArrayHelper()->processAssociationParams($this, $associationName, $values);
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection */
@@ -89,14 +90,14 @@ trait EntityCoreTrait
     /**
      * @param string $assignType
      * @param string $associationName
-     * @param EntityContract $entity
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function bindAssociation(string $assignType=null, string $associationName, EntityContract $entity = null, $force = false):void
+    public function bindAssociation(string $assignType=null, string $associationName, $force = false):void
     {
         /** @noinspection NullPointerExceptionInspection */
-        $this->getConfigArrayHelper()->bindAssociation($assignType, $associationName, $entity, $force);
+        /** @noinspection PhpParamsInspection */
+        $this->getConfigArrayHelper()->bindAssociation($this, $assignType, $associationName, $force);
     }
 
     /**
@@ -134,7 +135,8 @@ trait EntityCoreTrait
     {
         $arrayHelper = $this->getConfigArrayHelper();
         if ($arrayHelper !== NULL) {
-            $arrayHelper->ttPrePersist();
+            /** @noinspection PhpParamsInspection */
+            $arrayHelper->ttPrePersist($this);
         }
     }
 
@@ -165,7 +167,8 @@ trait EntityCoreTrait
     public function getValuesOfFields(array $fields = []): array
     {
         /** @noinspection NullPointerExceptionInspection */
-        return $this->getConfigArrayHelper()->getValuesOfFields($fields);
+        /** @noinspection PhpParamsInspection */
+        return $this->getConfigArrayHelper()->getValuesOfFields($this, $fields);
     }
 
     /**
@@ -192,7 +195,8 @@ trait EntityCoreTrait
     public function allowed($nosey = true): bool
     {
         /** @noinspection NullPointerExceptionInspection */
-        return $this->getConfigArrayHelper()->allowed($nosey);
+        /** @noinspection PhpParamsInspection */
+        return $this->getConfigArrayHelper()->allowed($this, $nosey);
     }
 
     /**
