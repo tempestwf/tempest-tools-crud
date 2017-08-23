@@ -66,6 +66,15 @@ class EntityArrayHelperException extends \RunTimeException
         return new self (sprintf('Error: Assign type must be set, add or remove. assignType = %s', $arg1));
     }
 
+    /**
+     * @param string $arg1
+     * @return EntityArrayHelperException
+     */
+    public static function callToBadBuilderMethod (string $arg1): EntityArrayHelperException
+    {
+        return new self (sprintf('Error: A call was made to a builder method that does not exist, check the key names in the settings in your TT configurations. method name = %s', $arg1));
+    }
+
 
 }
 

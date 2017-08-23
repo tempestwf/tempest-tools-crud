@@ -85,9 +85,10 @@ $readInfo = [
             'fields'=>[
                 '<field name>'=>[
                     'permissive'=>'<true or false>',
-                    'closure'=>'<closure to test param, return false from closure to cancel execution>',
-                    'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
-                    'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>',
+                    'settings'=>[
+                        'closure'=>'<closure to test param, return false from closure to cancel execution>',
+                        'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
+                    ],
                     'operators'=>[
                         '<operator name>'=>'<allowed>'
                     ]
@@ -99,9 +100,10 @@ $readInfo = [
             'fields'=>[
                 '<field name>'=>[
                     'permissive'=>'<true or false>',
-                    'closure'=>'<closure to test param, return false from closure to cancel execution>',
-                    'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
-                    'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>',
+                    'settings'=>[
+                        'closure'=>'<closure to test param, return false from closure to cancel execution>',
+                        'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
+                    ],
                     'operators'=>[
                         '<operator name>'=>'<allowed>'
                     ]
@@ -113,9 +115,10 @@ $readInfo = [
             'fields'=>[
                 '<field name>'=>[
                     'permissive'=>'<true or false>',
-                    'closure'=>'<closure to test param, return false from closure to cancel execution>',
-                    'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
-                    'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>',
+                    'settings'=>[
+                        'closure'=>'<closure to test param, return false from closure to cancel execution>',
+                        'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
+                    ],
                     'directions'=>[
                         '<operator name>'=>'<allowed true or false>'
                     ]
@@ -127,9 +130,10 @@ $readInfo = [
             'fields'=>[
                 '<field name>'=>[
                     'allowed'=>'<true or false>',
-                    'closure'=>'<closure to test param, return false from closure to cancel execution>',
-                    'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
-                    'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>',
+                    'settings'=>[
+                        'closure'=>'<closure to test param, return false from closure to cancel execution>',
+                        'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
+                    ]
                 ]
             ]
         ],
@@ -138,9 +142,10 @@ $readInfo = [
             'placeholderNames'=>[
                 '<field name>'=>[
                     'allowed'=>'<true or false>',
-                    'closure'=>'<closure to test param, return false from closure to cancel execution>',
-                    'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
-                    'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>',
+                    'settings'=>[
+                        'closure'=>'<closure to test param, return false from closure to cancel execution>',
+                        'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
+                    ]
                 ]
             ]
         ],
@@ -258,25 +263,27 @@ $entityInfo = [
     'create'=>[
         'allowed'=>'<true or false>', //Tested in: testAllowedWorks
         'permissive'=>'<true or false>',//Tested in: testPermissiveWorks1
-        'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>', //Tested in: testFastMode1
-        'validate'=>[ // Tested in: testValidatorWorks
-            'fields'=>['<array of fields to validate>'], // if not set the keys from rules will be used instead
-            'rules'=>['<rules>'], // Tested in: testValidatorWorks
-            'messages'=>['<messages>'],
-            'customAttributes'=>['<customAttributes>'],
+        'settings'=>[
+            'setTo'=>'<array of field names with values to set them to, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>', // Tested In: testTopLevelSetToAndMutate
+            'enforce'=>'<array of field names with values to make sure they match, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>', // Tested in: testEnforceTopLevelWorks
+            'closure'=>'<validation closure>', // Tested in: testTopLevelClosure
+            'mutate'=>'<mutate closure>', // Tested In: testTopLevelSetToAndMutate
+            'validate'=>[ // Tested in: testValidatorWorks
+                'fields'=>['<array of fields to validate>'], // if not set the keys from rules will be used instead
+                'rules'=>['<rules>'], // Tested in: testValidatorWorks
+                'messages'=>['<messages>'],
+                'customAttributes'=>['<customAttributes>'],
+            ],
         ],
-        'setTo'=>'<array of field names with values to set them to, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>', // Tested In: testTopLevelSetToAndMutate
-        'enforce'=>'<array of field names with values to make sure they match, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>', // Tested in: testEnforceTopLevelWorks
-        'closure'=>'<validation closure>', // Tested in: testTopLevelClosure
-        'mutate'=>'<mutate closure>', // Tested In: testTopLevelSetToAndMutate
         'fields'=>[
             '<field name>'=>[
                 'permissive'=>'<true or false>', //Tested in: testPermissiveWorks1 / testPermissiveWorks2
-                'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>', //Tested in: testFastMode2AndLowLevelSetTo
-                'setTo'=>'<a value to set it to>', //Tested in: testFastMode2AndLowLevelSetTo
-                'enforce'=>'<error if not this value, this can be array if used on a relation>', // Tested in: testLowLevelEnforce and testLowLevelEnforceOnRelation
-                'closure'=>'<validation closure>', // Tested in testLowLevelClosure
-                'mutate'=>'<mutate closure>', // Tested in testLowLevelMutate
+                'settings'=>[
+                    'setTo'=>'<a value to set it to>', //Tested in: testFastMode2AndLowLevelSetTo
+                    'enforce'=>'<error if not this value, this can be array if used on a relation>', // Tested in: testLowLevelEnforce and testLowLevelEnforceOnRelation
+                    'closure'=>'<validation closure>', // Tested in testLowLevelClosure
+                    'mutate'=>'<mutate closure>', // Tested in testLowLevelMutate
+                ],
                 'assign'=>[ // Note: all combinations of assign type as not tested, but there component parts are tested and shown to work.
                     'set'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
                     'add'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
@@ -301,25 +308,27 @@ $entityInfo = [
     'update'=>[
         'allowed'=>'<true or false>', //Tested in: testAllowedWorks
         'permissive'=>'<true or false>',//Tested in: testPermissiveWorks1
-        'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>', //Tested in: testFastMode1
         'validate'=>[ // Tested in: testValidatorWorks
             'fields'=>['<array of fields to validate>'], // if not set the keys from rules will be used instead
             'rules'=>['<rules>'], // Tested in: testValidatorWorks
             'messages'=>['<messages>'],
             'customAttributes'=>['<customAttributes>'],
         ],
-        'setTo'=>'<array of field names with values to set them to, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>', // Tested In: testTopLevelSetToAndMutate
-        'enforce'=>'<array of field names with values to make sure they match, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>', // Tested in: testEnforceTopLevelWorks
-        'closure'=>'<validation closure>', // Tested in: testTopLevelClosure
-        'mutate'=>'<mutate closure>', // Tested In: testTopLevelSetToAndMutate
+        'settings'=>[
+            'setTo'=>'<array of field names with values to set them to, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>', // Tested In: testTopLevelSetToAndMutate
+            'enforce'=>'<array of field names with values to make sure they match, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>', // Tested in: testEnforceTopLevelWorks
+            'closure'=>'<validation closure>', // Tested in: testTopLevelClosure
+            'mutate'=>'<mutate closure>', // Tested In: testTopLevelSetToAndMutate
+        ],
         'fields'=>[
             '<field name>'=>[
                 'permissive'=>'<true or false>', //Tested in: testPermissiveWorks1 / testPermissiveWorks2
-                'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>', //Tested in: testFastMode2AndLowLevelSetTo
-                'setTo'=>'<a value to set it to>', //Tested in: testFastMode2AndLowLevelSetTo
-                'enforce'=>'<error if not this value, this can be array if used on a relation>', // Tested in: testLowLevelEnforce and testLowLevelEnforceOnRelation
-                'closure'=>'<validation closure>', // Tested in testLowLevelClosure
-                'mutate'=>'<mutate closure>', // Tested in testLowLevelMutate
+                'settings'=>[
+                    'setTo'=>'<a value to set it to>', //Tested in: testFastMode2AndLowLevelSetTo
+                    'enforce'=>'<error if not this value, this can be array if used on a relation>', // Tested in: testLowLevelEnforce and testLowLevelEnforceOnRelation
+                    'closure'=>'<validation closure>', // Tested in testLowLevelClosure
+                    'mutate'=>'<mutate closure>', // Tested in testLowLevelMutate
+                ],
                 'assign'=>[ // Note: all combinations of assign type as not tested, but there component parts are tested and shown to work.
                     'set'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
                     'add'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
@@ -344,25 +353,27 @@ $entityInfo = [
     'delete'=>[
         'allowed'=>'<true or false>', //Tested in: testAllowedWorks
         'permissive'=>'<true or false>',//Tested in: testPermissiveWorks1
-        'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>', //Tested in: testFastMode1
         'validate'=>[ // Tested in: testValidatorWorks
             'fields'=>['<array of fields to validate>'], // if not set the keys from rules will be used instead
             'rules'=>['<rules>'], // Tested in: testValidatorWorks
             'messages'=>['<messages>'],
             'customAttributes'=>['<customAttributes>'],
         ],
-        'setTo'=>'<array of field names with values to set them to, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>', // Tested In: testTopLevelSetToAndMutate
-        'enforce'=>'<array of field names with values to make sure they match, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>', // Tested in: testEnforceTopLevelWorks
-        'closure'=>'<validation closure>', // Tested in: testTopLevelClosure
-        'mutate'=>'<mutate closure>', // Tested In: testTopLevelSetToAndMutate
+        'settings'=>[
+            'setTo'=>'<array of field names with values to set them to, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>', // Tested In: testTopLevelSetToAndMutate
+            'enforce'=>'<array of field names with values to make sure they match, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>', // Tested in: testEnforceTopLevelWorks
+            'closure'=>'<validation closure>', // Tested in: testTopLevelClosure
+            'mutate'=>'<mutate closure>', // Tested In: testTopLevelSetToAndMutate
+        ],
         'fields'=>[
             '<field name>'=>[
                 'permissive'=>'<true or false>', //Tested in: testPermissiveWorks1 / testPermissiveWorks2
-                'fastMode'=>'<whether or not to bypass all the inline checks and changes to run more quickly>', //Tested in: testFastMode2AndLowLevelSetTo
-                'setTo'=>'<a value to set it to>', //Tested in: testFastMode2AndLowLevelSetTo
-                'enforce'=>'<error if not this value, this can be array if used on a relation>', // Tested in: testLowLevelEnforce and testLowLevelEnforceOnRelation
-                'closure'=>'<validation closure>', // Tested in testLowLevelClosure
-                'mutate'=>'<mutate closure>', // Tested in testLowLevelMutate
+                'settings'=>[
+                    'setTo'=>'<a value to set it to>', //Tested in: testFastMode2AndLowLevelSetTo
+                    'enforce'=>'<error if not this value, this can be array if used on a relation>', // Tested in: testLowLevelEnforce and testLowLevelEnforceOnRelation
+                    'closure'=>'<validation closure>', // Tested in testLowLevelClosure
+                    'mutate'=>'<mutate closure>', // Tested in testLowLevelMutate
+                ],
                 'assign'=>[ // Note: all combinations of assign type as not tested, but there component parts are tested and shown to work.
                     'set'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
                     'add'=>'<true or false>', //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
