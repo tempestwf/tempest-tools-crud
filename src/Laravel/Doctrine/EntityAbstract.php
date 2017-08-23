@@ -53,7 +53,7 @@ abstract class EntityAbstract extends EntityAbstractBase
         if ($validator->fails()) {
             $messages = $validator->getMessageBag()->all();
             $errorMessage = implode(' \n', $messages);
-            $errorMessage = $errorMessage === ''?$this->getErrorFromConstant('prePersistValidatorFails')['message']:$errorMessage;
+            $errorMessage = $errorMessage === ''?EntityException::prePersistValidatorFails():$errorMessage;
             throw new EntityException($errorMessage);
         }
     }

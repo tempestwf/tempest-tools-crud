@@ -12,7 +12,14 @@ namespace TempestTools\Crud\Exceptions\Orm;
 class EntityException extends \RunTimeException
 {
 
+    /**
+     * @return EntityException
+     */
+    public static function prePersistValidatorFails (): EntityException
+    {
+        return new self (sprintf('Error: Validation failed on pre-persist.'));
 
+    }
 
 }
 

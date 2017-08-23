@@ -16,20 +16,7 @@ use TempestTools\Crud\Orm\EntityCoreTrait;
 abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityContract
 {
     use EntityCoreTrait, CreateEventManagerWrapperTrait;
-    const ERRORS = [
-        'noArrayHelper' => [
-            'message' => 'Error: No array helper on entity.',
-        ],
-        'enforcementFails' => [
-            'message' => 'Error: A field is not set to it\'s enforced value. Value is %s, value should be %s',
-        ],
-        'closureFails' => [
-            'message' => 'Error: A validation closure did not pass.',
-        ],
-        'prePersistValidatorFails' => [
-            'message' => 'Error: Validation failed on pre-persist.',
-        ],
-    ];
+
 
     /**
      * Makes event args to use

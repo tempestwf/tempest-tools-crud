@@ -39,9 +39,11 @@ trait EventManagerWrapperTrait
     protected function eventManagerInit(bool $force= true):void
     {
         if ($force === true || $this->getEventManager() === null) {
-            $this->setEventManager($this->createEventManagerWrapper());
+            $eventManager = $this->createEventManagerWrapper();
             /** @noinspection PhpParamsInspection */
-            $this->getEventManager()->addEventSubscriber($this);
+            $eventManager->addEventSubscriber($this);
+            $this->setEventManager($eventManager);
+
         }
     }
 

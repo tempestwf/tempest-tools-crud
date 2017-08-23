@@ -41,18 +41,14 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
         return $this->queryBuilder;
     }
 
-
+    /** @noinspection SenselessMethodDuplicationInspection */
     /**
      * @param QueryBuilder $queryBuilder
      */
-    /** @noinspection SenselessMethodDuplicationInspection */
-    /** @noinspection PhpSignatureMismatchDuringInheritanceInspection */
-    public function setQueryBuilder(QueryBuilder $queryBuilder):void
+    public function setQueryBuilder(/** @noinspection PhpSignatureMismatchDuringInheritanceInspection */ QueryBuilder $queryBuilder):void
     {
         $this->queryBuilder = $queryBuilder;
     }
-
-
 
     /** @noinspection MoreThanThreeArgumentsInspection */
 
@@ -75,8 +71,9 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
             throw QueryBuilderWrapperException::hydrationNotCompatible();
         }
 
-        $result = $this->getQueryBuilder()->execute();
-        $count = $returnCount?$this->getQueryBuilder()->setFirstResult(0)->setMaxResults(null)->execute()->rowCount():null;
+        $qb = $this->getQueryBuilder();
+        $result = $qb->execute();
+        $count = $returnCount?$qb->setFirstResult(0)->setMaxResults(null)->execute()->rowCount():null;
 
         return ['count'=>$count, 'result'=>$result];
     }

@@ -169,14 +169,15 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
      */
     public function setCacheSettings (bool $useQueryCache=true, bool $useResultCache = false, int $timeToLive=null, string $cacheId = null, $queryCacheDriver= null, $resultCacheDriver = null):void
     {
-        $this->getQueryBuilder()->getQuery()->useQueryCache($useQueryCache);
+        $query = $this->getQueryBuilder()->getQuery();
+        $query->useQueryCache($useQueryCache);
 
-        $this->getQueryBuilder()->getQuery()->useResultCache($useResultCache, $timeToLive, $cacheId);
+        $query->useResultCache($useResultCache, $timeToLive, $cacheId);
         if ($queryCacheDriver !== null) {
-            $this->getQueryBuilder()->getQuery()->setQueryCacheDriver($queryCacheDriver);
+            $query->setQueryCacheDriver($queryCacheDriver);
         }
         if ($resultCacheDriver !== null) {
-            $this->getQueryBuilder()->getQuery()->setResultCacheDriver($resultCacheDriver);
+            $query->setResultCacheDriver($resultCacheDriver);
         }
     }
 
