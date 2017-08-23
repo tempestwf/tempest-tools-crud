@@ -32,10 +32,9 @@ interface DataBindHelperContract {
 
     /**
      * @param array $array
-     * @param \TempestTools\Crud\Contracts\Orm\RepositoryContract $repo
      * @return array
      */
-    public function findEntitiesFromArrayKeys (array $array, RepositoryContract $repo):array;
+    public function findEntitiesFromArrayKeys (array $array):array;
     /**
      * @param string $targetClass
      * @throws \RuntimeException

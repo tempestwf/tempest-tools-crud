@@ -221,7 +221,7 @@ class DataBindHelper implements DataBindHelperContract
                     $foundEntities = $repo->create($params, $chainOverrides);
                     break;
                 case 'read':
-                    $foundEntities = $this->findEntitiesFromArrayKeys($params, $repo);
+                    $foundEntities = $repo->findEntitiesFromArrayKeys($params);
                     break;
                 case 'update':
                     $foundEntities = $repo->update($params, $chainOverrides);
@@ -250,13 +250,12 @@ class DataBindHelper implements DataBindHelperContract
 
     /**
      * @param array $array
-     * @param RepositoryContract $repo
      * @return array
      */
-    public function findEntitiesFromArrayKeys (array $array, RepositoryContract $repo):array {
+    public function findEntitiesFromArrayKeys (array $array):array {
         $keys = array_keys($array);
         /** @var \TempestTools\Crud\Contracts\Orm\EntityContract|HasIdContract[] $entities */
-        $entities = $repo->findIn('id', $keys);
+        $entities = $this->getRepository()->findIn('id', $keys);
         /** @var \TempestTools\Crud\Contracts\Orm\EntityContract|HasIdContract $entity */
         foreach ($entities as $entity) {
             $entity->setBindParams($array[$entity->getId()]);
@@ -403,7 +402,7 @@ class DataBindHelper implements DataBindHelperContract
             $this->checkBatchMax($params, $options, $optionOverrides);
             /** @noinspection NullPointerExceptionInspection */
             /** @noinspection PhpParamsInspection */
-            $entities = $this->findEntitiesFromArrayKeys($params, $this);
+            $entities = $this->findEntitiesFromArrayKeys($params);
             /** @var EntityAbstract $entity */
             foreach ($entities as $entity) {
                 $batchParams = $entity->getBindParams();
@@ -477,7 +476,7 @@ class DataBindHelper implements DataBindHelperContract
             $this->checkBatchMax($params, $options, $optionOverrides);
             /** @noinspection NullPointerExceptionInspection */
             /** @noinspection PhpParamsInspection */
-            $entities = $this->findEntitiesFromArrayKeys($params, $this);
+            $entities = $this->findEntitiesFromArrayKeys($params);
             /** @var EntityAbstract $entity */
             foreach ($entities as $entity) {
                 $batchParams = $entity->getBindParams();

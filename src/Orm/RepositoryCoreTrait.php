@@ -74,6 +74,15 @@ trait RepositoryCoreTrait
         }
     }
 
+    /**
+     * @param array $array
+     * @return array
+     */
+    public function findEntitiesFromArrayKeys (array $array):array
+    {
+        /** @noinspection NullPointerExceptionInspection */
+        return $this->getDataBindHelper()->findEntitiesFromArrayKeys($array);
+    }
 
 
     /** @noinspection MoreThanThreeArgumentsInspection */

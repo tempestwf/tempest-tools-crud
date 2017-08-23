@@ -297,5 +297,11 @@ interface RepositoryContract
      */
     public function createEntityManagerWrapper():EntityManagerWrapperContract;
 
+    /**
+     * @param array $array
+     * @return array
+     */
+    public function findEntitiesFromArrayKeys (array $array):array;
+
 
 }
