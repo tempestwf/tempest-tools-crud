@@ -115,7 +115,6 @@ class DataBindHelper implements DataBindHelperContract
     {
         /** @noinspection NullPointerExceptionInspection */
         $entity->allowed();
-        $entity->setArrayHelper($this->getRepository()->getArrayHelper());
         $entity->setBindParams($params);
         /** @noinspection NullPointerExceptionInspection */
         $entityName = get_class($entity);
@@ -140,7 +139,7 @@ class DataBindHelper implements DataBindHelperContract
      * @return array
      */
     protected function fixScalarAssociationValue($value):array {
-        $return = $value !== null && is_scalar($value) ? [
+        $return = is_scalar($value) ? [
             'read' => [
                 $value => [
                     'assignType' => 'set'
@@ -274,8 +273,9 @@ class DataBindHelper implements DataBindHelperContract
     public function getRepoForRelation(string $targetClass):RepositoryContract {
         /** @var \TempestTools\Crud\Contracts\Orm\RepositoryContract $repo */
         /** @noinspection NullPointerExceptionInspection */
-        $repo = $this->getRepository()->getEm()->getRepository($targetClass);
-        $repo->init($this->getRepository()->getArrayHelper(), $this->getRepository()->getTTPath(), $this->getRepository()->getTTFallBack());
+        $myRepo = $this->getRepository();
+        $repo = $myRepo->getEm()->getRepository($targetClass);
+        $repo->init($myRepo->getArrayHelper(), $myRepo->getTTPath(), $myRepo->getTTFallBack());
 
         if (!$repo instanceof RepositoryContract) {
             throw DataBindHelperException::wrongTypeOfRepo();
@@ -299,10 +299,11 @@ class DataBindHelper implements DataBindHelperContract
      */
     public function create(array $params, array $optionOverrides = [], array $frontEndOptions=[]):array
     {
-        $evm = $this->getRepository()->getEventManager();
+        $repo = $this->getRepository();
+        $evm = $repo->getEventManager();
         /** @noinspection NullPointerExceptionInspection */
-        $this->getRepository()->getArrayHelper()->wrapArray($params);
-        $eventArgs = $this->getRepository()->makeEventArgs($params, $optionOverrides, $frontEndOptions);
+        $repo->getArrayHelper()->wrapArray($params);
+        $eventArgs = $repo->makeEventArgs($params, $optionOverrides, $frontEndOptions);
         $eventArgs->getArgs()['action'] = 'create';
 
         $this->start($eventArgs);
@@ -312,7 +313,7 @@ class DataBindHelper implements DataBindHelperContract
             $evm->dispatchEvent(RepositoryEventsConstants::PRE_CREATE_BATCH, $eventArgs);
             /** @var array $params */
             $params = $eventArgs->getArgs()['params'];
-            $options = $eventArgs->getArgs()['$options'];
+            $options = $eventArgs->getArgs()['options'];
             $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
             $this->checkBatchMax($params, $options, $optionOverrides);
             foreach ($params as $batchParams) {
@@ -383,10 +384,11 @@ class DataBindHelper implements DataBindHelperContract
      */
     public function update(array $params, array $optionOverrides = [], array $frontEndOptions=[]):array
     {
-        $evm = $this->getRepository()->getEventManager();
+        $repo = $this->getRepository();
+        $evm = $repo->getEventManager();
         /** @noinspection NullPointerExceptionInspection */
-        $this->getRepository()->getArrayHelper()->wrapArray($params);
-        $eventArgs = $this->getRepository()->makeEventArgs($params, $optionOverrides, $frontEndOptions);
+        $repo->getArrayHelper()->wrapArray($params);
+        $eventArgs = $repo->makeEventArgs($params, $optionOverrides, $frontEndOptions);
         $eventArgs->getArgs()['action'] = 'update';
 
         $this->start($eventArgs);
@@ -396,7 +398,7 @@ class DataBindHelper implements DataBindHelperContract
             $evm->dispatchEvent(RepositoryEventsConstants::PRE_UPDATE_BATCH, $eventArgs);
             /** @var array $params */
             $params = $eventArgs->getArgs()['params'];
-            $options = $eventArgs->getArgs()['$options'];
+            $options = $eventArgs->getArgs()['options'];
             $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
             $this->checkBatchMax($params, $options, $optionOverrides);
             /** @noinspection NullPointerExceptionInspection */
@@ -456,11 +458,12 @@ class DataBindHelper implements DataBindHelperContract
      */
     public function delete(array $params, array $optionOverrides = [], array $frontEndOptions=[]):array
     {
+        $repo = $this->getRepository();
         /** @noinspection NullPointerExceptionInspection */
-        $this->getRepository()->getArrayHelper()->wrapArray($params);
-        $eventArgs = $this->getRepository()->makeEventArgs($params, $optionOverrides, $frontEndOptions);
+        $repo->getArrayHelper()->wrapArray($params);
+        $eventArgs = $repo->makeEventArgs($params, $optionOverrides, $frontEndOptions);
         $eventArgs->getArgs()['action'] = 'delete';
-        $evm = $this->getRepository()->getEventManager();
+        $evm = $repo->getEventManager();
 
         $this->start($eventArgs);
 
@@ -529,6 +532,8 @@ class DataBindHelper implements DataBindHelperContract
      */
     protected function processSingleEntity (GenericEventArgsContract $eventArgs, EntityContract $entity, bool $remove=false): EntityContract
     {
+        $repo = $this->getRepository();
+        $em = $repo->getEm();
         $entitiesShareConfigs = $eventArgs->getArgs()['entitiesShareConfigs'];
         if ($entitiesShareConfigs === true) {
             if (isset($eventArgs->getArgs()['sharedConfig'])) {
@@ -536,16 +541,16 @@ class DataBindHelper implements DataBindHelperContract
                 $entity->setConfigArrayHelper($sharedConfig);
             }
         }
-        $entity->init($eventArgs->getArgs()['action'] , $this->getRepository()->getArrayHelper(), $this->getRepository()->getTTPath(), $this->getRepository()->getTTFallBack());
+        $entity->init($eventArgs->getArgs()['action'] , $repo->getArrayHelper(), $repo->getTTPath(), $repo->getTTFallBack());
         if ($entitiesShareConfigs === true) {
             $eventArgs->getArgs()['sharedConfig'] = $entity->getConfigArrayHelper();
         }
         /** @noinspection NullPointerExceptionInspection */
         $this->bind($entity, $eventArgs->getArgs()['params']);
         if ($remove === true) {
-            $this->getRepository()->getEm()->remove($entity);
+            $em->remove($entity);
         } else {
-            $this->getRepository()->getEm()->persist($entity);
+            $em->persist($entity);
         }
         return $entity;
     }
