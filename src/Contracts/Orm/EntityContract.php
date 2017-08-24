@@ -76,13 +76,15 @@ interface EntityContract
      */
     public function processAssociationParams(string $associationName, array $values): array;
 
+    /** @noinspection MoreThanThreeArgumentsInspection */
+
     /**
      * @param string $assignType
      * @param string $associationName
+     * @param EntityContract $entityToBind
      * @param bool $force
-     * @throws \RuntimeException
      */
-    public function bindAssociation(string $assignType = null, string $associationName, $force = false): void;
+    public function bindAssociation(string $assignType = null, string $associationName, EntityContract $entityToBind, $force = false): void;
 
     /**
      * Subscribes to the available events that are present on the class
@@ -170,7 +172,6 @@ interface EntityContract
      */
     public function setEventManager(EventManagerWrapperContract $eventManagerWrapper): void;
 
-
     /**
      * @return mixed
      * @internal param Entity $entity
@@ -179,16 +180,6 @@ interface EntityContract
      * @internal param string $permission
      */
     public function getId();
-
-    /**
-     * Tags a config and a path, gets the element in the path in the config, and then uses an array helper to parse
-     * it's inheritance. Sets the result on parsedConfig property
-     *
-     * @param ArrayHelperContract|null $substituteArrayHelper
-     * @return array
-     * @throws \RuntimeException
-     */
-    public function parseTTConfig(ArrayHelperContract $substituteArrayHelper = null): array;
 
     /**
      * @return array

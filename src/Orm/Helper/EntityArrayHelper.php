@@ -282,7 +282,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function bindAssociation(EntityContract $entity, string $assignType=null, string $associationName, $force = false):void
+    public function bindAssociation(EntityContract $entity, string $assignType=null, string $associationName, EntityContract $entityToBind, $force = false):void
     {
         if ($force === false) {
             /** @noinspection NullPointerExceptionInspection */
@@ -291,7 +291,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
 
         if ($assignType !== null) {
             $methodName = $this->accessorMethodName($assignType, $associationName);
-            $entity->$methodName($entity);
+            $entity->$methodName($entityToBind);
         }
     }
 

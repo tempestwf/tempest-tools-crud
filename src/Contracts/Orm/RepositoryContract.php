@@ -133,16 +133,6 @@ interface RepositoryContract
     public function setConfigArrayHelper(QueryBuilderHelperContract $configArrayHelper): void;
 
     /**
-     * Tags a config and a path, gets the element in the path in the config, and then uses an array helper to parse
-     * it's inheritance. Sets the result on parsedConfig property
-     *
-     * @param ArrayHelperContract|null $substituteArrayHelper
-     * @return array
-     * @throws \RuntimeException
-     */
-    public function parseTTConfig(ArrayHelperContract $substituteArrayHelper = null): array;
-
-    /**
      * @param array $ttPath
      */
     public function setTTPath(array $ttPath): void;

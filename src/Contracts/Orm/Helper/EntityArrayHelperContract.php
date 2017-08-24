@@ -92,13 +92,13 @@ interface EntityArrayHelperContract extends ArrayHelperContract
     public function processAssociationParams(EntityContract $entity, string $associationName, array $values): array;/** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * @param EntityContract $entity
      * @param string $assignType
      * @param string $associationName
-     * @param EntityContract $entity
+     * @param EntityContract $entityToBind
      * @param bool $force
-     * @throws \RuntimeException
      */
-    public function bindAssociation(EntityContract $entity, string $assignType = null, string $associationName, $force = false): void;
+    public function bindAssociation(EntityContract $entity, string $assignType = null, string $associationName, EntityContract $entityToBind, $force = false): void;
 
     /**
      * On an entity with HasLifecycleCallbacks it will run the special features of tt entities before persist

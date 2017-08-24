@@ -178,8 +178,8 @@ class DataBindHelper implements DataBindHelperContract
                     $this->bindEntities($foundEntities, $entity, $associationName);
                 }
             }
-        } else {
-            $entity->bindAssociation('set', $associationName, true);
+        /*} else {
+            $entity->bindAssociation('set', $associationName, true);*/
         }
     }
 
@@ -194,7 +194,7 @@ class DataBindHelper implements DataBindHelperContract
         foreach ($entities as $foundEntity) {
             $params = $foundEntity->getBindParams();
             $assignType = $params['assignType'] ?? null;
-            $targetEntity->bindAssociation($assignType, $associationName);
+            $targetEntity->bindAssociation($assignType, $associationName, $foundEntity);
         }
     }
 

@@ -6,6 +6,7 @@ use TempestTools\Common\Contracts\ArrayHelperContract;
 use TempestTools\Common\Utility\EvmTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
 use TempestTools\Crud\Constants\EntityEventsConstants;
+use TempestTools\Crud\Contracts\Orm\EntityContract;
 use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
 use TempestTools\Crud\Orm\Helper\EntityArrayHelper;
 use TempestTools\Crud\Contracts\Orm\Helper\EntityArrayHelperContract;
@@ -41,6 +42,7 @@ trait EntityCoreTrait
     {
         $force = $this->coreInit($arrayHelper, $path, $fallBack, $force);
         $this->entityArrayHelperInit($force, $mode);
+        $this->eventManagerInit($force);
         $this->setLastMode($mode);
     }
 
@@ -88,14 +90,15 @@ trait EntityCoreTrait
     /**
      * @param string $assignType
      * @param string $associationName
+     * @param EntityContract $entityToBind
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function bindAssociation(string $assignType=null, string $associationName, $force = false):void
+    public function bindAssociation(string $assignType=null, string $associationName, EntityContract $entityToBind, $force = false):void
     {
         /** @noinspection NullPointerExceptionInspection */
         /** @noinspection PhpParamsInspection */
-        $this->getConfigArrayHelper()->bindAssociation($this, $assignType, $associationName, $force);
+        $this->getConfigArrayHelper()->bindAssociation($this, $assignType, $associationName, $entityToBind, $force);
     }
 
     /**
