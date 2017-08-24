@@ -6,7 +6,8 @@ use TempestTools\Crud\Contracts\Orm\EntityContract;
 use TempestTools\Crud\Contracts\Orm\RepositoryContract;
 use TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException;
 
-interface DataBindHelperContract {
+interface DataBindHelperContract
+{
 
     /**
      * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity

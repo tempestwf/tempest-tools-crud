@@ -299,7 +299,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $fieldSettings = $permissions['fields'][$key]??[];
 
         /** @noinspection PhpUnusedLocalVariableInspection */
-        [$key, $value] = $this->processSettings($key, null, $arrayHelper, $fieldSettings, $extra);
+        [$key, $value] = $this->processSettings($key, $value, $arrayHelper, $fieldSettings, $extra);
 
         $allowed = $repo->permissivePermissionCheck($permissions, $fieldSettings, 'directions', $value);
         /** @noinspection NullPointerExceptionInspection */
@@ -463,6 +463,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      * @param array $permissions
      * @param array $extra
      * @return array
+     * @throws \RuntimeException
      * @throws \TempestTools\Crud\Exceptions\Orm\Helper\QueryBuilderHelperException
      * @internal param array $extra
      */

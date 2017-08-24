@@ -33,6 +33,7 @@ class DataBindHelper implements DataBindHelperContract
      *
      * @param GenericEventArgsContract $eventArgs
      * @internal param array $optionOverrides
+     * @throws \RuntimeException
      */
     protected function start(GenericEventArgsContract $eventArgs):void
     {
@@ -560,6 +561,7 @@ class DataBindHelper implements DataBindHelperContract
      * @param array $options
      * @param array $optionOverrides
      * @throws DataBindHelperException
+     * @throws \RuntimeException
      */
     protected function checkBatchMax(array $values, array $options, array $optionOverrides):void
     {
