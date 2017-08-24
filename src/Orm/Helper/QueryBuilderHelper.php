@@ -52,7 +52,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      * @param RepositoryContract $repository
      * @param ArrayToQueryBuilderBuilderContract $arrayToQueryBuilderBuilder
      */
-    public function __construct(ArrayObject $array = NULL, /** @noinspection PhpHierarchyChecksInspection */ RepositoryContract $repository, ArrayToQueryBuilderBuilderContract $arrayToQueryBuilderBuilder = null)
+    public function __construct(ArrayObject $array = NULL, RepositoryContract $repository, ArrayToQueryBuilderBuilderContract $arrayToQueryBuilderBuilder = null)
     {
         $arrayToQueryBuilderBuilder = $arrayToQueryBuilderBuilder ?? new $arrayToQueryBuilderBuilder();
         $this->setRepository($repository);
@@ -586,7 +586,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     /**
      * @param ArrayToQueryBuilderBuilderContract $arrayToQueryBuilderBuilder
      */
-    public function setArrayToQueryBuilderBuilder(ArrayToQueryBuilderBuilderContract $arrayToQueryBuilderBuilder)
+    public function setArrayToQueryBuilderBuilder(ArrayToQueryBuilderBuilderContract $arrayToQueryBuilderBuilder):void
     {
         $this->arrayToQueryBuilderBuilder = $arrayToQueryBuilderBuilder;
     }

@@ -32,7 +32,6 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         'flush'=>true,
     ];
 
-
     /**
      * @return EntityManagerWrapperContract
      */

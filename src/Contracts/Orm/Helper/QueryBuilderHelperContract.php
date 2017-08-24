@@ -3,9 +3,13 @@ namespace TempestTools\Crud\Contracts\Orm\Helper;
 
 use RuntimeException;
 use TempestTools\Common\Contracts\ArrayHelperContract;
+use TempestTools\Crud\Contracts\Orm\RepositoryContract;
 use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
+use TempestTools\Crud\Orm\Builder\ArrayToQueryBuilderBuilderContract;
 
-interface QueryBuilderHelperContract extends ArrayHelperContract {
+interface QueryBuilderHelperContract extends ArrayHelperContract
+{
+
 
     /** @noinspection MoreThanThreeArgumentsInspection */
 
@@ -17,7 +21,7 @@ interface QueryBuilderHelperContract extends ArrayHelperContract {
      * @throws \Doctrine\ORM\ORMException
      * @throws \RuntimeException
      */
-    public function read (array $params=[], array $frontEndOptions=[], array $optionOverrides = []):array;
+    public function read(array $params = [], array $frontEndOptions = [], array $optionOverrides = []): array;
 
 
     /**
@@ -26,20 +30,21 @@ interface QueryBuilderHelperContract extends ArrayHelperContract {
      * @return array
      * @throws \RuntimeException
      */
-    public function prepareResult (QueryBuilderWrapperContract $qb, array $extra):array;
+    public function prepareResult(QueryBuilderWrapperContract $qb, array $extra): array;
+
     /**
      * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws \RuntimeException
      */
-    public function addLimitAndOffset(QueryBuilderWrapperContract $qb, array $extra):void;
+    public function addLimitAndOffset(QueryBuilderWrapperContract $qb, array $extra): void;
 
     /**
      * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws \RuntimeException
      */
-    public function addFrontEndGroupBys(QueryBuilderWrapperContract $qb, array $extra):void;
+    public function addFrontEndGroupBys(QueryBuilderWrapperContract $qb, array $extra): void;
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
@@ -47,28 +52,28 @@ interface QueryBuilderHelperContract extends ArrayHelperContract {
      * @param array $extra
      * @throws \RuntimeException
      */
-    public function addFrontEndOrderBys(QueryBuilderWrapperContract $qb, array $extra):void;
+    public function addFrontEndOrderBys(QueryBuilderWrapperContract $qb, array $extra): void;
 
     /**
      * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws \RuntimeException
      */
-    public function addFrontEndWhere(QueryBuilderWrapperContract $qb, array $extra):void;
+    public function addFrontEndWhere(QueryBuilderWrapperContract $qb, array $extra): void;
 
     /**
      * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws \RuntimeException
      */
-    public function addFrontEndHaving(QueryBuilderWrapperContract $qb, array $extra):void;
+    public function addFrontEndHaving(QueryBuilderWrapperContract $qb, array $extra): void;
 
     /**
      * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws \RuntimeException
      */
-    public function addPlaceholders(QueryBuilderWrapperContract $qb, array $extra):void;
+    public function addPlaceholders(QueryBuilderWrapperContract $qb, array $extra): void;
 
     /**
      * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
@@ -76,13 +81,32 @@ interface QueryBuilderHelperContract extends ArrayHelperContract {
      * @throws RuntimeException
      * @throws \Doctrine\ORM\ORMException
      */
-    public function applyCachingToQuery (QueryBuilderWrapperContract $qb, array $extra):void;
+    public function applyCachingToQuery(QueryBuilderWrapperContract $qb, array $extra): void;
 
     /**
      * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      */
-    public function buildBaseQuery(QueryBuilderWrapperContract $qb, array $extra):void;
+    public function buildBaseQuery(QueryBuilderWrapperContract $qb, array $extra): void;
 
+
+    /**
+     * @return \TempestTools\Crud\Contracts\Orm\RepositoryContract
+     */
+    public function getRepository(): RepositoryContract;
+
+    /**
+     * @param RepositoryContract $repository
+     */
+    public function setRepository(RepositoryContract $repository): void;
+
+    /**
+     * @return ArrayToQueryBuilderBuilderContract
+     */
+    public function getArrayToQueryBuilderBuilder(): ArrayToQueryBuilderBuilderContract;
+    /**
+     * @param ArrayToQueryBuilderBuilderContract $arrayToQueryBuilderBuilder
+     */
+    public function setArrayToQueryBuilderBuilder(ArrayToQueryBuilderBuilderContract $arrayToQueryBuilderBuilder):void;
 }
 ?>

@@ -3,8 +3,6 @@ namespace TempestTools\Crud\Orm;
 
 use RuntimeException;
 use TempestTools\Common\Contracts\ArrayHelperContract;
-use TempestTools\Common\Helper\ArrayHelperTrait;
-use TempestTools\Common\Utility\ErrorConstantsTrait;
 use TempestTools\Common\Utility\EvmTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
 use TempestTools\Crud\Constants\EntityEventsConstants;
@@ -17,7 +15,7 @@ use TempestTools\Crud\Orm\Utility\EventManagerWrapperTrait;
 
 trait EntityCoreTrait
 {
-    use ArrayHelperTrait, ErrorConstantsTrait, TTConfigTrait, EvmTrait, EventManagerWrapperTrait;
+    use TTConfigTrait, EvmTrait, EventManagerWrapperTrait;
 
     /**
      * @var array $bindParams

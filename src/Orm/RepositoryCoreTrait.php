@@ -27,14 +27,7 @@ trait RepositoryCoreTrait
     /**
      * @var array|NULL $options;
      */
-    protected $options = [
-        'paginate'=>true,
-        'hydrate'=>true,
-        'hydrationType'=>null,
-        'transaction'=>true,
-        'entitiesShareConfigs'=>true,
-        'flush'=>true,
-    ];
+    protected $options;
 
 
     /** @noinspection MoreThanThreeArgumentsInspection */

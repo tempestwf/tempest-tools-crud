@@ -12,6 +12,43 @@ use TempestTools\Crud\Contracts\Orm\Helper\EntityArrayHelperContract;
 interface EntityContract
 {
 
+    /**
+     * Passes it's self to the extractor
+     *
+     * @return \ArrayObject
+     * @throws \RuntimeException
+     */
+    public function extractSelf(): \ArrayObject;
+
+    /**
+     * @param null|ArrayHelperContract $arrayHelper
+     */
+    public function setArrayHelper(ArrayHelperContract $arrayHelper): void;
+
+    /**
+     * @return null|ArrayHelperContract
+     */
+    public function getArrayHelper():?ArrayHelperContract;
+    /**
+     * Gets existing array helper, or makes new one and then returns it
+     *
+     * @return null|ArrayHelperContract
+     */
+    public function arrayHelper(): ArrayHelperContract;
+
+    /**
+     * @return EventManagerWrapperContract
+     * @throws \RuntimeException
+     */
+    public function createEventManagerWrapper(): EventManagerWrapperContract;
+
+    /**
+     * Makes event args to use
+     *
+     * @param array $params
+     * @return GenericEventArgsContract
+     */
+    public function makeEventArgs(array $params): GenericEventArgsContract;
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
@@ -22,15 +59,14 @@ interface EntityContract
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function init(string $mode, ArrayHelperContract $arrayHelper = null, array $path = null, array $fallBack = null, bool $force = false):void;
-
+    public function init(string $mode, ArrayHelperContract $arrayHelper = null, array $path = null, array $fallBack = null, bool $force = false): void;
 
     /**
      * @param string $fieldName
      * @param $value
      * @throws RuntimeException
      */
-    public function setField(string $fieldName, $value):void;
+    public function setField(string $fieldName, $value): void;
 
     /**
      * @param string $associationName
@@ -40,17 +76,13 @@ interface EntityContract
      */
     public function processAssociationParams(string $associationName, array $values): array;
 
-    /** @noinspection MoreThanThreeArgumentsInspection */
-
     /**
      * @param string $assignType
      * @param string $associationName
-     * @param EntityContract $entity
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function bindAssociation(string $assignType, string $associationName, EntityContract $entity = null, $force = false):void;
-
+    public function bindAssociation(string $assignType = null, string $associationName, $force = false): void;
 
     /**
      * Subscribes to the available events that are present on the class
@@ -65,8 +97,7 @@ interface EntityContract
      * @ORM\PrePersist
      * @throws \RuntimeException
      */
-    public function ttPrePersist():void;
-
+    public function ttPrePersist(): void;
 
     /**
      * Needs extending in a child class to get a validation factory to use
@@ -74,44 +105,6 @@ interface EntityContract
      * @throws \RuntimeException
      */
     public function getValidationFactory();
-
-    /**
-     * @param array $fields
-     * @return array
-     */
-    public function getValuesOfFields(array $fields = []): array;
-    /**
-     * @return array
-     */
-    public function getBindParams(): array;
-
-    /**
-     * @param array $bindParams
-     */
-    public function setBindParams(array $bindParams):void;
-    /**
-     * @param bool $nosey
-     * @return bool
-     * @throws \RuntimeException
-     */
-    public function allowed($nosey = true): bool;
-
-    /**
-     * @return NULL|EntityArrayHelperContract
-     */
-    public function getConfigArrayHelper():?EntityArrayHelperContract;
-
-    /**
-     * @param EntityArrayHelperContract $configArrayHelper
-     */
-    public function setConfigArrayHelper(EntityArrayHelperContract $configArrayHelper):void;
-
-
-    /**
-     * @param null|ArrayHelperContract $arrayHelper
-     */
-    public function setArrayHelper(ArrayHelperContract $arrayHelper):void;
-
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
@@ -122,43 +115,70 @@ interface EntityContract
      * @param array $customAttributes
      * @throws \RuntimeException
      */
-    public function validate(array $values, array $rules, array $messages = [], array $customAttributes = []):void;
+    public function validate(array $values, array $rules, array $messages = [], array $customAttributes = []): void;
 
     /**
-     * @param array $params
-     * @return GenericEventArgsContract
+     * @param array $fields
+     * @return array
      */
-    public function makeEventArgs(array $params): GenericEventArgsContract;
+    public function getValuesOfFields(array $fields = []): array;
+
+    /**
+     * @return array
+     */
+    public function getBindParams(): array;
+
+    /**
+     * @param array $bindParams
+     */
+    public function setBindParams(array $bindParams): void;
+
+    /**
+     * @param bool $nosey
+     * @return bool
+     * @throws \RuntimeException
+     */
+    public function allowed($nosey = true): bool;
+
+    /**
+     * @return NULL|\TempestTools\Crud\Contracts\Orm\Helper\EntityArrayHelperContract
+     */
+    public function getConfigArrayHelper(): ?EntityArrayHelperContract;
+
+    /**
+     * @param EntityArrayHelperContract $configArrayHelper
+     */
+    public function setConfigArrayHelper(EntityArrayHelperContract $configArrayHelper): void;
+
+    /**
+     * @return null|string
+     */
+    public function getLastMode(): ?string;
+
+    /**
+     * @param null|string $lastMode
+     */
+    public function setLastMode(string $lastMode = null): void;
 
     /**
      * @return EventManagerWrapperContract
      */
     public function getEventManager(): EventManagerWrapperContract;
+
     /**
      * @param \TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract $eventManagerWrapper
      */
-    public function setEventManager(EventManagerWrapperContract $eventManagerWrapper):void;
+    public function setEventManager(EventManagerWrapperContract $eventManagerWrapper): void;
+
 
     /**
-     * Passes it's self to the extractor
-     *
-     * @return \ArrayObject
-     * @throws \RuntimeException
+     * @return mixed
+     * @internal param Entity $entity
+     * @internal param $names
+     * @internal param bool $requireAll
+     * @internal param string $permission
      */
-    public function extractSelf (): \ArrayObject;
-
-    /**
-     * @return null|ArrayHelperContract
-     */
-    public function getArrayHelper():?ArrayHelperContract;
-
-    /**
-     * Gets existing array helper, or makes new one and then returns it
-     *
-     * @return null|ArrayHelperContract
-     */
-    public function arrayHelper():ArrayHelperContract;
-
+    public function getId();
 
     /**
      * Tags a config and a path, gets the element in the path in the config, and then uses an array helper to parse
@@ -168,7 +188,7 @@ interface EntityContract
      * @return array
      * @throws \RuntimeException
      */
-    public function parseTTConfig(ArrayHelperContract $substituteArrayHelper = NULL):array;
+    public function parseTTConfig(ArrayHelperContract $substituteArrayHelper = null): array;
 
     /**
      * @return array
@@ -184,59 +204,45 @@ interface EntityContract
      * @param array $ttFallBack
      */
     public function setTTFallBack(array $ttFallBack): void;
+
     /**
      * @return NULL|array
      */
     public function getTTPath(): ?array;
+
     /**
      * @return NULL|array
      */
     public function getTTFallBack(): ?array;
 
     /** @noinspection MoreThanThreeArgumentsInspection */
+
     /**
      * Common logic for checking if the permissive settings allow something to be don
+     *
      * @param array|\ArrayObject $high
      * @param array $low
      * @param string $canDo
      * @param string $target
      * @return bool
      */
-    public function permissivePermissionCheck ($high, array $low, string $canDo, string $target):bool;
+    public function permissivePermissionCheck($high, array $low, string $canDo, string $target): bool;
+
     /**
      * @param array|\ArrayObject $high
      * @param array $low
      * @param string $setting
      * @return bool|mixed|null
      */
-    public function highLowSettingCheck($high, array $low = NULL, string $setting);
+    public function highLowSettingCheck($high, array $low = null, string $setting);
 
-    /** @noinspection MoreThanThreeArgumentsInspection */
     /**
      * Common logic for checking if the permissive settings allow something to be don
+     *
      * @param array|\ArrayObject $high
      * @param array $low
      * @return bool
      */
-    public function permissiveAllowedCheck ($high, array $low):bool;
-
-    /** @noinspection MoreThanThreeArgumentsInspection */
-
-    /**
-     * @param ArrayHelperContract|null $arrayHelper
-     * @param array|null $path
-     * @param array|null $fallBack
-     * @param bool $force
-     * @param string|null $mode
-     * @throws \RuntimeException
-     * @return bool
-     */
-    public function coreInit (ArrayHelperContract $arrayHelper = NULL, array $path=NULL, array $fallBack=NULL, bool $force= true, string $mode = null):bool;
-
-    /**
-     * @return \TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract
-     * @throws \RuntimeException
-     */
-    public function createEventManagerWrapper ():EventManagerWrapperContract;
+    public function permissiveAllowedCheck($high, array $low): bool;
 
 }
