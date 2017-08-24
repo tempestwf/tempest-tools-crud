@@ -6,11 +6,12 @@ use RuntimeException;
 use TempestTools\Common\Contracts\ArrayHelperContract;
 use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Crud\Constants\RepositoryEventsConstants;
+use TempestTools\Crud\Contracts\Orm\Builder\ArrayToQueryBuilderBuilderContract;
 use TempestTools\Crud\Contracts\Orm\RepositoryContract;
 use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
 use TempestTools\Crud\Contracts\Orm\Helper\QueryBuilderHelperContract;
 use TempestTools\Crud\Exceptions\Orm\Helper\QueryBuilderHelperException;
-use TempestTools\Crud\Orm\Builder\ArrayToQueryBuilderBuilderContract;
+use TempestTools\Crud\Orm\Builder\ArrayToQueryBuilderBuilder;
 use TempestTools\Crud\Orm\Utility\RepositoryTrait;
 
 class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContract
@@ -54,7 +55,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      */
     public function __construct(ArrayObject $array = NULL, RepositoryContract $repository, ArrayToQueryBuilderBuilderContract $arrayToQueryBuilderBuilder = null)
     {
-        $arrayToQueryBuilderBuilder = $arrayToQueryBuilderBuilder ?? new $arrayToQueryBuilderBuilder();
+        $arrayToQueryBuilderBuilder = $arrayToQueryBuilderBuilder ?? new ArrayToQueryBuilderBuilder();
         $this->setRepository($repository);
         $this->setArrayToQueryBuilderBuilder($arrayToQueryBuilderBuilder);
 

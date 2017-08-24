@@ -9,6 +9,7 @@
 namespace TempestTools\Crud\Orm\Builder;
 
 use TempestTools\Common\Utility\AccessorMethodNameTrait;
+use TempestTools\Crud\Contracts\Orm\Builder\PrePersistEntityBuilderContract;
 use TempestTools\Crud\Contracts\Orm\EntityContract;
 use TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException;
 use TempestTools\Crud\Orm\Utility\BadBuilderCallTrait;

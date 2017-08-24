@@ -9,6 +9,7 @@
 namespace TempestTools\Crud\Orm\Builder;
 
 use TempestTools\Common\Contracts\ArrayHelperContract;
+use TempestTools\Crud\Contracts\Orm\Builder\ArrayToQueryBuilderBuilderContract;
 use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
 use TempestTools\Crud\Exceptions\Orm\Helper\QueryBuilderHelperException;
 use TempestTools\Crud\Orm\Utility\BadBuilderCallTrait;
@@ -16,7 +17,6 @@ use TempestTools\Crud\Orm\Utility\BadBuilderCallTrait;
 class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
 {
     use BadBuilderCallTrait;
-
 
     /** @noinspection MoreThanThreeArgumentsInspection
      * @param string $key

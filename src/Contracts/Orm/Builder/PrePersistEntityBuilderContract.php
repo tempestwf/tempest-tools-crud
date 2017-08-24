@@ -6,7 +6,7 @@
  * Time: 5:15 PM
  */
 
-namespace TempestTools\Crud\Orm\Builder;
+namespace TempestTools\Crud\Contracts\Orm\Builder;
 
 use TempestTools\Crud\Contracts\Orm\EntityContract;
 

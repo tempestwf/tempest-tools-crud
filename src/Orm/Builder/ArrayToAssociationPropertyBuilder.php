@@ -10,6 +10,7 @@ namespace TempestTools\Crud\Orm\Builder;
 
 
 use TempestTools\Common\Contracts\ArrayHelperContract;
+use TempestTools\Crud\Contracts\Orm\Builder\ArrayToAssociationPropertyBuilderContract;
 use TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException;
 use TempestTools\Crud\Orm\Utility\BadBuilderCallTrait;
 

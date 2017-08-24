@@ -3,9 +3,9 @@ namespace TempestTools\Crud\Contracts\Orm\Helper;
 
 use RuntimeException;
 use TempestTools\Common\Contracts\ArrayHelperContract;
+use TempestTools\Crud\Contracts\Orm\Builder\ArrayToQueryBuilderBuilderContract;
 use TempestTools\Crud\Contracts\Orm\RepositoryContract;
 use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
-use TempestTools\Crud\Orm\Builder\ArrayToQueryBuilderBuilderContract;
 
 interface QueryBuilderHelperContract extends ArrayHelperContract
 {
@@ -104,6 +104,7 @@ interface QueryBuilderHelperContract extends ArrayHelperContract
      * @return ArrayToQueryBuilderBuilderContract
      */
     public function getArrayToQueryBuilderBuilder(): ArrayToQueryBuilderBuilderContract;
+
     /**
      * @param ArrayToQueryBuilderBuilderContract $arrayToQueryBuilderBuilder
      */

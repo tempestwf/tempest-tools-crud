@@ -7,16 +7,18 @@ use RuntimeException;
 use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Common\Utility\AccessorMethodNameTrait;
 use TempestTools\Crud\Constants\EntityEventsConstants;
+use TempestTools\Crud\Contracts\Orm\Builder\ArrayToAssociationPropertyBuilderContract;
+use TempestTools\Crud\Contracts\Orm\Builder\ArrayToFieldPropertyBuilderContract;
+use TempestTools\Crud\Contracts\Orm\Builder\PrePersistEntityBuilderContract;
 use TempestTools\Crud\Contracts\Orm\EntityContract;
+use TempestTools\Crud\Contracts\Orm\Helper\EntityArrayHelperContract;
 use TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException;
 use TempestTools\Crud\Orm\Builder\ArrayToAssociationPropertyBuilder;
-use TempestTools\Crud\Orm\Builder\ArrayToAssociationPropertyBuilderContract;
 use TempestTools\Crud\Orm\Builder\ArrayToFieldPropertyBuilder;
-use TempestTools\Crud\Orm\Builder\ArrayToFieldPropertyBuilderContract;
 use TempestTools\Crud\Orm\Builder\PrePersistEntityBuilder;
-use TempestTools\Crud\Orm\Builder\PrePersistEntityBuilderContract;
 
-class EntityArrayHelper extends ArrayHelper //implements EntityArrayHelperContract
+
+class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
 {
     use AccessorMethodNameTrait;
 

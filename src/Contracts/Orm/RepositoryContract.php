@@ -193,19 +193,6 @@ interface RepositoryContract
      */
     public function permissiveAllowedCheck($high, array $low): bool;
 
-    /** @noinspection MoreThanThreeArgumentsInspection */
-
-    /**
-     * @param ArrayHelperContract|null $arrayHelper
-     * @param array|null $path
-     * @param array|null $fallBack
-     * @param bool $force
-     * @param string|null $mode
-     * @throws \RuntimeException
-     * @return bool
-     */
-    public function coreInit(ArrayHelperContract $arrayHelper = null, array $path = null, array $fallBack = null, bool $force = true, string $mode = null): bool;
-
     /**
      * Passes it's self to the extractor
      *

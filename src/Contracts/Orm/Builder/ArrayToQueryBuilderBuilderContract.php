@@ -6,7 +6,7 @@
  * Time: 2:27 PM
  */
 
-namespace TempestTools\Crud\Orm\Builder;
+namespace TempestTools\Crud\Contracts\Orm\Builder;
 
 use TempestTools\Common\Contracts\ArrayHelperContract;
 use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
