@@ -85,7 +85,7 @@ trait RepositoryCoreTrait
      */
     protected function queryBuilderInit(bool $force= true):void
     {
-        if ($force !== true || $this->getConfigArrayHelper() === null ) {
+        if ($force === true || $this->getConfigArrayHelper() === null ) {
             $queryArrayHelper = new QueryBuilderHelper(null, $this);
             /** @noinspection PhpParamsInspection */
             $this->parseTTConfig($queryArrayHelper);

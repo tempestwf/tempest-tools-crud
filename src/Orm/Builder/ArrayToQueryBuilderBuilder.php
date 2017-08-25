@@ -27,6 +27,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
      * @internal param EntityContract $entity
      * @internal param \Closure $fieldSetting
      * @return array
+     * @throws \RuntimeException
      * @throws \TempestTools\Crud\Exceptions\Orm\Helper\QueryBuilderHelperException
      */
     public function closure(string $key, array $settings, ArrayHelperContract $arrayHelper, $closure, array $extra):array
@@ -49,6 +50,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
      * @internal param EntityContract $entity
      * @internal param mixed $fieldSetting
      * @return array
+     * @throws \RuntimeException
      */
     public function mutate (string $key, array $settings, ArrayHelperContract $arrayHelper, $closure, array $extra):array
     {
@@ -65,6 +67,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
      * @param QueryBuilderWrapperContract $qb
      * @param ArrayHelperContract $arrayHelper
      * @param array $extra
+     * @throws \RuntimeException
      */
     public function select (array $entries, QueryBuilderWrapperContract $qb, ArrayHelperContract $arrayHelper, array $extra):void
     {
@@ -90,6 +93,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
      * @param QueryBuilderWrapperContract $qb
      * @param ArrayHelperContract $arrayHelper
      * @param array $extra
+     * @throws \RuntimeException
      */
     public function from (array $entries, QueryBuilderWrapperContract $qb, ArrayHelperContract $arrayHelper, array $extra):void
     {
@@ -110,6 +114,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
      * @param QueryBuilderWrapperContract $qb
      * @param ArrayHelperContract $arrayHelper
      * @param array $extra
+     * @throws \RuntimeException
      */
     public function leftJoin(array $entries, QueryBuilderWrapperContract $qb, ArrayHelperContract $arrayHelper, array $extra):void
     {
@@ -126,6 +131,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
      * @param QueryBuilderWrapperContract $qb
      * @param ArrayHelperContract $arrayHelper
      * @param array $extra
+     * @throws \RuntimeException
      */
     public function innerJoin(array $entries, QueryBuilderWrapperContract $qb, ArrayHelperContract $arrayHelper, array $extra):void
     {
@@ -142,6 +148,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
      * @param QueryBuilderWrapperContract $qb
      * @param ArrayHelperContract $arrayHelper
      * @param array $extra
+     * @throws \RuntimeException
      */
     public function where(array $entries, QueryBuilderWrapperContract $qb, ArrayHelperContract $arrayHelper, array $extra):void
     {
@@ -164,6 +171,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
      * @param QueryBuilderWrapperContract $qb
      * @param ArrayHelperContract $arrayHelper
      * @param array $extra
+     * @throws \RuntimeException
      */
     public function having(array $entries, QueryBuilderWrapperContract $qb, ArrayHelperContract $arrayHelper, array $extra):void
     {
@@ -185,6 +193,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
      * @param QueryBuilderWrapperContract $qb
      * @param ArrayHelperContract $arrayHelper
      * @param array $extra
+     * @throws \RuntimeException
      */
     public function orderBy(array $entries, QueryBuilderWrapperContract $qb, ArrayHelperContract $arrayHelper, array $extra):void
     {
@@ -201,6 +210,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
      * @param QueryBuilderWrapperContract $qb
      * @param ArrayHelperContract $arrayHelper
      * @param array $extra
+     * @throws \RuntimeException
      */
     public function groupBy(array $entries, QueryBuilderWrapperContract $qb, ArrayHelperContract $arrayHelper, array $extra):void
     {
@@ -223,6 +233,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
      * @param array $extra
      * @param ArrayHelperContract $arrayHelper
      * @return array
+     * @throws \RuntimeException
      */
     protected function processFrom(array $array, QueryBuilderWrapperContract $qb, array $extra, ArrayHelperContract $arrayHelper):array
     {
@@ -244,6 +255,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
      * @param array $extra
      * @param ArrayHelperContract $arrayHelper
      * @return array
+     * @throws \RuntimeException
      */
     protected function processQueryPartArray (array $array, array $defaults, QueryBuilderWrapperContract $qb, array $extra, ArrayHelperContract $arrayHelper):array
     {
@@ -262,6 +274,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
      * @param array $extra
      * @param ArrayHelperContract $arrayHelper
      * @return null|string
+     * @throws \RuntimeException
      */
     protected function processQueryPartExpr($value, QueryBuilderWrapperContract $qb, array $extra, ArrayHelperContract $arrayHelper):?string
     {
@@ -286,6 +299,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
      * @param array $extra
      * @param ArrayHelperContract $arrayHelper
      * @return array
+     * @throws \RuntimeException
      */
     protected function processJoinParams(array $array, QueryBuilderWrapperContract $qb, array $extra, ArrayHelperContract $arrayHelper):array
     {
@@ -306,6 +320,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
      * @param array $extra
      * @param ArrayHelperContract $arrayHelper
      * @return array
+     * @throws \RuntimeException
      */
     protected function processOrderParams(array $array, QueryBuilderWrapperContract $qb, array $extra, ArrayHelperContract $arrayHelper):array
     {

@@ -335,7 +335,8 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      * @param array $extra
      * @throws \RuntimeException
      */
-    public function addFrontEndHaving(QueryBuilderWrapperContract $qb, array $extra):void {
+    public function addFrontEndHaving(QueryBuilderWrapperContract $qb, array $extra):void
+    {
         $params = $extra['params'];
         /** @noinspection NullPointerExceptionInspection */
         $permissions = $this->getRepository()->getArrayHelper()->parse($this->getArray()['permissions']['having'] ?? [], $extra);
