@@ -223,8 +223,8 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $permissions = $this->getArray()['permissions']['groupBy'] ?? [];
         foreach ($groupBys as $key => $value) {
             /** @noinspection PhpUnusedLocalVariableInspection */
-            $key = $this->verifyFrontEndGroupBys($qb, $key, $permissions, $extra);
-            $qb->groupBy($key);
+            $value = $this->verifyFrontEndGroupBys($qb, $value, $permissions, $extra);
+            $qb->groupBy($value);
         }
     }
 
@@ -386,7 +386,8 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     {
         $result = [];
         foreach ($arguments as $argument) {
-            $placeholderName = uniqid('', true);
+            /** @noinspection ArgumentEqualsDefaultValueInspection */
+            $placeholderName = (string)uniqid('placeholder' , false);
             $result[] = ':' . $placeholderName;
             $qb->setParameter($placeholderName, $argument);
         }
@@ -433,8 +434,8 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     {
         $repo = $this->getRepository();
         $arrayHelper = $repo->getArrayHelper();
-        $queryPlaceholders = $this->getArray()['read']['placeholders'] ?? [];
-        $frontEndPlaceholders = $extra['params']['settings']['placeholders'] ?? [];
+        $queryPlaceholders = $this->getArray()['settings']['placeholders'] ?? [];
+        $frontEndPlaceholders = $extra['params']['placeholders'] ?? [];
         $options = $extra['options']['placeholders'] ?? [];
         $overridePlaceholders = $extra['optionOverrides']['placeholders'] ?? [];
         /** @noinspection NullPointerExceptionInspection */
@@ -565,7 +566,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      * @param array $extra
      * @return array
      */
-    protected function processSettings(string $key, $value, ArrayHelperContract $arrayHelper, array $permissions, array $extra):array
+    protected function processSettings(string $key=null, $value=null, ArrayHelperContract $arrayHelper, array $permissions, array $extra):array
     {
         /**@var array[] $permissions*/
         if (isset($permissions['settings'])) {
