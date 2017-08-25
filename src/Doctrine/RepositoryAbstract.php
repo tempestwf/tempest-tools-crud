@@ -48,13 +48,14 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * Makes event args to use
      *
      * @param array $params
-     * @param array $options
      * @param array $optionOverrides
      * @param array $frontEndOptions
      * @return \TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract
+     * @throws \RuntimeException
      */
-    public function makeEventArgs(array $params, array $options = [], array $optionOverrides = [], array $frontEndOptions=[]): GenericEventArgsContract
+    public function makeEventArgs(array $params, array $optionOverrides = [], array $frontEndOptions=[]): GenericEventArgsContract
     {
+        $options = $this->getOptions();
         /** @noinspection NullPointerExceptionInspection */
         $entitiesShareConfigs = $this->getArrayHelper()->findSetting([
             $options,
@@ -66,7 +67,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
             'arrayHelper'=>$this->getArrayHelper(),
             'results'=>[],
             'self'=>$this,
-            'options'=>$this->getOptions(),
+            'options'=>$options,
             'optionOverrides'=>$optionOverrides,
             'entitiesShareConfigs'=>$entitiesShareConfigs,
             'frontEndOptions'=>$frontEndOptions,

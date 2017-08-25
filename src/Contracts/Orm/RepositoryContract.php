@@ -239,12 +239,11 @@ interface RepositoryContract
      * Makes event args to use
      *
      * @param array $params
-     * @param array $options
      * @param array $optionOverrides
      * @param array $frontEndOptions
      * @return GenericEventArgsContract
      */
-    public function makeEventArgs(array $params, array $options = [], array $optionOverrides = [], array $frontEndOptions = []): GenericEventArgsContract;
+    public function makeEventArgs(array $params, array $optionOverrides = [], array $frontEndOptions = []): GenericEventArgsContract;
 
     /**
      * @return string

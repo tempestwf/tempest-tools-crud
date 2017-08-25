@@ -65,18 +65,22 @@ class DataBindHelper implements DataBindHelperContract
      */
     protected function stop($failure = false, GenericEventArgsContract $eventArgs):void
     {
-        $this->getRepository()->getEventManager()->dispatchEvent(RepositoryEventsConstants::PRE_STOP, $eventArgs);
+        $repo = $this->getRepository();
+        $em = $repo->getEm();
+        $arrayHelper = $repo->getArrayHelper();
+        $evm = $repo->getEventManager();
+        $evm->dispatchEvent(RepositoryEventsConstants::PRE_STOP, $eventArgs);
         $options = $eventArgs->getArgs()['options'];
         $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
 
         /** @noinspection NullPointerExceptionInspection */
-        $transaction = $this->getRepository()->getArrayHelper()->findSetting([
+        $transaction = $arrayHelper->findSetting([
             $options,
             $optionOverrides,
         ], 'transaction');
 
         /** @noinspection NullPointerExceptionInspection */
-        $flush = $this->getRepository()->getArrayHelper()->findSetting([
+        $flush = $arrayHelper->findSetting([
             $options,
             $optionOverrides,
         ], 'flush');
@@ -84,7 +88,7 @@ class DataBindHelper implements DataBindHelperContract
 
         if ($failure === false && $flush === true) {
             /** @noinspection NullPointerExceptionInspection */
-            $this->getRepository()->getEm()->flush();
+            $em->flush();
         }
 
         if (
@@ -92,10 +96,10 @@ class DataBindHelper implements DataBindHelperContract
         ) {
             if ($failure === true) {
                 /** @noinspection NullPointerExceptionInspection */
-                $this->getRepository()->getEm()->rollBack();
+                $em->rollBack();
             } else {
                 /** @noinspection NullPointerExceptionInspection */
-                $this->getRepository()->getEm()->commit();
+                $em->commit();
             }
         }
     }
