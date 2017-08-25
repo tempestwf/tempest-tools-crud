@@ -40,7 +40,7 @@ trait EntityCoreTrait
      */
     public function init(string $mode, ArrayHelperContract $arrayHelper = null, array $path = null, array $fallBack = null, bool $force = false):void
     {
-        $force = $this->coreInit($arrayHelper, $path, $fallBack, $force);
+        $force = $this->coreInit($arrayHelper, $path, $fallBack, $force, $mode);
         $this->entityArrayHelperInit($force, $mode);
         $this->eventManagerInit($force);
         $this->setLastMode($mode);

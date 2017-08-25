@@ -129,6 +129,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param EntityContract $entity
      * @param bool $nosey
      * @return bool
+     * @throws \RuntimeException
      * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
      */
     public function allowed (EntityContract $entity, $nosey = true):bool {
@@ -276,9 +277,10 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * @param EntityContract $entity
      * @param string $assignType
      * @param string $associationName
-     * @param EntityContract $entity
+     * @param EntityContract $entityToBind
      * @param bool $force
      * @throws \RuntimeException
      */
@@ -286,7 +288,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     {
         if ($force === false) {
             /** @noinspection NullPointerExceptionInspection */
-            $this->canAssign($entity, $assignType);
+            $this->canAssign($entity, $associationName, $assignType);
         }
 
         if ($assignType !== null) {
