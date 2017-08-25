@@ -23,6 +23,7 @@ class PrePersistEntityBuilder implements PrePersistEntityBuilderContract
      * @param EntityContract $entity
      * @param array $fieldSetting
      * @return mixed
+     * @throws \RuntimeException
      * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
      */
     public function enforce(EntityContract $entity, array $fieldSetting):void
@@ -69,6 +70,7 @@ class PrePersistEntityBuilder implements PrePersistEntityBuilderContract
      * @param EntityContract $entity
      * @param mixed $fieldSetting
      * @return mixed
+     * @throws \RuntimeException
      */
     public function setTo (EntityContract $entity, $fieldSetting):void
     {

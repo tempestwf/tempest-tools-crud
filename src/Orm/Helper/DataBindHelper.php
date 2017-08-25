@@ -476,7 +476,7 @@ class DataBindHelper implements DataBindHelperContract
             $evm->dispatchEvent(RepositoryEventsConstants::PRE_DELETE_BATCH, $eventArgs);
             /** @var array $params */
             $params = $eventArgs->getArgs()['params'];
-            $options = $eventArgs->getArgs()['$options'];
+            $options = $eventArgs->getArgs()['options'];
             $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
             $this->checkBatchMax($params, $options, $optionOverrides);
             /** @noinspection NullPointerExceptionInspection */
