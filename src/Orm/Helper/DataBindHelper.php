@@ -37,19 +37,21 @@ class DataBindHelper implements DataBindHelperContract
      */
     protected function start(GenericEventArgsContract $eventArgs):void
     {
-        $this->getRepository()->getEventManager()->dispatchEvent(RepositoryEventsConstants::PRE_START, $eventArgs);
+        $repo = $this->getRepository();
+        /** @noinspection NullPointerExceptionInspection */
+        $repo->getEventManager()->dispatchEvent(RepositoryEventsConstants::PRE_START, $eventArgs);
         $options = $eventArgs->getArgs()['options'];
         $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
 
         /** @noinspection NullPointerExceptionInspection */
-        $transaction = $this->getRepository()->getArrayHelper()->findSetting([
+        $transaction = $repo->getArrayHelper()->findSetting([
             $options,
             $optionOverrides,
         ], 'transaction');
 
         if ($transaction !== false) {
             /** @noinspection NullPointerExceptionInspection */
-            $this->getRepository()->getEm()->beginTransaction();
+            $repo->getEm()->beginTransaction();
         }
     }
 
@@ -541,13 +543,17 @@ class DataBindHelper implements DataBindHelperContract
         $entitiesShareConfigs = $eventArgs->getArgs()['entitiesShareConfigs'];
         if ($entitiesShareConfigs === true) {
             if (isset($eventArgs->getArgs()['sharedConfig'])) {
-                $sharedConfig = $eventArgs->getArgs()['sharedConfig'];
-                $entity->setConfigArrayHelper($sharedConfig);
+                $entity->setConfigArrayHelper($eventArgs->getArgs()['sharedConfig']);
+                $entity->setTTPath($repo->getTTPath());
+                $entity->setTTFallBack($repo->getTTFallBack());
+                $entity->setLastMode($eventArgs->getArgs()['lastMode']);
+                $entity->setArrayHelper($repo->getArrayHelper());
             }
         }
         $entity->init($eventArgs->getArgs()['action'] , $repo->getArrayHelper(), $repo->getTTPath(), $repo->getTTFallBack());
         if ($entitiesShareConfigs === true) {
             $eventArgs->getArgs()['sharedConfig'] = $entity->getConfigArrayHelper();
+            $eventArgs->getArgs()['lastMode'] = $entity->getLastMode();
         }
         /** @noinspection NullPointerExceptionInspection */
         $this->bind($entity, $eventArgs->getArgs()['params']);

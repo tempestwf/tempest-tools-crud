@@ -165,7 +165,7 @@ interface EntityContract
     /**
      * @return EventManagerWrapperContract
      */
-    public function getEventManager(): EventManagerWrapperContract;
+    public function getEventManager(): ?EventManagerWrapperContract;
 
     /**
      * @param \TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract $eventManagerWrapper

@@ -17,9 +17,9 @@ trait EventManagerWrapperTrait
     protected $eventManager;
 
     /**
-     * @return EventManagerWrapperContract
+     * @return EventManagerWrapperContract|null
      */
-    public function getEventManager(): EventManagerWrapperContract
+    public function getEventManager(): ?EventManagerWrapperContract
     {
         return $this->eventManager;
     }

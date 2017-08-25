@@ -211,7 +211,7 @@ interface RepositoryContract
     /**
      * @return \TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract
      */
-    public function getEventManager(): EventManagerWrapperContract;
+    public function getEventManager(): ?EventManagerWrapperContract;
 
     /**
      * @param \TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract $eventManagerWrapper
