@@ -12,7 +12,6 @@ use Doctrine\DBAL\Query\QueryBuilder;
 
 use TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException;
 
-
 class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
 {
     /** @var QueryBuilder $queryBuilder*/
@@ -57,10 +56,11 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
      * @param bool $returnCount
      * @param int|null $hydrationType
      * @param bool $fetchJoin
+     * @param array $cacheSettings
      * @return mixed
-     * @throws QueryBuilderWrapperException
+     * @throws \TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
      */
-    public function getResult(bool $paginate=false, bool $returnCount=true, int $hydrationType=null, bool $fetchJoin = false)
+    public function getResult(bool $paginate=false, bool $returnCount=true, int $hydrationType=null, bool $fetchJoin = false, array $cacheSettings)
     {
         $count = null;
         if ($paginate === true) {
@@ -78,27 +78,6 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
         return ['count'=>$count, 'result'=>$result];
     }
 
-
-    /** @noinspection MoreThanThreeArgumentsInspection */
-
-
-    /**
-     * @param bool $useQueryCache
-     * @param bool $useResultCache
-     * @param int|null $timeToLive
-     * @param string|null $cacheId
-     * @param null $queryCacheDriver
-     * @param null $resultCacheDriver
-     * @throws \Doctrine\ORM\ORMException
-     * @throws QueryBuilderWrapperException
-     */
-    public function setCacheSettings (bool $useQueryCache=true, bool $useResultCache = false, int $timeToLive=null, string $cacheId = null, $queryCacheDriver= null, $resultCacheDriver = null):void
-    {
-        if ($useQueryCache === true || $useResultCache === true || $queryCacheDriver !== null || $resultCacheDriver !== null) {
-            throw QueryBuilderWrapperException::cacheNotCompatible();
-        }
-
-    }
 
     /** @noinspection MoreThanThreeArgumentsInspection */
 

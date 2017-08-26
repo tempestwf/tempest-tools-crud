@@ -239,7 +239,7 @@ $batchParams = [
     ]
 ];
 
-$backendOptions = [
+$backendOptions = [ // not all cache options override query level cache options
     'options'=>[
         'paginate'=>'<true or false>',
         'hydrate'=>'<if false qb or paginator is returned>',
@@ -251,6 +251,11 @@ $backendOptions = [
         'queryCacheDrive'=>'<driver for query cache>',
         'resultCacheDrive'=>'<driver for query cache>',
         'allowQueryCache'=>'<whether or not to allow the query cache, true or false>',
+        'cacheId' => '<result cache id>',
+        'useQueryCache' => '<whether or not to use query cache>',
+        'useResultCache' => '<whether or not to use result cache>',
+        'timeToLive' => '<result cache time to live>',
+        'tagSet' => '<future feature for tags sets in cache>',
         'transaction'=>'<true or false to wrap everythign in a transations>',
         'entitiesShareConfigs'=>'<if true then to optimize the process configs during batches the same config is used for each entity processed, to save reprocessing time>',
         'flush' => '<whether or not to automatically flush>',

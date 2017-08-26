@@ -8,12 +8,14 @@
 
 namespace TempestTools\Crud\Doctrine\Wrapper;
 
+use Doctrine\Common\Cache\Cache;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\QueryBuilder as BaseQueryBuilder;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
 use TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException;
+use Doctrine\ORM\Query;
 
 class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
 {
@@ -52,23 +54,36 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
      * @param bool $returnCount
      * @param int|null $hydrationType
      * @param bool $fetchJoin
+     * @param array $cacheSettings
      * @return mixed
+     * @throws \Doctrine\ORM\ORMException
      * @throws \TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
      */
-    public function getResult(bool $paginate=false, bool $returnCount=true, int $hydrationType=1, bool $fetchJoin = false)
+    public function getResult(bool $paginate=false, bool $returnCount=true, int $hydrationType=1, bool $fetchJoin = false, array $cacheSettings)
     {
         $count = null;
+        $query = $this->getQueryBuilder()->getQuery();
+        $paginator = null;
         if ($paginate === true) {
-            $paginator = new Paginator($this->getQueryBuilder()->getQuery());
-            $paginator->getQuery()->setHydrationMode($hydrationType);
-            $count = $returnCount?count($paginator, $fetchJoin):null;
-            $result = $paginator->getIterator()->getArrayCopy();
+            $paginator = new Paginator($query);
+            $query = $paginator->getQuery();
+            $query->setHydrationMode($hydrationType);
         } else {
             if ($count === true) {
                 throw QueryBuilderWrapperException::countRequiresPaginator();
             }
-            $this->getQueryBuilder()->getQuery()->setHydrationMode($hydrationType);
-            $result = $this->getQueryBuilder()->getQuery()->getResult();
+            $query->setHydrationMode($hydrationType);
+        }
+
+        if (count($cacheSettings) > 0) {
+            $this->setCacheSettings($query, $cacheSettings['useQueryCache'], $cacheSettings['useResultCache'], $cacheSettings['timeToLive'], $cacheSettings['cacheId'], $cacheSettings['queryCacheDriver'], $cacheSettings['resultCacheDriver']);
+        }
+
+        if ($paginate === true) {
+            $count = $returnCount?count($paginator, $fetchJoin):null;
+            $result = $paginator->getIterator()->getArrayCopy();
+        } else {
+            $result = $query->getResult();
         }
         return ['count'=>$count, 'result'=>$result];
     }
@@ -159,19 +174,18 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
 
 
     /**
+     * @param Query $query
      * @param bool $useQueryCache
      * @param bool $useResultCache
      * @param int|null $timeToLive
      * @param string|null $cacheId
-     * @param null $queryCacheDriver
-     * @param null $resultCacheDriver
+     * @param Cache|null $queryCacheDriver
+     * @param Cache|null $resultCacheDriver
      * @throws \Doctrine\ORM\ORMException
      */
-    public function setCacheSettings (bool $useQueryCache=true, bool $useResultCache = false, int $timeToLive=null, string $cacheId = null, $queryCacheDriver= null, $resultCacheDriver = null):void
+    protected function setCacheSettings (Query $query, bool $useQueryCache=true, bool $useResultCache = false, int $timeToLive=null, string $cacheId = null, Cache $queryCacheDriver= null, Cache $resultCacheDriver = null):void
     {
-        $query = $this->getQueryBuilder()->getQuery();
         $query->useQueryCache($useQueryCache);
-
         $query->useResultCache($useResultCache, $timeToLive, $cacheId);
         if ($queryCacheDriver !== null) {
             $query->setQueryCacheDriver($queryCacheDriver);

@@ -19,9 +19,10 @@ interface QueryBuilderWrapperContract
      * @param bool $returnCount
      * @param int|null $hydrationType
      * @param bool $fetchJoin
+     * @param array $cacheSettings
      * @return mixed
      */
-    public function getResult(bool $paginate=false, bool $returnCount=true, int $hydrationType=1, bool $fetchJoin = false);
+    public function getResult(bool $paginate=false, bool $returnCount=true, int $hydrationType=1, bool $fetchJoin = false, array $cacheSettings);
     /**
      * @param string $string
      * @param bool $add
@@ -62,17 +63,6 @@ interface QueryBuilderWrapperContract
 
     /** @noinspection MoreThanThreeArgumentsInspection */
 
-
-    /**
-     * @param bool $useQueryCache
-     * @param bool $useResultCache
-     * @param int|null $timeToLive
-     * @param string|null $cacheId
-     * @param null $queryCacheDriver
-     * @param null $resultCacheDriver
-     * @throws \Doctrine\ORM\ORMException
-     */
-    public function setCacheSettings (bool $useQueryCache=true, bool $useResultCache = false, int $timeToLive=null, string $cacheId = null, $queryCacheDriver= null, $resultCacheDriver = null):void;
 
     /**
      * @param string $string

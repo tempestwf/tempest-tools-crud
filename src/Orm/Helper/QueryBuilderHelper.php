@@ -122,7 +122,6 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         ];
         $this->verifyAllowed($extra);
         $this->buildBaseQuery($qb, $extra);
-        $this->applyCachingToQuery($qb, $extra);
         $this->addPlaceholders($qb, $extra);
         $this->addFrontEndWhere($qb, $extra);
         $this->addFrontEndHaving($qb, $extra);
@@ -152,6 +151,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @return array
+     * @throws \Doctrine\ORM\ORMException
      * @throws \RuntimeException
      */
     public function prepareResult (QueryBuilderWrapperContract $qb, array $extra):array
@@ -170,7 +170,8 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
             return ['qb'=>$qb];
         }
 
-        return $qb->getResult($paginate, $returnCount, $hydrationType, $fetchJoin);
+        $cacheSettings = $this->buildCacheSettings($extra);
+        return $qb->getResult($paginate, $returnCount, $hydrationType, $fetchJoin, $cacheSettings);
 
 
     }
@@ -499,23 +500,25 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     }
 
     /**
-     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws RuntimeException
      * @throws \Doctrine\ORM\ORMException
+     * @return array
      */
-    public function applyCachingToQuery (QueryBuilderWrapperContract $qb, array $extra):void
+    public function buildCacheSettings (array $extra):array
     {
-        $params = $extra['params'];
+        $config = $this->getArray()['settings'] ?? [];
         $options = $extra['options'];
+        $cacheSettings = $config['cache'] ?? [];
         $optionOverrides = $extra['optionOverrides'];
-        $queryCacheDriver = $this->findSetting([$options, $optionOverrides], 'queryCacheDrive') ?? null;
-        $resultCacheDriver = $this->findSetting([$options, $optionOverrides], 'resultCacheDriver') ?? null;
-        $allowQueryCache = $this->findSetting([$options, $optionOverrides], 'allowQueryCache') ?? true;
-        $useQueryCache = $params['settings']['useQueryCache'] ?? true;
-        $useResultCache = $params['settings']['useResultCache'] ?? false;
-        $timeToLive = $params['settings']['timeToLive'] ?? null;
-        $cacheId = $params['settings']['cacheId'] ?? null;
+        $queryCacheDriver = $this->findSetting([$cacheSettings, $options, $optionOverrides], 'queryCacheDrive') ?? null;
+        $resultCacheDriver = $this->findSetting([$cacheSettings, $options, $optionOverrides], 'resultCacheDriver') ?? null;
+        $allowQueryCache = $this->findSetting([$cacheSettings, $options, $optionOverrides], 'allowQueryCache') ?? true;
+        $useQueryCache = $this->findSetting([$cacheSettings, $options, $optionOverrides], 'useQueryCache') ?? true;
+        $useResultCache = $this->findSetting([$cacheSettings, $options, $optionOverrides], 'useResultCache') ?? false;
+        $timeToLive = $this->findSetting([$cacheSettings, $options, $optionOverrides], 'timeToLive') ?? null;
+        $cacheId = $this->findSetting([$cacheSettings, $options, $optionOverrides], 'cacheId') ?? null;
+
         if ($allowQueryCache === true) {
             $arrayHelper = $this->getRepository()->getArrayHelper();
             /** @noinspection NullPointerExceptionInspection */
@@ -526,10 +529,10 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
             $timeToLive = $arrayHelper->parse($timeToLive, $extra);
             /** @noinspection NullPointerExceptionInspection */
             $cacheId = $arrayHelper->parse($cacheId, $extra);
-            $qb->setCacheSettings($useQueryCache, $useResultCache, $timeToLive, $cacheId, $queryCacheDriver, $resultCacheDriver);
+            return ['useQueryCache'=>$useQueryCache, 'useResultCache'=>$useResultCache, 'timeToLive'=>$timeToLive, 'cacheId'=>$cacheId, 'queryCacheDriver'=>$queryCacheDriver, 'resultCacheDriver'=>$resultCacheDriver];
+            //$qb->setCacheSettings($useQueryCache, $useResultCache, $timeToLive, $cacheId, $queryCacheDriver, $resultCacheDriver);
         }
-
-        //TODO: Add tagging in later version
+        return [];
     }
 
     /**
