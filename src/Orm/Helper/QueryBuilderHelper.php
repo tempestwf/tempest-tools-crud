@@ -323,7 +323,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $permissions = $this->getRepository()->getArrayHelper()->parse($this->getArray()['permissions']['where']??[], $extra) ?? [];
         $wheres = $params['query']['where'] ?? [];
         foreach ($wheres as $where) {
-            $type = !isset($where['type'])?'where':null;
+            $type = $where['type'] ?? 'where';
             $string = $this->buildFilterFromFrontEnd($qb, $where, $permissions, $extra);
             $qb->where($type, $string);
         }
@@ -342,7 +342,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $permissions = $this->getRepository()->getArrayHelper()->parse($this->getArray()['permissions']['having'] ?? [], $extra);
         $havings = $params['query']['having'] ?? [];
         foreach ($havings as $having) {
-            $type = !isset($having['type'])?'having':null;
+            $type = $having['type'] ?? 'having';
             $string = $this->buildFilterFromFrontEnd($qb, $having, $permissions, $extra);
             $qb->having($type, $string);
         }
@@ -363,7 +363,11 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
 
         if ($operator === 'andX' || $operator === 'orX') {
             $conditions = $condition['conditions']??[];
-            $string = $this->buildFilterFromFrontEnd($qb, $conditions, $permissions, $extra);
+            $arguments = [];
+            foreach ($conditions as $newCondition) {
+                $arguments[] = $this->buildFilterFromFrontEnd($qb, $newCondition, $permissions, $extra);
+            }
+            $string = $qb->useExpression($operator, $arguments);
         } else {
             /** @noinspection PhpUnusedLocalVariableInspection */
             [$key, $condition] = $this->verifyFrontEndCondition($qb, $condition, $permissions, $extra);
@@ -387,12 +391,23 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $result = [];
         foreach ($arguments as $argument) {
             /** @noinspection ArgumentEqualsDefaultValueInspection */
-            $placeholderName = (string)uniqid('placeholder' , false);
+            $placeholderName = $this->makePlaceholderName($argument);
             $result[] = ':' . $placeholderName;
             $qb->setParameter($placeholderName, $argument);
         }
         return $result;
     }
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public function makePlaceholderName($value):string
+    {
+        $placeholderName = (string)is_array($value)?json_encode($value):$value;
+        return  'placeholder' . substr(md5($placeholderName), 0, 16);
+    }
+
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
@@ -435,7 +450,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $repo = $this->getRepository();
         $arrayHelper = $repo->getArrayHelper();
         $queryPlaceholders = $this->getArray()['settings']['placeholders'] ?? [];
-        $frontEndPlaceholders = $extra['params']['placeholders'] ?? [];
+        $frontEndPlaceholders = $extra['params']['query']['placeholders'] ?? [];
         $options = $extra['options']['placeholders'] ?? [];
         $overridePlaceholders = $extra['optionOverrides']['placeholders'] ?? [];
         /** @noinspection NullPointerExceptionInspection */

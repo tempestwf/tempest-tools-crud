@@ -109,5 +109,11 @@ interface QueryBuilderHelperContract extends ArrayHelperContract
      * @param ArrayToQueryBuilderBuilderContract $arrayToQueryBuilderBuilder
      */
     public function setArrayToQueryBuilderBuilder(ArrayToQueryBuilderBuilderContract $arrayToQueryBuilderBuilder):void;
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public function makePlaceholderName($value):string;
 }
 ?>
