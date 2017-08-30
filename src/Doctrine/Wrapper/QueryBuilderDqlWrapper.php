@@ -55,11 +55,12 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
      * @param int|null $hydrationType
      * @param bool $fetchJoin
      * @param array $cacheSettings
+     * @param bool $hydrate
      * @return mixed
      * @throws \Doctrine\ORM\ORMException
      * @throws \TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
      */
-    public function getResult(bool $paginate=false, bool $returnCount=true, int $hydrationType=1, bool $fetchJoin = false, array $cacheSettings)
+    public function getResult(bool $paginate=false, bool $returnCount=true, int $hydrationType=1, bool $fetchJoin = false, array $cacheSettings, bool $hydrate)
     {
         $count = null;
         $query = $this->getQueryBuilder()->getQuery();
@@ -79,13 +80,24 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
             $this->setCacheSettings($query, $cacheSettings['useQueryCache'], $cacheSettings['useResultCache'], $cacheSettings['timeToLive'], $cacheSettings['cacheId'], $cacheSettings['queryCacheDriver'], $cacheSettings['resultCacheDriver']);
         }
 
-        if ($paginate === true) {
-            $count = $returnCount?count($paginator, $fetchJoin):null;
-            $result = $paginator->getIterator()->getArrayCopy();
-        } else {
-            $result = $query->getResult();
+        if ($hydrate === true) {
+            if ($paginate === true) {
+                $count = $returnCount?count($paginator, $fetchJoin):null;
+                $result = $paginator->getIterator()->getArrayCopy();
+            } else {
+                $result = $query->getResult();
+            }
+            return ['count'=>$count, 'result'=>$result];
         }
-        return ['count'=>$count, 'result'=>$result];
+
+        return [
+            'paginator'=>$paginator,
+            'query'=>$query,
+            'qb'=>$this->getQueryBuilder(),
+            'qbWrapper'=>$this
+        ];
+
+
     }
 
     /**
@@ -126,7 +138,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
         if ($add === false) {
             $this->getQueryBuilder()->where($string);
         } else {
-            $type = $type === null || $type === 'and'?'andWhere':'orWhere';
+            $type = $type === null || $type !== 'or'?'andWhere':'orWhere';
             $this->getQueryBuilder()->$type($string);
         }
 

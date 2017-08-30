@@ -165,13 +165,9 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $hydrate = $this->findSetting([$options, $optionOverrides], 'hydrate');
         /** @noinspection NullPointerExceptionInspection */
         $fetchJoin = isset($this->getArray()['read']['fetchJoin']) ? $this->getRepository()->getArrayHelper()->parse($this->getArray()['read']['fetchJoin'], $extra): static::DEFAULT_FETCH_JOIN;
-        $count = null;
-        if ($hydrate !== true) {
-            return ['qb'=>$qb];
-        }
 
         $cacheSettings = $this->buildCacheSettings($extra);
-        return $qb->getResult($paginate, $returnCount, $hydrationType, $fetchJoin, $cacheSettings);
+        return $qb->getResult($paginate, $returnCount, $hydrationType, $fetchJoin, $cacheSettings, $hydrate);
 
 
     }
@@ -324,7 +320,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $permissions = $this->getRepository()->getArrayHelper()->parse($this->getArray()['permissions']['where']??[], $extra) ?? [];
         $wheres = $params['query']['where'] ?? [];
         foreach ($wheres as $where) {
-            $type = $where['type'] ?? 'where';
+            $type = $where['type'] ?? 'and';
             $string = $this->buildFilterFromFrontEnd($qb, $where, $permissions, $extra);
             $qb->where($type, $string);
         }

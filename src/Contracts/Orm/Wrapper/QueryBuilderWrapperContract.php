@@ -20,9 +20,10 @@ interface QueryBuilderWrapperContract
      * @param int|null $hydrationType
      * @param bool $fetchJoin
      * @param array $cacheSettings
+     * @param bool $hydrate
      * @return mixed
      */
-    public function getResult(bool $paginate=false, bool $returnCount=true, int $hydrationType=1, bool $fetchJoin = false, array $cacheSettings);
+    public function getResult(bool $paginate=false, bool $returnCount=true, int $hydrationType=1, bool $fetchJoin = false, array $cacheSettings, bool $hydrate);
     /**
      * @param string $string
      * @param bool $add

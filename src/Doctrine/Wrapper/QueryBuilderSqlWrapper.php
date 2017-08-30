@@ -57,10 +57,11 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
      * @param int|null $hydrationType
      * @param bool $fetchJoin
      * @param array $cacheSettings
+     * @param bool $hydrate
      * @return mixed
      * @throws \TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
      */
-    public function getResult(bool $paginate=false, bool $returnCount=true, int $hydrationType=null, bool $fetchJoin = false, array $cacheSettings)
+    public function getResult(bool $paginate=false, bool $returnCount=true, int $hydrationType=null, bool $fetchJoin = false, array $cacheSettings, bool $hydrate)
     {
         $count = null;
         if ($paginate === true) {
@@ -71,11 +72,19 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
             throw QueryBuilderWrapperException::hydrationNotCompatible();
         }
 
-        $qb = $this->getQueryBuilder();
-        $result = $qb->execute();
-        $count = $returnCount?$qb->setFirstResult(0)->setMaxResults(null)->execute()->rowCount():null;
 
-        return ['count'=>$count, 'result'=>$result];
+        $qb = $this->getQueryBuilder();
+        if ($hydrate === true) {
+            $result = $qb->execute();
+            $count = $returnCount?$qb->setFirstResult(0)->setMaxResults(null)->execute()->rowCount():null;
+            return ['count'=>$count, 'result'=>$result];
+        }
+
+        return [
+            'qb'=>$qb,
+            'qbWrapper'=>$this
+        ];
+
     }
 
 

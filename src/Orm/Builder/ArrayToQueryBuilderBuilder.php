@@ -73,14 +73,16 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
     {
         $firstSelect = true;
         foreach ($entries as $key => $value) {
-            /** @var string $value */
-            /** @noinspection NullPointerExceptionInspection */
-            $value = $arrayHelper->parse($value, $extra);
-            if ($firstSelect === true) {
-                $qb->select($value, false);
-                $firstSelect = false;
-            } else {
-                $qb->select($value);
+            if ($value !== null) {
+                /** @var string $value */
+                /** @noinspection NullPointerExceptionInspection */
+                $value = $arrayHelper->parse($value, $extra);
+                if ($firstSelect === true) {
+                    $qb->select($value, false);
+                    $firstSelect = false;
+                } else {
+                    $qb->select($value);
+                }
             }
         }
     }
@@ -98,11 +100,13 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
     public function from (array $entries, QueryBuilderWrapperContract $qb, ArrayHelperContract $arrayHelper, array $extra):void
     {
         foreach ($entries as $key => $value) {
-            $value = $this->processFrom($value, $qb, $extra, $arrayHelper);
-            if ($value['append'] === false) {
-                $qb->from($value['className'], $value['alias'], $value['indexBy']);
-            } else {
-                $qb->from($value['className'], $value['alias'], $value['indexBy'], true);
+            if ($value !== null) {
+                $value = $this->processFrom($value, $qb, $extra, $arrayHelper);
+                if ($value['append'] === false) {
+                    $qb->from($value['className'], $value['alias'], $value['indexBy']);
+                } else {
+                    $qb->from($value['className'], $value['alias'], $value['indexBy'], true);
+                }
             }
         }
     }
@@ -119,8 +123,10 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
     public function leftJoin(array $entries, QueryBuilderWrapperContract $qb, ArrayHelperContract $arrayHelper, array $extra):void
     {
         foreach ($entries as $key => $value) {
-            $value = $this->processJoinParams($value, $qb, $extra, $arrayHelper);
-            $qb->leftJoin($value['join'], $value['alias'], $value['conditionType'], $value['condition'], $value['indexBy']);
+            if ($value !== null) {
+                $value = $this->processJoinParams($value, $qb, $extra, $arrayHelper);
+                $qb->leftJoin($value['join'], $value['alias'], $value['conditionType'], $value['condition'], $value['indexBy']);
+            }
         }
     }
 
@@ -136,8 +142,10 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
     public function innerJoin(array $entries, QueryBuilderWrapperContract $qb, ArrayHelperContract $arrayHelper, array $extra):void
     {
         foreach ($entries as $key => $value) {
-            $value = $this->processJoinParams($value, $qb, $extra, $arrayHelper);
-            $qb->innerJoin($value['join'], $value['alias'], $value['conditionType'], $value['condition'], $value['indexBy']);
+            if ($value !== null) {
+                $value = $this->processJoinParams($value, $qb, $extra, $arrayHelper);
+                $qb->innerJoin($value['join'], $value['alias'], $value['conditionType'], $value['condition'], $value['indexBy']);
+            }
         }
     }
 
@@ -153,12 +161,14 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
     public function where(array $entries, QueryBuilderWrapperContract $qb, ArrayHelperContract $arrayHelper, array $extra):void
     {
         foreach ($entries as $key => $value) {
-            /** @noinspection NullPointerExceptionInspection */
-            $where = is_array($value['value']) && isset($value['value']['arguments'])?$this->processQueryPartExpr($value['value'], $qb, $extra, $arrayHelper):$arrayHelper->parse($value['value'], $extra);
-            if (isset($value['type'])) {
-                $qb->where($value['type'], $where);
-            } else {
-                $qb->where(null, $where, false);
+            if ($value !== null) {
+                /** @noinspection NullPointerExceptionInspection */
+                $where = is_array($value['value']) && isset($value['value']['arguments'])?$this->processQueryPartExpr($value['value'], $qb, $extra, $arrayHelper):$arrayHelper->parse($value['value'], $extra);
+                if (isset($value['type'])) {
+                    $qb->where($value['type'], $where);
+                } else {
+                    $qb->where(null, $where, false);
+                }
             }
         }
     }
@@ -176,12 +186,14 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
     public function having(array $entries, QueryBuilderWrapperContract $qb, ArrayHelperContract $arrayHelper, array $extra):void
     {
         foreach ($entries as $key => $value) {
-            /** @noinspection NullPointerExceptionInspection */
-            $where = is_array($value['value']) && isset($value['value']['arguments'])?$this->processQueryPartExpr($value['value'], $qb, $extra, $arrayHelper):$arrayHelper->parse($value['value'], $extra);
-            if (isset($value['type'])) {
-                $qb->having($value['type'], $where);
-            } else {
-                $qb->having(null, $where, false);
+            if ($value !== null) {
+                /** @noinspection NullPointerExceptionInspection */
+                $where = is_array($value['value']) && isset($value['value']['arguments']) ? $this->processQueryPartExpr($value['value'], $qb, $extra, $arrayHelper) : $arrayHelper->parse($value['value'], $extra);
+                if (isset($value['type'])) {
+                    $qb->having($value['type'], $where);
+                } else {
+                    $qb->having(null, $where, false);
+                }
             }
         }
     }
@@ -198,8 +210,10 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
     public function orderBy(array $entries, QueryBuilderWrapperContract $qb, ArrayHelperContract $arrayHelper, array $extra):void
     {
         foreach ($entries as $key => $value) {
-            $value = $this->processOrderParams($value, $qb, $extra, $arrayHelper);
-            $qb->orderBy($value['sort'], $value['order']);
+            if ($value !== null) {
+                $value = $this->processOrderParams($value, $qb, $extra, $arrayHelper);
+                $qb->orderBy($value['sort'], $value['order']);
+            }
         }
     }
 
@@ -215,10 +229,12 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
     public function groupBy(array $entries, QueryBuilderWrapperContract $qb, ArrayHelperContract $arrayHelper, array $extra):void
     {
         foreach ($entries as $key => $value) {
-            /** @noinspection NullPointerExceptionInspection */
-            $value = $arrayHelper->parse($value, $extra);
-            /** @var string $value */
-            $qb->groupBy($value);
+            if ($value !== null) {
+                /** @noinspection NullPointerExceptionInspection */
+                $value = $arrayHelper->parse($value, $extra);
+                /** @var string $value */
+                $qb->groupBy($value);
+            }
         }
     }
 
