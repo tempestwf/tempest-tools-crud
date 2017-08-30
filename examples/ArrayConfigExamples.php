@@ -55,11 +55,11 @@ $readInfo = [
         ],
         'settings'=>[
             'queryType'=>'<dql or sql>', // Defaults to DQL, if SQL is used then Doctrine DBAL query is used instead of an ORM query. Design your syntax accordingly.
-            'cache'=>[
-                'useQueryCache'=>'<true or false>',
-                'useResultCache'=>'<true or false>',
-                'timeToLive'=>'<time to live>',
-                'cacheId'=>'<template for cache id, optional>',
+            'cache'=>[ //Tested in: testGeneralQueryBuilding
+                'useQueryCache'=>'<true or false>', // Can't be properly determined by a test case
+                'useResultCache'=>'<true or false>', // Can't be properly determined by a test case
+                'timeToLive'=>'<time to live>', //Tested in: testGeneralQueryBuilding
+                'cacheId'=>'<template for cache id, optional>', //Tested in: testGeneralQueryBuilding
                 'tagSet'=>[ // Future release
                     '<tag set name>'=>[
                         'disjunction'=>'<true or false>',
@@ -70,7 +70,7 @@ $readInfo = [
 
                 ]
             ],
-            'placeholders'=>[
+            'placeholders'=>[ //Tested in: testGeneralQueryBuilding
                 '<placeholder name>'=>[
                     'value'=>'<value>',
                     'type'=>'<param type can be null>'
@@ -157,7 +157,7 @@ $readInfo = [
 ];
 $frontEndQuery = [
     'query'=>[
-        'where'=>[
+        'where'=>[ //Tested in: testGeneralQueryBuilding
             [
                 'field'=>'<fieldName>',
                 'type'=>'<and, or>',
@@ -166,7 +166,7 @@ $frontEndQuery = [
                 'conditions'=>['<array of just like any other filter>'] // If operator is not 'andX' or 'orX' this is omitted. This allows condition nesting.
             ]
         ],
-        'having'=>[
+        'having'=>[ //Tested in: testGeneralQueryBuilding
             [
                 'field'=>'<fieldName>',
                 'type'=>'<and, or>',
@@ -175,13 +175,13 @@ $frontEndQuery = [
                 'conditions'=>['<array of just like any other filter>'] // If operator is not 'andX' or 'orX' this is omitted. This allows condition nesting.
             ]
         ],
-        'orderBy'=>[
+        'orderBy'=>[ //Tested in: testGeneralQueryBuilding
             '<field name>'=>'<ASC or DESC>'
         ],
-        'groupBy'=>[
+        'groupBy'=>[ //Tested in: testGeneralQueryBuilding
             '<field name>'
         ],
-        'placeholders'=>[
+        'placeholders'=>[ //Tested in: testGeneralQueryBuilding
             '<placeholder name>'=>[
                 'value'=>'<value>',
                 'type'=>'<param type can be null>'
@@ -190,8 +190,8 @@ $frontEndQuery = [
     ],
     'options'=>[
         'returnCount'=>'<true or false>',
-        'limit'=>'<limit>',
-        'offset'=>'<offset>',
+        'limit'=>'<limit>', //Tested in: testGeneralQueryBuilding
+        'offset'=>'<offset>', //Tested in: testGeneralQueryBuilding
     ]
 ];
 
@@ -245,25 +245,25 @@ $batchParams = [
 
 $backendOptions = [ // not all cache options override query level cache options
     'options'=>[
-        'paginate'=>'<true or false>',
-        'hydrate'=>'<if false qb or paginator is returned>',
-        'hydrationType'=>'doctrine hydration type',
-        '<placeholder name>'=>[
+        'paginate'=>'<true or false>', // Tested in: testGeneralDataRetrieval
+        'hydrate'=>'<if false qb or paginator is returned>', // Tested in: testGeneralDataRetrieval
+        'hydrationType'=>'doctrine hydration type', // Tested in: testGeneralDataRetrieval
+        '<placeholder name>'=>[ // Tested in: testGeneralDataRetrieval
             'value'=>'<value>',
             'type'=>'<param type can be null>'
         ],
-        'queryCacheDrive'=>'<driver for query cache>',
-        'resultCacheDrive'=>'<driver for query cache>',
-        'allowQueryCache'=>'<whether or not to allow the query cache, true or false>',
-        'cacheId' => '<result cache id>',
-        'useQueryCache' => '<whether or not to use query cache>',
-        'useResultCache' => '<whether or not to use result cache>',
-        'timeToLive' => '<result cache time to live>',
+        'queryCacheDrive'=>'<driver for query cache>', //Tested in: testGeneralQueryBuilding
+        'resultCacheDrive'=>'<driver for query cache>', //Tested in: testGeneralQueryBuilding
+        'allowQueryCache'=>'<whether or not to allow the query cache, true or false>', //Tested in: testGeneralQueryBuilding
+        'cacheId' => '<result cache id>', //Tested in: testGeneralQueryBuilding
+        'useQueryCache' => '<whether or not to use query cache>', //Tested in: testGeneralQueryBuilding
+        'useResultCache' => '<whether or not to use result cache>', //Tested in: testGeneralQueryBuilding
+        'timeToLive' => '<result cache time to live>', //Tested in: testGeneralQueryBuilding
         'tagSet' => '<future feature for tags sets in cache>',
-        'transaction'=>'<true or false to wrap everythign in a transations>',
-        'entitiesShareConfigs'=>'<if true then to optimize the process configs during batches the same config is used for each entity processed, to save reprocessing time>',
-        'flush' => '<whether or not to automatically flush>',
-        'batchMax' => '<the max we can do in one batch>',
+        'transaction'=>'<true or false to wrap everythign in a transations>', // Tested in testMultiAddAndChain
+        'entitiesShareConfigs'=>'<if true then to optimize the process configs during batches the same config is used for each entity processed, to save reprocessing time>', // Tested in testMultiAddAndChain
+        'flush' => '<whether or not to automatically flush>', // Tested in testMultiAddAndChain
+        'batchMax' => '<the max we can do in one batch>', // Tested in testMaxBatch
         'queryMaxParams' => '<the max number of query params that can be passed in to a read request.>'
     ]
 ];
