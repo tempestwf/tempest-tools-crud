@@ -5,7 +5,7 @@ $readInfo = [
             'select'=>[ //Tested in: testBasicRead
                 '<keyName>'=>'<string>'
             ],
-            'from'=>[ // if not supplied it will be auto generated. Tested in: testGeneralQueryBuilding
+            'from'=>[ // if not supplied it will be auto generated. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
                 '<keyName>'=>[
                     'className'=>'<string>',
                     'alias'=>'<string>',
@@ -25,7 +25,7 @@ $readInfo = [
                     'value'=>'<string>'
                 ]
             ],
-            'leftJoin'=>[ //Tested in: testGeneralQueryBuilding
+            'leftJoin'=>[ //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
                 '<keyName>'=>[
                     'join'=>'<join string>', // When using a queryType of sql use: <from alias>.<name of table to join too>. IE: t.Albums
                     'alias'=>'<join alias>',
@@ -34,7 +34,7 @@ $readInfo = [
                     'indexBy'=>'<index by>',
                 ]
             ],
-            'innerJoin'=>[ //Tested in: testGeneralQueryBuilding
+            'innerJoin'=>[ //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
                 '<keyName>'=>[
                     'join'=>'<join string>', // When using a queryType of sql use: <from alias>.<name of table to join too>. IE: t.Albums
                     'alias'=>'<join alias>',
@@ -54,9 +54,9 @@ $readInfo = [
             ],
         ],
         'settings'=>[
-            'queryType'=>'<dql or sql>', // Defaults to DQL, if SQL is used then Doctrine DBAL query is used instead of an ORM query. Design your syntax accordingly.
+            'queryType'=>'<dql or sql>', // Defaults to DQL, if SQL is used then Doctrine DBAL query is used instead of an ORM query. Design your syntax accordingly. sql tested in testSqlQueryFunctionality
             'cache'=>[ //Tested in: testGeneralQueryBuilding
-                'queryCacheProfile'=>'<a doctrine query cache profile>',// Used only by SQL queries. Use a QueryCacheProfile object
+                'queryCacheProfile'=>'<a doctrine query cache profile>',// Used only by SQL queries. Use a QueryCacheProfile object. Tested in testSqlQueryFunctionality
                 'useQueryCache'=>'<true or false>', // Can't be properly determined by a test case
                 'useResultCache'=>'<true or false>', // Can't be properly determined by a test case
                 'timeToLive'=>'<time to live>', //Tested in: testGeneralQueryBuilding
