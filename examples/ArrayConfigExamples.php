@@ -247,6 +247,7 @@ $batchParams = [
 $backendOptions = [ // not all cache options override query level cache options
     'options'=>[
         'paginate'=>'<true or false>', // Tested in: testGeneralDataRetrieval
+        'fetchJoin'=>'<true or false>',
         'hydrate'=>'<if false qb or paginator is returned>', // Tested in: testGeneralDataRetrieval
         'hydrationType'=>'doctrine hydration type', // Tested in: testGeneralDataRetrieval
         '<placeholder name>'=>[ // Tested in: testGeneralDataRetrieval

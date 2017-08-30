@@ -66,7 +66,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
         $query = $this->getQueryBuilder()->getQuery();
         $paginator = null;
         if ($paginate === true) {
-            $paginator = new Paginator($query);
+            $paginator = new Paginator($query, $fetchJoin);
             $query = $paginator->getQuery();
             $query->setHydrationMode($hydrationType);
         } else {
@@ -82,7 +82,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
 
         if ($hydrate === true) {
             if ($paginate === true) {
-                $count = $returnCount?count($paginator, $fetchJoin):null;
+                $count = $returnCount?count($paginator):null;
                 $result = $paginator->getIterator()->getArrayCopy();
             } else {
                 $result = $query->getResult();

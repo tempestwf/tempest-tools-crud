@@ -161,10 +161,11 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $frontEndOptions = $extra['frontEndOptions']??[];
         $hydrationType = $this->findSetting([$options, $optionOverrides], 'hydrationType');
         $paginate = $this->findSetting([$options, $optionOverrides], 'paginate');
-        $returnCount = $frontEndOptions['options']['returnCount'] ?? static::DEFAULT_RETURN_COUNT;
+        $fetchJoin = $this->findSetting([$options, $optionOverrides], 'fetchJoin');
+        $returnCount = $frontEndOptions['returnCount'] ?? static::DEFAULT_RETURN_COUNT;
         $hydrate = $this->findSetting([$options, $optionOverrides], 'hydrate');
         /** @noinspection NullPointerExceptionInspection */
-        $fetchJoin = isset($this->getArray()['read']['fetchJoin']) ? $this->getRepository()->getArrayHelper()->parse($this->getArray()['read']['fetchJoin'], $extra): static::DEFAULT_FETCH_JOIN;
+        $fetchJoin = $fetchJoin !== null ? $this->getRepository()->getArrayHelper()->parse($fetchJoin, $extra): static::DEFAULT_FETCH_JOIN;
 
         $cacheSettings = $this->buildCacheSettings($extra);
         return $qb->getResult($paginate, $returnCount, $hydrationType, $fetchJoin, $cacheSettings, $hydrate);
