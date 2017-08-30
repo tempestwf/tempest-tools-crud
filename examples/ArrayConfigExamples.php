@@ -1,155 +1,159 @@
 <?php
 $readInfo = [
     'read'=>[
-        'select'=>[ //Tested in: testBasicRead
-            '<keyName>'=>'<string>'
-        ],
-        'from'=>[ // if not supplied it will be auto generated
-            '<keyName>'=>[
-                'className'=>'<string>',
-                'alias'=>'<string>',
-                'indexBy'=>'<string>',
-                'append'=>'<true or false>' // whether or not to ad an an addition from. Defaults to false
-            ]
-        ],
-        'where'=>[
-            '<keyName>'=>[
-                'type'=>'<null, and, or>',
-                'value'=>'<string>' // If an array of: ['expr'=>'<xpr name>', 'arguments'=>['<arguments, could be another xpr array>']] is used, then all parts will be parsed by the array helper, and corresponding xpr methods will be called with the specified arguments. This is true for all parts of the query
-            ]
-        ],
-        'having'=>[
-            '<keyName>'=>[
-                'type'=>'<null, and, or>',
-                'value'=>'<string>'
-            ]
-        ],
-        'leftJoin'=>[
-            '<keyName>'=>[
-                'join'=>'<join string>',
-                'alias'=>'<join alias>',
-                'conditionType'=>'<condition type>',
-                'condition'=>'<condition>',
-                'indexBy'=>'<index by>',
-            ]
-        ],
-        'innerJoin'=>[
-            '<keyName>'=>[
-                'join'=>'<join string>',
-                'alias'=>'<join alias>',
-                'conditionType'=>'<condition type>',
-                'condition'=>'<condition>',
-                'indexBy'=>'<index by>',
-            ]
-        ],
-        'orderBy'=>[
-            '<keyName>'=>[
-                'sort'=>'<sort string>',
-                'order'=>'sort order'
-            ]
-        ],
-        'groupBy'=>[
-            '<keyName>'=>'<string>'
-        ],
-    ],
-    'settings'=>[
-        'queryType'=>'<dql or sql>', // Defaults to DQL, if SQL is used then Doctrine DBAL query is used instead of an ORM query. Design your syntax accordingly
-        'cache'=>[
-            'useQueryCache'=>'<true or false>',
-            'useResultCache'=>'<true or false>',
-            'timeToLive'=>'<time to live>',
-            'cacheId'=>'<template for cache id, optional>',
-            'tagSet'=>[ // Future release
-                '<tag set name>'=>[
-                    'disjunction'=>'<true or false>',
-                    'templates'=>[
-                        '<templates used to make tags>'
-                    ]
+        'query'=>[
+            'select'=>[ //Tested in: testBasicRead
+                '<keyName>'=>'<string>'
+            ],
+            'from'=>[ // if not supplied it will be auto generated. Tested in: testGeneralQueryBuilding
+                '<keyName>'=>[
+                    'className'=>'<string>',
+                    'alias'=>'<string>',
+                    'indexBy'=>'<string>',
+                    'append'=>'<true or false>' // whether or not to ad an an addition from. Defaults to false
                 ]
+            ],
+            'where'=>[  //Tested in: testGeneralQueryBuilding
+                '<keyName>'=>[
+                    'type'=>'<null, and, or>',
+                    'value'=>'<string>' // If an array of: ['expr'=>'<xpr name>', 'arguments'=>['<arguments, could be another xpr array>']] is used, then all parts will be parsed by the array helper, and corresponding xpr methods will be called with the specified arguments. This is true for all parts of the query
+                ]
+            ],
+            'having'=>[ //Tested in: testGeneralQueryBuilding
+                '<keyName>'=>[
+                    'type'=>'<null, and, or>',
+                    'value'=>'<string>'
+                ]
+            ],
+            'leftJoin'=>[ //Tested in: testGeneralQueryBuilding
+                '<keyName>'=>[
+                    'join'=>'<join string>',
+                    'alias'=>'<join alias>',
+                    'conditionType'=>'<condition type>',
+                    'condition'=>'<condition>',
+                    'indexBy'=>'<index by>',
+                ]
+            ],
+            'innerJoin'=>[ //Tested in: testGeneralQueryBuilding
+                '<keyName>'=>[
+                    'join'=>'<join string>',
+                    'alias'=>'<join alias>',
+                    'conditionType'=>'<condition type>',
+                    'condition'=>'<condition>',
+                    'indexBy'=>'<index by>',
+                ]
+            ],
+            'orderBy'=>[ //Tested in: testGeneralQueryBuilding
+                '<keyName>'=>[
+                    'sort'=>'<sort string>',
+                    'order'=>'sort order'
+                ]
+            ],
+            'groupBy'=>[ //Tested in: testGeneralQueryBuilding
+                '<keyName>'=>'<string>'
+            ],
+        ],
+        'settings'=>[
+            'queryType'=>'<dql or sql>', // Defaults to DQL, if SQL is used then Doctrine DBAL query is used instead of an ORM query. Design your syntax accordingly.
+            'cache'=>[
+                'useQueryCache'=>'<true or false>',
+                'useResultCache'=>'<true or false>',
+                'timeToLive'=>'<time to live>',
+                'cacheId'=>'<template for cache id, optional>',
+                'tagSet'=>[ // Future release
+                    '<tag set name>'=>[
+                        'disjunction'=>'<true or false>',
+                        'templates'=>[
+                            '<templates used to make tags>'
+                        ]
+                    ]
 
-            ]
+                ]
+            ],
+            'placeholders'=>[
+                '<placeholder name>'=>[
+                    'value'=>'<value>',
+                    'type'=>'<param type can be null>'
+                ]
+            ],
+            'fetchJoin'=>'<true or false>', // whether or not when paginating this query requires a fetch join
         ],
-        'placeholders'=>[
-            '<placeholder name>'=>[
-                'value'=>'<value>',
-                'type'=>'<param type can be null>'
-            ]
-        ],
-        'fetchJoin'=>'<true or false>', // whether or not when paginating this query requires a fetch join
+        'permissions'=>[
+            'allowed'=>'<true or false>',
+            'maxLimit'=>'<max limit>',
+            'where'=>[
+                'permissive'=>'<true or false>',
+                'fields'=>[
+                    '<field name>'=>[
+                        'permissive'=>'<true or false>',
+                        'settings'=>[
+                            'closure'=>'<closure to test param, return false from closure to cancel execution>',
+                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
+                        ],
+                        'operators'=>[
+                            '<operator name>'=>'<allowed>'
+                        ]
+                    ]
+                ]
+            ],
+            'having'=>[
+                'permissive'=>'<true or false>',
+                'fields'=>[
+                    '<field name>'=>[
+                        'permissive'=>'<true or false>',
+                        'settings'=>[
+                            'closure'=>'<closure to test param, return false from closure to cancel execution>',
+                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
+                        ],
+                        'operators'=>[
+                            '<operator name>'=>'<allowed>'
+                        ]
+                    ]
+                ]
+            ],
+            'orderBy'=>[
+                'permissive'=>'<true or false>',
+                'fields'=>[
+                    '<field name>'=>[
+                        'permissive'=>'<true or false>',
+                        'settings'=>[
+                            'closure'=>'<closure to test param, return false from closure to cancel execution>',
+                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
+                        ],
+                        'directions'=>[
+                            '<operator name>'=>'<allowed true or false>'
+                        ]
+                    ]
+                ]
+            ],
+            'groupBy'=>[
+                'permissive'=>'<true or false>',
+                'fields'=>[
+                    '<field name>'=>[
+                        'allowed'=>'<true or false>',
+                        'settings'=>[
+                            'closure'=>'<closure to test param, return false from closure to cancel execution>',
+                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
+                        ]
+                    ]
+                ]
+            ],
+            'placeholders'=>[
+                'permissive'=>'<true or false>',
+                'placeholderNames'=>[
+                    '<field name>'=>[
+                        'allowed'=>'<true or false>',
+                        'settings'=>[
+                            'closure'=>'<closure to test param, return false from closure to cancel execution>',
+                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
+                        ]
+                    ]
+                ]
+            ],
+        ]
     ],
-    'permissions'=>[
-        'allowed'=>'<true or false>',
-        'maxLimit'=>'<max limit>',
-        'where'=>[
-            'permissive'=>'<true or false>',
-            'fields'=>[
-                '<field name>'=>[
-                    'permissive'=>'<true or false>',
-                    'settings'=>[
-                        'closure'=>'<closure to test param, return false from closure to cancel execution>',
-                        'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
-                    ],
-                    'operators'=>[
-                        '<operator name>'=>'<allowed>'
-                    ]
-                ]
-            ]
-        ],
-        'having'=>[
-            'permissive'=>'<true or false>',
-            'fields'=>[
-                '<field name>'=>[
-                    'permissive'=>'<true or false>',
-                    'settings'=>[
-                        'closure'=>'<closure to test param, return false from closure to cancel execution>',
-                        'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
-                    ],
-                    'operators'=>[
-                        '<operator name>'=>'<allowed>'
-                    ]
-                ]
-            ]
-        ],
-        'orderBy'=>[
-            'permissive'=>'<true or false>',
-            'fields'=>[
-                '<field name>'=>[
-                    'permissive'=>'<true or false>',
-                    'settings'=>[
-                        'closure'=>'<closure to test param, return false from closure to cancel execution>',
-                        'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
-                    ],
-                    'directions'=>[
-                        '<operator name>'=>'<allowed true or false>'
-                    ]
-                ]
-            ]
-        ],
-        'groupBy'=>[
-            'permissive'=>'<true or false>',
-            'fields'=>[
-                '<field name>'=>[
-                    'allowed'=>'<true or false>',
-                    'settings'=>[
-                        'closure'=>'<closure to test param, return false from closure to cancel execution>',
-                        'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
-                    ]
-                ]
-            ]
-        ],
-        'placeholders'=>[
-            'permissive'=>'<true or false>',
-            'placeholderNames'=>[
-                '<field name>'=>[
-                    'allowed'=>'<true or false>',
-                    'settings'=>[
-                        'closure'=>'<closure to test param, return false from closure to cancel execution>',
-                        'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
-                    ]
-                ]
-            ]
-        ],
-    ]
+
+
 ];
 $frontEndQuery = [
     'query'=>[

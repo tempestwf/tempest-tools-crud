@@ -217,7 +217,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $params = $extra['params']??[];
         $groupBys = $params['query']['groupBy'] ?? [];
         /** @noinspection NullPointerExceptionInspection */
-        $permissions = $this->getArray()['permissions']['groupBy'] ?? [];
+        $permissions = $this->getArray()['read']['permissions']['groupBy'] ?? [];
         foreach ($groupBys as $key => $value) {
             /** @noinspection PhpUnusedLocalVariableInspection */
             $value = $this->verifyFrontEndGroupBys($qb, $value, $permissions, $extra);
@@ -269,7 +269,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $params = $extra['params'];
         $orderBys = $params['query']['orderBy'] ?? [];
         /** @noinspection NullPointerExceptionInspection */
-        $permissions = $this->getRepository()->getArrayHelper()->parse($this->getArray()['permissions']['orderBy'] ?? [], $extra) ?? [];
+        $permissions = $this->getRepository()->getArrayHelper()->parse($this->getArray()['read']['permissions']['orderBy'] ?? [], $extra) ?? [];
         foreach ($orderBys as $key => $value) {
             [$key, $value] = $this->verifyFrontEndOrderBys($qb, $key, $value, $permissions, $extra);
             $qb->orderBy($key, $value);
@@ -317,7 +317,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     {
         $params = $extra['params'];
         /** @noinspection NullPointerExceptionInspection */
-        $permissions = $this->getRepository()->getArrayHelper()->parse($this->getArray()['permissions']['where']??[], $extra) ?? [];
+        $permissions = $this->getRepository()->getArrayHelper()->parse($this->getArray()['read']['permissions']['where']??[], $extra) ?? [];
         $wheres = $params['query']['where'] ?? [];
         foreach ($wheres as $where) {
             $type = $where['type'] ?? 'and';
@@ -336,7 +336,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     {
         $params = $extra['params'];
         /** @noinspection NullPointerExceptionInspection */
-        $permissions = $this->getRepository()->getArrayHelper()->parse($this->getArray()['permissions']['having'] ?? [], $extra);
+        $permissions = $this->getRepository()->getArrayHelper()->parse($this->getArray()['read']['permissions']['having'] ?? [], $extra);
         $havings = $params['query']['having'] ?? [];
         foreach ($havings as $having) {
             $type = $having['type'] ?? 'having';
@@ -446,12 +446,12 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     {
         $repo = $this->getRepository();
         $arrayHelper = $repo->getArrayHelper();
-        $queryPlaceholders = $this->getArray()['settings']['placeholders'] ?? [];
+        $queryPlaceholders = $this->getArray()['read']['settings']['placeholders'] ?? [];
         $frontEndPlaceholders = $extra['params']['query']['placeholders'] ?? [];
         $options = $extra['options']['placeholders'] ?? [];
         $overridePlaceholders = $extra['optionOverrides']['placeholders'] ?? [];
         /** @noinspection NullPointerExceptionInspection */
-        $permissions = $this->getArray()['permissions']['placeholders'] ?? [];
+        $permissions = $this->getArray()['read']['permissions']['placeholders'] ?? [];
         $placeholders = array_replace($queryPlaceholders, $options, $overridePlaceholders);
         $safeKeys = array_keys($placeholders);
         $placeholders = array_replace($frontEndPlaceholders, $placeholders);
@@ -503,7 +503,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      */
     public function buildCacheSettings (array $extra):array
     {
-        $config = $this->getArray()['settings'] ?? [];
+        $config = $this->getArray()['read']['settings'] ?? [];
         $options = $extra['options'];
         $cacheSettings = $config['cache'] ?? [];
         $optionOverrides = $extra['optionOverrides'];
@@ -537,7 +537,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      */
     public function buildBaseQuery(QueryBuilderWrapperContract $qb, array $extra):void
     {
-        $config = $this->getArray()['read'] ?? [];
+        $config = $this->getArray()['read']['query'] ?? [];
         $builder = $this->getArrayToQueryBuilderBuilder();
         $arrayHelper = $this->getRepository()->getArrayHelper();
         /** @var array $config */

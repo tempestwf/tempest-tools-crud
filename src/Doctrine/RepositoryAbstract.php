@@ -83,7 +83,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     {
         $entityAlias = $entityAlias ?? $this->getEntityAlias();
         /** @noinspection NullPointerExceptionInspection */
-        $queryType = $this->getConfigArrayHelper()->getArray()['settings']['queryType'] ?? 'dql';
+        $queryType = $this->getConfigArrayHelper()->getArray()['read']['settings']['queryType'] ?? 'dql';
         if ($queryType === 'dql') {
             $qb = $this->createQueryBuilder($entityAlias);
             $qbWrapper = new QueryBuilderDqlWrapper($qb);
