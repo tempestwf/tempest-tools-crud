@@ -27,7 +27,7 @@ $readInfo = [
             ],
             'leftJoin'=>[ //Tested in: testGeneralQueryBuilding
                 '<keyName>'=>[
-                    'join'=>'<join string>',
+                    'join'=>'<join string>', // When using a queryType of sql use: <from alias>.<name of table to join too>. IE: t.Albums
                     'alias'=>'<join alias>',
                     'conditionType'=>'<condition type>',
                     'condition'=>'<condition>',
@@ -36,7 +36,7 @@ $readInfo = [
             ],
             'innerJoin'=>[ //Tested in: testGeneralQueryBuilding
                 '<keyName>'=>[
-                    'join'=>'<join string>',
+                    'join'=>'<join string>', // When using a queryType of sql use: <from alias>.<name of table to join too>. IE: t.Albums
                     'alias'=>'<join alias>',
                     'conditionType'=>'<condition type>',
                     'condition'=>'<condition>',
@@ -56,6 +56,7 @@ $readInfo = [
         'settings'=>[
             'queryType'=>'<dql or sql>', // Defaults to DQL, if SQL is used then Doctrine DBAL query is used instead of an ORM query. Design your syntax accordingly.
             'cache'=>[ //Tested in: testGeneralQueryBuilding
+                'queryCacheProfile'=>'<a doctrine query cache profile>',// Used only by SQL queries. Use a QueryCacheProfile object
                 'useQueryCache'=>'<true or false>', // Can't be properly determined by a test case
                 'useResultCache'=>'<true or false>', // Can't be properly determined by a test case
                 'timeToLive'=>'<time to live>', //Tested in: testGeneralQueryBuilding
@@ -252,9 +253,10 @@ $backendOptions = [ // not all cache options override query level cache options
             'value'=>'<value>',
             'type'=>'<param type can be null>'
         ],
+        'queryCacheProfile'=>'<a doctrine query cache profile>',// Used only by SQL queries. Use a QueryCacheProfile object
         'queryCacheDrive'=>'<driver for query cache>', //Tested in: testGeneralQueryBuilding
         'resultCacheDrive'=>'<driver for query cache>', //Tested in: testGeneralQueryBuilding
-        'allowQueryCache'=>'<whether or not to allow the query cache, true or false>', //Tested in: testGeneralQueryBuilding
+        'allowCache'=>'<whether or not to allow the query cache, true or false>', //Tested in: testGeneralQueryBuilding
         'cacheId' => '<result cache id>', //Tested in: testGeneralQueryBuilding
         'useQueryCache' => '<whether or not to use query cache>', //Tested in: testGeneralQueryBuilding
         'useResultCache' => '<whether or not to use result cache>', //Tested in: testGeneralQueryBuilding

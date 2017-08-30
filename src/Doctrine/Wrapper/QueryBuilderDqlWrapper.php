@@ -319,20 +319,22 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
             throw QueryBuilderWrapperException::operatorNotSafe($operator);
         }
     }
+    /** @noinspection ReturnTypeCanBeDeclaredInspection */
 
 
     /**
      * @return BaseQueryBuilder
      */
-    public function getQueryBuilder():BaseQueryBuilder
+    public function getQueryBuilder()
     {
         return $this->queryBuilder;
     }
 
+
     /**
      * @param BaseQueryBuilder $queryBuilder
      */
-    public function setQueryBuilder(BaseQueryBuilder $queryBuilder):void
+    public function setQueryBuilder($queryBuilder):void
     {
         $this->queryBuilder = $queryBuilder;
     }

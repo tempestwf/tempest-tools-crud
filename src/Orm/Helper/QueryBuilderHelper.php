@@ -509,13 +509,14 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $optionOverrides = $extra['optionOverrides'];
         $queryCacheDriver = $this->findSetting([$cacheSettings, $options, $optionOverrides], 'queryCacheDrive') ?? null;
         $resultCacheDriver = $this->findSetting([$cacheSettings, $options, $optionOverrides], 'resultCacheDriver') ?? null;
-        $allowQueryCache = $this->findSetting([$cacheSettings, $options, $optionOverrides], 'allowQueryCache') ?? true;
+        $allowCache = $this->findSetting([$cacheSettings, $options, $optionOverrides], 'allowCache') ?? true;
         $useQueryCache = $this->findSetting([$cacheSettings, $options, $optionOverrides], 'useQueryCache') ?? true;
         $useResultCache = $this->findSetting([$cacheSettings, $options, $optionOverrides], 'useResultCache') ?? false;
         $timeToLive = $this->findSetting([$cacheSettings, $options, $optionOverrides], 'timeToLive') ?? null;
         $cacheId = $this->findSetting([$cacheSettings, $options, $optionOverrides], 'cacheId') ?? null;
+        $queryCacheProfile = $this->findSetting([$cacheSettings, $options, $optionOverrides], 'queryCacheProfile') ?? null;
 
-        if ($allowQueryCache === true) {
+        if ($allowCache === true) {
             $arrayHelper = $this->getRepository()->getArrayHelper();
             /** @noinspection NullPointerExceptionInspection */
             $useQueryCache = $arrayHelper->parse($useQueryCache, $extra);
@@ -525,7 +526,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
             $timeToLive = $arrayHelper->parse($timeToLive, $extra);
             /** @noinspection NullPointerExceptionInspection */
             $cacheId = $arrayHelper->parse($cacheId, $extra);
-            return ['useQueryCache'=>$useQueryCache, 'useResultCache'=>$useResultCache, 'timeToLive'=>$timeToLive, 'cacheId'=>$cacheId, 'queryCacheDriver'=>$queryCacheDriver, 'resultCacheDriver'=>$resultCacheDriver];
+            return ['useQueryCache'=>$useQueryCache, 'useResultCache'=>$useResultCache, 'timeToLive'=>$timeToLive, 'cacheId'=>$cacheId, 'queryCacheDriver'=>$queryCacheDriver, 'resultCacheDriver'=>$resultCacheDriver, 'queryCacheProfile'=>$queryCacheProfile];
             //$qb->setCacheSettings($useQueryCache, $useResultCache, $timeToLive, $cacheId, $queryCacheDriver, $resultCacheDriver);
         }
         return [];

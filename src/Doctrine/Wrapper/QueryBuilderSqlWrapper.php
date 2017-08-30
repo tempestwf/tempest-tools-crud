@@ -35,7 +35,7 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
     /**
      * @return QueryBuilder
      */
-    public function getQueryBuilder():QueryBuilder
+    public function getQueryBuilder()
     {
         return $this->queryBuilder;
     }
@@ -44,7 +44,7 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
     /**
      * @param QueryBuilder $queryBuilder
      */
-    public function setQueryBuilder(/** @noinspection PhpSignatureMismatchDuringInheritanceInspection */ QueryBuilder $queryBuilder):void
+    public function setQueryBuilder($queryBuilder):void
     {
         $this->queryBuilder = $queryBuilder;
     }
@@ -59,6 +59,7 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
      * @param array $cacheSettings
      * @param bool $hydrate
      * @return mixed
+     * @throws \Doctrine\DBAL\DBALException
      * @throws \TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
      */
     public function getResult(bool $paginate=false, bool $returnCount=true, int $hydrationType=null, bool $fetchJoin = false, array $cacheSettings, bool $hydrate)
@@ -75,8 +76,14 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
 
         $qb = $this->getQueryBuilder();
         if ($hydrate === true) {
-            $result = $qb->execute();
-            $count = $returnCount?$qb->setFirstResult(0)->setMaxResults(null)->execute()->rowCount():null;
+            if (isset($cacheSettings['queryCacheProfile'])) {
+                $result = $qb->getConnection()->executeQuery($qb->getSQL(), $qb->getParameters(), $qb->getParameterTypes(), $cacheSettings['queryCacheProfile'])->fetchAll();
+                $count = $returnCount?$qb->setFirstResult(0)->setMaxResults(null)->getConnection()->executeQuery($qb->getSQL(), $qb->getParameters(), $qb->getParameterTypes(), $cacheSettings['queryCacheProfile'])->rowCount():null;
+            } else {
+                $result = $qb->execute()->fetchAll();
+                $count = $returnCount?$qb->setFirstResult(0)->setMaxResults(null)->execute()->rowCount():null;
+            }
+
             return ['count'=>$count, 'result'=>$result];
         }
 
@@ -105,10 +112,10 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
 
         if ($add === false) {
             /** @noinspection PhpParamsInspection */
-            $this->getQueryBuilder()->$this->add('from', array(
+            $this->getQueryBuilder()->add('from', [[
                 'table' => $className,
                 'alias' => $alias
-            ), false);
+            ]]);
         } else {
             $this->getQueryBuilder()->from($className, $alias);
         }
@@ -127,7 +134,8 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
         if ($indexBy !== null) {
             throw QueryBuilderWrapperException::indexByNotCompatible();
         }
-        $this->getQueryBuilder()->leftJoin($join, $alias, $conditionType, $condition);
+        [$fromAlias, $join] = explode('.', $join);
+        $this->getQueryBuilder()->leftJoin($fromAlias, $join, $alias, $condition);
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection
@@ -143,7 +151,8 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
         if ($indexBy !== null) {
             throw QueryBuilderWrapperException::indexByNotCompatible();
         }
-        $this->getQueryBuilder()->innerJoin($join, $alias, $conditionType, $condition);
+        [$fromAlias, $join] = explode('.', $join);
+        $this->getQueryBuilder()->innerJoin($fromAlias, $join, $alias, $condition);
     }
 
 
