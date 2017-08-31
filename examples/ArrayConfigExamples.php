@@ -3,54 +3,54 @@ $readInfo = [
     'read'=>[
         'query'=>[
             'select'=>[ //Tested in: testBasicRead
-                '<keyName>'=>'<string>'
+                '<keyName>'=>'<string>' //Tested in: testBasicRead
             ],
             'from'=>[ // if not supplied it will be auto generated. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
-                '<keyName>'=>[
-                    'className'=>'<string>',
-                    'alias'=>'<string>',
-                    'indexBy'=>'<string>',
-                    'append'=>'<true or false>' // whether or not to ad an an addition from. Defaults to false
+                '<keyName>'=>[ // Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                    'className'=>'<string>', // Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                    'alias'=>'<string>', // Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                    'indexBy'=>'<string>', // Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                    'append'=>'<true or false>' // whether or not to ad an an addition from. Defaults to false // Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
                 ]
             ],
             'where'=>[  //Tested in: testGeneralQueryBuilding
-                '<keyName>'=>[
-                    'type'=>'<null, and, or>',
-                    'value'=>'<string>' // If an array of: ['expr'=>'<xpr name>', 'arguments'=>['<arguments, could be another xpr array>']] is used, then all parts will be parsed by the array helper, and corresponding xpr methods will be called with the specified arguments. This is true for all parts of the query
+                '<keyName>'=>[ //Tested in: testGeneralQueryBuilding
+                    'type'=>'<null, and, or>', //Tested in: testGeneralQueryBuilding
+                    'value'=>'<string>' // If an array of: ['expr'=>'<xpr name>', 'arguments'=>['<arguments, could be another xpr array>']] is used, then all parts will be parsed by the array helper, and corresponding xpr methods will be called with the specified arguments. This is true for all parts of the query //Tested in: testGeneralQueryBuilding
                 ]
             ],
             'having'=>[ //Tested in: testGeneralQueryBuilding
-                '<keyName>'=>[
-                    'type'=>'<null, and, or>',
-                    'value'=>'<string>'
+                '<keyName>'=>[ //Tested in: testGeneralQueryBuilding
+                    'type'=>'<null, and, or>', //Tested in: testGeneralQueryBuilding
+                    'value'=>'<string>' //Tested in: testGeneralQueryBuilding
                 ]
             ],
             'leftJoin'=>[ //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
-                '<keyName>'=>[
-                    'join'=>'<join string>', // When using a queryType of sql use: <from alias>.<name of table to join too>. IE: t.Albums
-                    'alias'=>'<join alias>',
-                    'conditionType'=>'<condition type>',
-                    'condition'=>'<condition>',
-                    'indexBy'=>'<index by>',
+                '<keyName>'=>[ //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                    'join'=>'<join string>', // When using a queryType of sql use: <from alias>.<name of table to join too>. IE: t.Albums //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                    'alias'=>'<join alias>', //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                    'conditionType'=>'<condition type>', //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                    'condition'=>'<condition>', //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                    'indexBy'=>'<index by>', //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
                 ]
             ],
             'innerJoin'=>[ //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
-                '<keyName>'=>[
-                    'join'=>'<join string>', // When using a queryType of sql use: <from alias>.<name of table to join too>. IE: t.Albums
-                    'alias'=>'<join alias>',
-                    'conditionType'=>'<condition type>',
-                    'condition'=>'<condition>',
-                    'indexBy'=>'<index by>',
+                '<keyName>'=>[ //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                    'join'=>'<join string>', // When using a queryType of sql use: <from alias>.<name of table to join too>. IE: t.Albums //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                    'alias'=>'<join alias>', //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                    'conditionType'=>'<condition type>', //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                    'condition'=>'<condition>', //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                    'indexBy'=>'<index by>', //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
                 ]
             ],
             'orderBy'=>[ //Tested in: testGeneralQueryBuilding
-                '<keyName>'=>[
-                    'sort'=>'<sort string>',
-                    'order'=>'sort order'
+                '<keyName>'=>[ //Tested in: testGeneralQueryBuilding
+                    'sort'=>'<sort string>', //Tested in: testGeneralQueryBuilding
+                    'order'=>'sort order' //Tested in: testGeneralQueryBuilding
                 ]
             ],
             'groupBy'=>[ //Tested in: testGeneralQueryBuilding
-                '<keyName>'=>'<string>'
+                '<keyName>'=>'<string>' //Tested in: testGeneralQueryBuilding
             ],
         ],
         'settings'=>[
@@ -72,27 +72,27 @@ $readInfo = [
                 ]
             ],
             'placeholders'=>[ //Tested in: testGeneralQueryBuilding
-                '<placeholder name>'=>[
-                    'value'=>'<value>',
-                    'type'=>'<param type can be null>'
+                '<placeholder name>'=>[ //Tested in: testGeneralQueryBuilding
+                    'value'=>'<value>', //Tested in: testGeneralQueryBuilding
+                    'type'=>'<param type can be null>' //Tested in: testGeneralQueryBuilding
                 ]
             ],
             'fetchJoin'=>'<true or false>', // whether or not when paginating this query requires a fetch join // Tested in: testGeneralDataRetrieval
         ],
         'permissions'=>[
-            'allowed'=>'<true or false>',
+            'allowed'=>'<true or false>', // Tested in testReadPermissions
             'maxLimit'=>'<max limit>', // Tested in testGeneralDataRetrieval
-            'where'=>[
-                'permissive'=>'<true or false>',
-                'fields'=>[
-                    '<field name>'=>[
-                        'permissive'=>'<true or false>',
+            'where'=>[ // Tested in testReadPermissions
+                'permissive'=>'<true or false>', // Tested in testReadPermissions
+                'fields'=>[ // Tested in testReadPermissions
+                    '<field name>'=>[ // Tested in testReadPermissions
+                        'permissive'=>'<true or false>', // Tested in testReadPermissions
                         'settings'=>[
                             'closure'=>'<closure to test param, return false from closure to cancel execution>',
                             'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
                         ],
-                        'operators'=>[
-                            '<operator name>'=>'<allowed>'
+                        'operators'=>[ // Tested in testReadPermissions
+                            '<operator name>'=>'<allowed>' // Tested in testReadPermissions
                         ]
                     ]
                 ]
