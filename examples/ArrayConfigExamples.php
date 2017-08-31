@@ -77,11 +77,11 @@ $readInfo = [
                     'type'=>'<param type can be null>'
                 ]
             ],
-            'fetchJoin'=>'<true or false>', // whether or not when paginating this query requires a fetch join
+            'fetchJoin'=>'<true or false>', // whether or not when paginating this query requires a fetch join // Tested in: testGeneralDataRetrieval
         ],
         'permissions'=>[
             'allowed'=>'<true or false>',
-            'maxLimit'=>'<max limit>',
+            'maxLimit'=>'<max limit>', // Tested in testGeneralDataRetrieval
             'where'=>[
                 'permissive'=>'<true or false>',
                 'fields'=>[
@@ -190,7 +190,7 @@ $frontEndQuery = [
         ],
     ],
     'options'=>[
-        'returnCount'=>'<true or false>',
+        'returnCount'=>'<true or false>', // Tested in: testGeneralDataRetrieval
         'limit'=>'<limit>', //Tested in: testGeneralQueryBuilding
         'offset'=>'<offset>', //Tested in: testGeneralQueryBuilding
     ]
@@ -247,7 +247,7 @@ $batchParams = [
 $backendOptions = [ // not all cache options override query level cache options
     'options'=>[
         'paginate'=>'<true or false>', // Tested in: testGeneralDataRetrieval
-        'fetchJoin'=>'<true or false>',
+        'fetchJoin'=>'<true or false>', // Tested in: testGeneralDataRetrieval
         'hydrate'=>'<if false qb or paginator is returned>', // Tested in: testGeneralDataRetrieval
         'hydrationType'=>'doctrine hydration type', // Tested in: testGeneralDataRetrieval
         '<placeholder name>'=>[ // Tested in: testGeneralDataRetrieval
@@ -267,7 +267,8 @@ $backendOptions = [ // not all cache options override query level cache options
         'entitiesShareConfigs'=>'<if true then to optimize the process configs during batches the same config is used for each entity processed, to save reprocessing time>', // Tested in testMultiAddAndChain
         'flush' => '<whether or not to automatically flush>', // Tested in testMultiAddAndChain
         'batchMax' => '<the max we can do in one batch>', // Tested in testMaxBatch
-        'queryMaxParams' => '<the max number of query params that can be passed in to a read request.>'
+        'queryMaxParams' => '<the max number of query params that can be passed in to a read request.>', // Tested in testGeneralDataRetrieval
+        'maxLimit' => '<The maxium number of rows that can be returned by a read at once>' // Tested in testGeneralDataRetrieval
     ]
 ];
 

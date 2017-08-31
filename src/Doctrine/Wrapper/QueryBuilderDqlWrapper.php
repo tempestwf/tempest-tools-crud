@@ -163,9 +163,11 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
      * @param string $expr
      * @param array $arguments
      * @return string
+     * @throws \TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
      */
     public function useExpression(string $expr, array $arguments):string
     {
+        $this->verifyOperatorAllowed($expr);
         return call_user_func_array ([$this->getQueryBuilder()->expr(), $expr], $arguments);
     }
 

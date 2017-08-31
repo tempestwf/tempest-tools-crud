@@ -138,7 +138,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      */
     protected function verifyAllowed(array $extra):void
     {
-        $config = $this->getArray()['permissions'] ?? [];
+        $config = $this->getArray()['read']['permissions'] ?? [];
         $allowed = $config['allowed']?? true;
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $this->getRepository()->getArrayHelper()->parse($allowed, $extra);
@@ -200,7 +200,10 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      */
     protected function verifyLimitAndOffset (int $limit, array $extra):void
     {
-        $maxLimit = $this->getArray()['permissions']['maxLimit'] ?? static::DEFAULT_MAX_LIMIT;
+        $options = $extra['options'];
+        $optionOverrides = $extra['optionOverrides'];
+        $maxLimit = $this->findSetting([$this->getArray()['read']['permissions'] ?? [], $options, $optionOverrides], 'maxLimit');
+        $maxLimit = $maxLimit ?? static::DEFAULT_MAX_LIMIT;
         /** @noinspection NullPointerExceptionInspection */
         $maxLimit = (int)$this->getRepository()->getArrayHelper()->parse($maxLimit, $extra);
         if ($limit > $maxLimit) {
