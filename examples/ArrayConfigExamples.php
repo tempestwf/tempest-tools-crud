@@ -104,7 +104,7 @@ $readInfo = [
                         'permissive'=>'<true or false>', // Tested in testReadPermissions2 and testReadPermissions3
                         'settings'=>[
                             'closure'=>'<closure to test param, return false from closure to cancel execution>', // Tested in testMutateAndClosure
-                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>', // Tested in testMutateAndClosure
+                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>', // Tested in testMutateAndClosure and testMutateUsed
                         ],
                         'operators'=>[ // Tested in testReadPermissions2 and testReadPermissions3
                             '<operator name>'=>'<allowed>' // Tested in testReadPermissions2 and testReadPermissions3
@@ -119,7 +119,7 @@ $readInfo = [
                         'permissive'=>'<true or false>', // Tested in testReadPermissions2 and testReadPermissions3
                         'settings'=>[
                             'closure'=>'<closure to test param, return false from closure to cancel execution>', // Tested in testMutateAndClosure
-                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>', // Tested in testMutateAndClosure
+                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>', // Tested in testMutateAndClosure and testMutateUsed
                         ],
                         'directions'=>[ // Tested in testReadPermissions2 and testReadPermissions3
                             '<ASC or DESC>'=>'<allowed true or false>' // Tested in testReadPermissions2 and testReadPermissions3
@@ -134,7 +134,7 @@ $readInfo = [
                         'allowed'=>'<true or false>', // Tested in testReadPermissions2 and testReadPermissions3
                         'settings'=>[
                             'closure'=>'<closure to test param, return false from closure to cancel execution>', // Tested in testMutateAndClosure
-                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>', // Tested in testMutateAndClosure
+                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>', // Tested in testMutateAndClosure and testMutateUsed
                         ]
                     ]
                 ]
@@ -146,7 +146,7 @@ $readInfo = [
                         'allowed'=>'<true or false>', // Tested in testReadPermissions2 and testReadPermissions3
                         'settings'=>[
                             'closure'=>'<closure to test param, return false from closure to cancel execution>', // Tested in testMutateAndClosure
-                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>', // Tested in testMutateAndClosure
+                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>', // Tested in testMutateAndClosure and testMutateUsed
                         ]
                     ]
                 ]
@@ -160,32 +160,32 @@ $frontEndQuery = [
     'query'=>[
         'where'=>[ //Tested in: testGeneralQueryBuilding
             [
-                'field'=>'<fieldName>',
-                'type'=>'<and, or>',
-                'operator'=>'<operator name>', // make sure here that only the safe ones are even used. If operator is 'andX' or 'orX' then conditions with a nested list of conditions is used instead
-                'arguments'=>['<arguments that get passed to that query builder operator>'],  // If operator is 'andX' or 'orX' this is omitted. Conditions appears in instead.
-                'conditions'=>['<array of just like any other filter>'] // If operator is not 'andX' or 'orX' this is omitted. This allows condition nesting.
+                'field'=>'<fieldName>', //Tested in: testGeneralQueryBuilding
+                'type'=>'<and, or>', //Tested in: testGeneralQueryBuilding
+                'operator'=>'<operator name>', // make sure here that only the safe ones are even used. If operator is 'andX' or 'orX' then conditions with a nested list of conditions is used instead //Tested in: testGeneralQueryBuilding
+                'arguments'=>['<arguments that get passed to that query builder operator>'],  // If operator is 'andX' or 'orX' this is omitted. Conditions appears in instead. //Tested in: testGeneralQueryBuilding
+                'conditions'=>['<array of just like any other filter>'] // If operator is not 'andX' or 'orX' this is omitted. This allows condition nesting. //Tested in: testGeneralQueryBuilding
             ]
         ],
         'having'=>[ //Tested in: testGeneralQueryBuilding
             [
-                'field'=>'<fieldName>',
-                'type'=>'<and, or>',
-                'operator'=>'<operator name>', // make sure here that only the safe ones are even used. If operator is 'andX' or 'orX' then conditions with a nested list of conditions is used instead
-                'arguments'=>['<arguments that get passed to that query builder operator>'],  // If operator is 'andX' or 'orX' this is omitted. Conditions appears in instead.
-                'conditions'=>['<array of just like any other filter>'] // If operator is not 'andX' or 'orX' this is omitted. This allows condition nesting.
+                'field'=>'<fieldName>', //Tested in: testGeneralQueryBuilding
+                'type'=>'<and, or>', //Tested in: testGeneralQueryBuilding
+                'operator'=>'<operator name>', // make sure here that only the safe ones are even used. If operator is 'andX' or 'orX' then conditions with a nested list of conditions is used instead //Tested in: testGeneralQueryBuilding
+                'arguments'=>['<arguments that get passed to that query builder operator>'],  // If operator is 'andX' or 'orX' this is omitted. Conditions appears in instead. //Tested in: testGeneralQueryBuilding
+                'conditions'=>['<array of just like any other filter>'] // If operator is not 'andX' or 'orX' this is omitted. This allows condition nesting. //Tested in: testGeneralQueryBuilding
             ]
         ],
         'orderBy'=>[ //Tested in: testGeneralQueryBuilding
-            '<field name>'=>'<ASC or DESC>'
+            '<field name>'=>'<ASC or DESC>' //Tested in: testGeneralQueryBuilding
         ],
         'groupBy'=>[ //Tested in: testGeneralQueryBuilding
-            '<field name>'
+            '<field name>' //Tested in: testGeneralQueryBuilding
         ],
         'placeholders'=>[ //Tested in: testGeneralQueryBuilding
-            '<placeholder name>'=>[
-                'value'=>'<value>',
-                'type'=>'<param type can be null>'
+            '<placeholder name>'=>[ //Tested in: testGeneralQueryBuilding
+                'value'=>'<value>', //Tested in: testGeneralQueryBuilding
+                'type'=>'<param type can be null>' //Tested in: testGeneralQueryBuilding
             ]
         ],
     ],
@@ -196,47 +196,47 @@ $frontEndQuery = [
     ]
 ];
 
-$createSingleParams = [
-    '<fieldName>'=>'<fieldValue>',
-    '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association.
-        '<chainType>'=>[ // chainType can be: create, update, delete, read
-            '<fieldName>'=>'<fieldValue>',
-            'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>' // any time single is at the end of the assign type, then we strip the s off the end of the assignation name before calling the method. For instance if you have a relation of users, but you have a method of addUser you need use an assignType of addSingle.
+$createSingleParams = [ // Tested in CudTest.php
+    '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
+    '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association. // Tested in CudTest.php
+        '<chainType>'=>[ // chainType can be: create, update, delete, read // Tested in CudTest.php
+            '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
+            'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>' // any time single is at the end of the assign type, then we strip the s off the end of the assignation name before calling the method. For instance if you have a relation of users, but you have a method of addUser you need use an assignType of addSingle. // Tested in CudTest.php
         ]
     ]
 ];
 
-$createBatchParams = [
+$createBatchParams = [ // Tested in CudTest.php
     [
-        '<fieldName>'=>'<fieldValue>',
-        '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association.
-            '<chainType>'=>[ // chainType can be: create, update, delete, read
-                '<fieldName>'=>'<fieldValue>',
-                'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>'
+        '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
+        '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association. // Tested in CudTest.php
+            '<chainType>'=>[ // chainType can be: create, update, delete, read // Tested in CudTest.php
+                '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
+                'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>' // Tested in CudTest.php
             ]
         ]
     ]
 ];
 
-$singleParams = [ // id will be passed as a separate argument
-    '<fieldName>'=>'<fieldValue>',
-    '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association.
-        '<chainType>'=>[ // chainType can be: create, update, delete, read
-            '<fieldName>'=>'<fieldValue>',
-            'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>'
+$singleParams = [ // id will be passed as a separate argument // Tested in CudTest.php
+    '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
+    '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association. // Tested in CudTest.php
+        '<chainType>'=>[ // chainType can be: create, update, delete, read // Tested in CudTest.php
+            '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
+            'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>' // Tested in CudTest.php
         ]
     ]
 ];
 
-$batchParams = [
+$batchParams = [ // Tested in CudTest.php
     [
         [
-            '<id of entity>' => [
-                '<fieldName>'=>'<fieldValue>',
-                '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association.
-                    '<chainType>'=>[ // chainType can be: create, update, delete, read
-                        '<fieldName>'=>'<fieldValue>',
-                        'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>'
+            '<id of entity>' => [ // Tested in CudTest.php
+                '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
+                '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association. // Tested in CudTest.php
+                    '<chainType>'=>[ // chainType can be: create, update, delete, read // Tested in CudTest.php
+                        '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
+                        'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>' // Tested in CudTest.php
                     ]
                 ]
             ]
@@ -244,31 +244,31 @@ $batchParams = [
     ]
 ];
 
-$backendOptions = [ // not all cache options override query level cache options
+$backendOptions = [ // note all options override query level options
     'options'=>[
         'paginate'=>'<true or false>', // Tested in: testGeneralDataRetrieval
-        'fetchJoin'=>'<true or false>', // Tested in: testGeneralDataRetrieval
+        'fetchJoin'=>'<true or false>', // Optional // Tested in: testGeneralDataRetrieval
         'hydrate'=>'<if false qb or paginator is returned>', // Tested in: testGeneralDataRetrieval
         'hydrationType'=>'doctrine hydration type', // Tested in: testGeneralDataRetrieval
-        '<placeholder name>'=>[ // Tested in: testGeneralDataRetrieval
+        '<placeholder name>'=>[  // Optional // Tested in: testGeneralDataRetrieval
             'value'=>'<value>',
             'type'=>'<param type can be null>'
         ],
-        'queryCacheProfile'=>'<a doctrine query cache profile>',// Used only by SQL queries. Use a QueryCacheProfile object
-        'queryCacheDrive'=>'<driver for query cache>', //Tested in: testGeneralQueryBuilding
-        'resultCacheDrive'=>'<driver for query cache>', //Tested in: testGeneralQueryBuilding
-        'allowCache'=>'<whether or not to allow the query cache, true or false>', //Tested in: testGeneralQueryBuilding
-        'cacheId' => '<result cache id>', //Tested in: testGeneralQueryBuilding
-        'useQueryCache' => '<whether or not to use query cache>', //Tested in: testGeneralQueryBuilding
-        'useResultCache' => '<whether or not to use result cache>', //Tested in: testGeneralQueryBuilding
-        'timeToLive' => '<result cache time to live>', //Tested in: testGeneralQueryBuilding
-        'tagSet' => '<future feature for tags sets in cache>',
+        'queryCacheProfile'=>'<a doctrine query cache profile>', // Optional // Used only by SQL queries. Use a QueryCacheProfile object
+        'queryCacheDrive'=>'<driver for query cache>', // Optional //Tested in: testGeneralQueryBuilding
+        'resultCacheDrive'=>'<driver for query cache>', // Optional //Tested in: testGeneralQueryBuilding
+        'allowCache'=>'<whether or not to allow the query cache, true or false>', // Optional //Tested in: testGeneralQueryBuilding
+        'cacheId' => '<result cache id>', // Optional //Tested in: testGeneralQueryBuilding
+        'useQueryCache' => '<whether or not to use query cache>', // Optional //Tested in: testGeneralQueryBuilding
+        'useResultCache' => '<whether or not to use result cache>', // Optional //Tested in: testGeneralQueryBuilding
+        'timeToLive' => '<result cache time to live>',// Optional  //Tested in: testGeneralQueryBuilding
+        'tagSet' => '<future feature for tags sets in cache>', // Not yet implemented
         'transaction'=>'<true or false to wrap everythign in a transations>', // Tested in testMultiAddAndChain
         'entitiesShareConfigs'=>'<if true then to optimize the process configs during batches the same config is used for each entity processed, to save reprocessing time>', // Tested in testMultiAddAndChain
         'flush' => '<whether or not to automatically flush>', // Tested in testMultiAddAndChain
-        'batchMax' => '<the max we can do in one batch>', // Tested in testMaxBatch
-        'queryMaxParams' => '<the max number of query params that can be passed in to a read request.>', // Tested in testGeneralDataRetrieval
-        'maxLimit' => '<The maxium number of rows that can be returned by a read at once>' // Tested in testGeneralDataRetrieval
+        'batchMax' => '<the max we can do in one batch>', // Optional // Tested in testMaxBatch
+        'queryMaxParams' => '<the max number of query params that can be passed in to a read request.>', // Optional // Tested in testGeneralDataRetrieval
+        'maxLimit' => '<The maxium number of rows that can be returned by a read at once>' // Optional // Tested in testGeneralDataRetrieval
     ]
 ];
 
@@ -315,7 +315,7 @@ $entityInfo = [
             ]
         ],
         'options'=>[
-            '<custom option name>'=>'<custom option value>',
+            '<custom option name>'=>'<custom option value>', // reserved for custom use cases
         ]
     ],
     'update'=>[
@@ -360,7 +360,7 @@ $entityInfo = [
             ]
         ],
         'options'=>[
-            '<custom option name>'=>'<custom option value>',
+            '<custom option name>'=>'<custom option value>', // reserved for custom use cases
         ]
     ],
     'delete'=>[
@@ -405,7 +405,7 @@ $entityInfo = [
             ]
         ],
         'options'=>[
-            '<custom option name>'=>'<custom option value>',
+            '<custom option name>'=>'<custom option value>', // reserved for custom use cases
         ]
     ]
 ];
