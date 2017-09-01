@@ -88,8 +88,8 @@ $readInfo = [
                     '<field name>'=>[ // Tested in testReadPermissions
                         'permissive'=>'<true or false>', // Tested in testReadPermissions
                         'settings'=>[
-                            'closure'=>'<closure to test param, return false from closure to cancel execution>',
-                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
+                            'closure'=>'<closure to test param, return false from closure to cancel execution>', // Tested in testMutateAndClosure
+                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>', // Tested in testMutateAndClosure
                         ],
                         'operators'=>[ // Tested in testReadPermissions
                             '<operator name>'=>'<allowed>' // Tested in testReadPermissions
@@ -98,55 +98,55 @@ $readInfo = [
                 ]
             ],
             'having'=>[
-                'permissive'=>'<true or false>',
-                'fields'=>[
-                    '<field name>'=>[
-                        'permissive'=>'<true or false>',
+                'permissive'=>'<true or false>', // Tested in testReadPermissions2 and testReadPermissions3
+                'fields'=>[ // Tested in testReadPermissions2 and testReadPermissions3
+                    '<field name>'=>[ // Tested in testReadPermissions2 and testReadPermissions3
+                        'permissive'=>'<true or false>', // Tested in testReadPermissions2 and testReadPermissions3
                         'settings'=>[
-                            'closure'=>'<closure to test param, return false from closure to cancel execution>',
-                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
+                            'closure'=>'<closure to test param, return false from closure to cancel execution>', // Tested in testMutateAndClosure
+                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>', // Tested in testMutateAndClosure
                         ],
-                        'operators'=>[
-                            '<operator name>'=>'<allowed>'
+                        'operators'=>[ // Tested in testReadPermissions2 and testReadPermissions3
+                            '<operator name>'=>'<allowed>' // Tested in testReadPermissions2 and testReadPermissions3
                         ]
                     ]
                 ]
             ],
             'orderBy'=>[
-                'permissive'=>'<true or false>',
+                'permissive'=>'<true or false>', // Tested in testReadPermissions2 and testReadPermissions3
                 'fields'=>[
-                    '<field name>'=>[
-                        'permissive'=>'<true or false>',
+                    '<field name>'=>[ // Tested in testReadPermissions2 and testReadPermissions3
+                        'permissive'=>'<true or false>', // Tested in testReadPermissions2 and testReadPermissions3
                         'settings'=>[
-                            'closure'=>'<closure to test param, return false from closure to cancel execution>',
-                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
+                            'closure'=>'<closure to test param, return false from closure to cancel execution>', // Tested in testMutateAndClosure
+                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>', // Tested in testMutateAndClosure
                         ],
-                        'directions'=>[
-                            '<ASC or DESC>'=>'<allowed true or false>'
+                        'directions'=>[ // Tested in testReadPermissions2 and testReadPermissions3
+                            '<ASC or DESC>'=>'<allowed true or false>' // Tested in testReadPermissions2 and testReadPermissions3
                         ]
                     ]
                 ]
             ],
-            'groupBy'=>[
-                'permissive'=>'<true or false>',
-                'fields'=>[
-                    '<field name>'=>[
-                        'allowed'=>'<true or false>',
+            'groupBy'=>[ // Tested in testReadPermissions2 and testReadPermissions3
+                'permissive'=>'<true or false>', // Tested in testReadPermissions2 and testReadPermissions3
+                'fields'=>[ // Tested in testReadPermissions2 and testReadPermissions3
+                    '<field name>'=>[ // Tested in testReadPermissions2 and testReadPermissions3
+                        'allowed'=>'<true or false>', // Tested in testReadPermissions2 and testReadPermissions3
                         'settings'=>[
-                            'closure'=>'<closure to test param, return false from closure to cancel execution>',
-                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
+                            'closure'=>'<closure to test param, return false from closure to cancel execution>', // Tested in testMutateAndClosure
+                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>', // Tested in testMutateAndClosure
                         ]
                     ]
                 ]
             ],
             'placeholders'=>[
-                'permissive'=>'<true or false>',
-                'placeholderNames'=>[
-                    '<name>'=>[
-                        'allowed'=>'<true or false>',
+                'permissive'=>'<true or false>', // Tested in testReadPermissions2 and testReadPermissions3
+                'placeholderNames'=>[ // Tested in testReadPermissions2 and testReadPermissions3
+                    '<name>'=>[ // Tested in testReadPermissions2 and testReadPermissions3
+                        'allowed'=>'<true or false>', // Tested in testReadPermissions2 and testReadPermissions3
                         'settings'=>[
-                            'closure'=>'<closure to test param, return false from closure to cancel execution>',
-                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
+                            'closure'=>'<closure to test param, return false from closure to cancel execution>', // Tested in testMutateAndClosure
+                            'mutate'=>'<closure to modify paramaters passed from front end before applying them>', // Tested in testMutateAndClosure
                         ]
                     ]
                 ]
