@@ -30,7 +30,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
      * @throws \RuntimeException
      * @throws \TempestTools\Crud\Exceptions\Orm\Helper\QueryBuilderHelperException
      */
-    public function closure(string $key, array $settings, ArrayHelperContract $arrayHelper, $closure, array $extra):array
+    public function closure(string $key=null, $settings, ArrayHelperContract $arrayHelper, $closure, array $extra):array
     {
         $extra['key'] = $key;
         $extra['settings'] = $settings;
@@ -52,7 +52,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
      * @return array
      * @throws \RuntimeException
      */
-    public function mutate (string $key, array $settings, ArrayHelperContract $arrayHelper, $closure, array $extra):array
+    public function mutate (string $key=null, $settings, ArrayHelperContract $arrayHelper, $closure, array $extra):array
     {
         $extra['key'] = $key;
         $extra['settings'] = $settings;

@@ -460,7 +460,9 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $safeKeys = array_keys($placeholders);
         $placeholders = array_replace($frontEndPlaceholders, $placeholders);
         foreach ($placeholders as $key=>$value) {
-            [$key, $value] = $this->verifyPlaceholders($key, $value, $arrayHelper, $permissions, $extra);
+            if (!in_array($key, $safeKeys, true)) {
+                [$key, $value] = $this->verifyPlaceholders($key, $value, $arrayHelper, $permissions, $extra);
+            }
             $type = $value['type'] ?? null;
             $value = $value['value'] ?? null;
             if (in_array($key, $safeKeys, true)) {

@@ -122,7 +122,7 @@ $readInfo = [
                             'mutate'=>'<closure to modify paramaters passed from front end before applying them>',
                         ],
                         'directions'=>[
-                            '<operator name>'=>'<allowed true or false>'
+                            '<ASC or DESC>'=>'<allowed true or false>'
                         ]
                     ]
                 ]
@@ -142,7 +142,7 @@ $readInfo = [
             'placeholders'=>[
                 'permissive'=>'<true or false>',
                 'placeholderNames'=>[
-                    '<field name>'=>[
+                    '<name>'=>[
                         'allowed'=>'<true or false>',
                         'settings'=>[
                             'closure'=>'<closure to test param, return false from closure to cancel execution>',

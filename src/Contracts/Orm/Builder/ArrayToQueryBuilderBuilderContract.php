@@ -23,7 +23,7 @@ interface ArrayToQueryBuilderBuilderContract
      * @internal param \Closure $fieldSetting
      * @return array
      */
-    public function closure(string $key, array $settings, ArrayHelperContract $arrayHelper, $closure, array $extra): array;
+    public function closure(string $key=null, $settings, ArrayHelperContract $arrayHelper, $closure, array $extra): array;
 
     /** @noinspection MoreThanThreeArgumentsInspection
      * @param string $key
@@ -35,7 +35,7 @@ interface ArrayToQueryBuilderBuilderContract
      * @internal param mixed $fieldSetting
      * @return array
      */
-    public function mutate(string $key, array $settings, ArrayHelperContract $arrayHelper, $closure, array $extra): array;
+    public function mutate(string $key=null, $settings, ArrayHelperContract $arrayHelper, $closure, array $extra): array;
 
     /** @noinspection MoreThanThreeArgumentsInspection */
 
