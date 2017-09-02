@@ -30,6 +30,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         'transaction'=>true,
         'entitiesShareConfigs'=>true,
         'flush'=>true,
+        'clearPrePopulatedEntitiesOnFlush'=>true
     ];
 
     /**

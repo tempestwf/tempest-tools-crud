@@ -320,6 +320,16 @@ trait RepositoryCoreTrait
         return $this->getDataBindHelper()->gatherPrePopulateEntityIds($params, $gathered);
     }
 
+    /**
+     * @internal param array $params
+     * @internal param array $gathered
+     */
+    public function clearPrePopulatedEntities ():void
+    {
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getDataBindHelper()->clearPrePopulatedEntities();
+    }
+
 
 }
 

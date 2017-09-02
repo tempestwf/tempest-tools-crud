@@ -131,5 +131,6 @@ interface DataBindHelperContract
      */
     public function prePopulateEntities(array $params, array $options, array $optionOverrides, string $action):void;
 
+    public function clearPrePopulatedEntities():void;
 }
 ?>

@@ -154,13 +154,13 @@ $readInfo = [
         ]
     ],
     'create'=>[
-        'prePopulateEntities'=>'<true or false>' // defaults to true, if true entities referenced in the params passed to CUD methods will be pre fetched using the minimum number of queries.
+        'prePopulateEntities'=>'<true or false>' // defaults to true, if true entities referenced in the params passed to CUD methods will be pre fetched using the minimum number of queries. // Tested in testPrePopulate
     ],
     'update'=>[
-        'prePopulateEntities'=>'<true or false>' // defaults to true, if true entities referenced in the params passed to CUD methods will be pre fetched using the minimum number of queries.
+        'prePopulateEntities'=>'<true or false>' // defaults to true, if true entities referenced in the params passed to CUD methods will be pre fetched using the minimum number of queries. // Tested in testPrePopulate
     ],
     'delete'=>[
-        'prePopulateEntities'=>'<true or false>' // defaults to true, if true entities referenced in the params passed to CUD methods will be pre fetched using the minimum number of queries.
+        'prePopulateEntities'=>'<true or false>' // defaults to true, if true entities referenced in the params passed to CUD methods will be pre fetched using the minimum number of queries. // Tested in testPrePopulate
     ]
 ];
 $frontEndQuery = [
@@ -276,8 +276,8 @@ $backendOptions = [ // note all options override query level options
         'batchMax' => '<the max we can do in one batch>', // Optional // Tested in testMaxBatch
         'queryMaxParams' => '<the max number of query params that can be passed in to a read request.>', // Optional // Tested in testGeneralDataRetrieval
         'maxLimit' => '<The maxium number of rows that can be returned by a read at once>', // Optional // Tested in testGeneralDataRetrieval
-        'prePopulateEntities'=>'<true or false>' // Optional  // defaults to true, if true entities referenced in the params passed to CUD methods will be pre fetched using the minimum number of queries.
-
+        'prePopulateEntities'=>'<true or false>', // Optional  // defaults to true, if true entities referenced in the params passed to CUD methods will be pre fetched using the minimum number of queries. // Tested in testPrePopulate
+        'clearPrePopulatedEntitiesOnFlush'=>'<true or false>' // whether or not when a flush occurred the pre populated entities should be cleared // Tested in testPrePopulate
     ]
 ];
 

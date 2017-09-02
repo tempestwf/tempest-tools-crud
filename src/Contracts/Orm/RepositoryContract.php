@@ -287,5 +287,6 @@ interface RepositoryContract
      */
     public function gatherPrePopulateEntityIds (array $params, array $gathered=[]):array;
 
+    public function clearPrePopulatedEntities ():void;
 
 }
