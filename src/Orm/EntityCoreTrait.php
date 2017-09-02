@@ -28,6 +28,8 @@ trait EntityCoreTrait
      */
     protected $lastMode;
 
+    protected $prePopulated = false;
+
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
@@ -230,6 +232,22 @@ trait EntityCoreTrait
     public function setLastMode(string $lastMode = null):void
     {
         $this->lastMode = $lastMode;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPrePopulated(): bool
+    {
+        return $this->prePopulated;
+    }
+
+    /**
+     * @param bool $prePopulated
+     */
+    public function setPrePopulated(bool $prePopulated): void
+    {
+        $this->prePopulated = $prePopulated;
     }
 
 }

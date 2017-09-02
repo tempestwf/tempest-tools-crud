@@ -236,4 +236,13 @@ interface EntityContract
      */
     public function permissiveAllowedCheck($high, array $low): bool;
 
+    /**
+     * @return bool
+     */
+    public function isPrePopulated(): bool;
+
+    /**
+     * @param bool $prePopulated
+     */
+    public function setPrePopulated(bool $prePopulated): void;
 }

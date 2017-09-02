@@ -430,6 +430,7 @@ class DataBindHelper implements DataBindHelperContract
             $foundEntities = $targetRepo->findIn('id', $ids);
             /** @var EntityContract $foundEntity */
             foreach ($foundEntities as $foundEntity) {
+                $foundEntity->setPrePopulated(true);
                 $prePopulate[$key][$foundEntity->getId()] = $foundEntity;
             }
 
