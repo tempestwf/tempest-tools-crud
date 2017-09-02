@@ -279,5 +279,13 @@ interface RepositoryContract
      */
     public function findEntitiesFromArrayKeys (array $array):array;
 
+    /**
+     * @param array $params
+     * @param array $gathered
+     * @return array
+     * @throws \InvalidArgumentException
+     */
+    public function gatherPrePopulateEntityIds (array $params, array $gathered=[]):array;
+
 
 }

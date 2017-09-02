@@ -114,5 +114,22 @@ interface DataBindHelperContract
      */
     public function setRepository(RepositoryContract $repository): void;
 
+    /**
+     * @param array $params
+     * @param array $gathered
+     * @return array
+     */
+    public function gatherPrePopulateEntityIds (array $params, array $gathered=[]):array;
+
+    /** @noinspection MoreThanThreeArgumentsInspection */
+
+    /**
+     * @param array $params
+     * @param array $options
+     * @param array $optionOverrides
+     * @param string $action
+     */
+    public function prePopulateEntities(array $params, array $options, array $optionOverrides, string $action):void;
+
 }
 ?>

@@ -308,6 +308,17 @@ trait RepositoryCoreTrait
 
     abstract public function createEntityManagerWrapper():EntityManagerWrapperContract;
 
+    /**
+     * @param array $params
+     * @param array $gathered
+     * @return array
+     * @throws \InvalidArgumentException
+     */
+    public function gatherPrePopulateEntityIds (array $params, array $gathered=[]):array
+    {
+        /** @noinspection NullPointerExceptionInspection */
+        return $this->getDataBindHelper()->gatherPrePopulateEntityIds($params, $gathered);
+    }
 
 
 }

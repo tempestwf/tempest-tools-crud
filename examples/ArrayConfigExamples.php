@@ -153,8 +153,15 @@ $readInfo = [
             ],
         ]
     ],
-
-
+    'create'=>[
+        'prePopulateEntities'=>'<true or false>' // defaults to true, if true entities referenced in the params passed to CUD methods will be pre fetched using the minimum number of queries.
+    ],
+    'update'=>[
+        'prePopulateEntities'=>'<true or false>' // defaults to true, if true entities referenced in the params passed to CUD methods will be pre fetched using the minimum number of queries.
+    ],
+    'delete'=>[
+        'prePopulateEntities'=>'<true or false>' // defaults to true, if true entities referenced in the params passed to CUD methods will be pre fetched using the minimum number of queries.
+    ]
 ];
 $frontEndQuery = [
     'query'=>[
@@ -268,7 +275,9 @@ $backendOptions = [ // note all options override query level options
         'flush' => '<whether or not to automatically flush>', // Tested in testMultiAddAndChain
         'batchMax' => '<the max we can do in one batch>', // Optional // Tested in testMaxBatch
         'queryMaxParams' => '<the max number of query params that can be passed in to a read request.>', // Optional // Tested in testGeneralDataRetrieval
-        'maxLimit' => '<The maxium number of rows that can be returned by a read at once>' // Optional // Tested in testGeneralDataRetrieval
+        'maxLimit' => '<The maxium number of rows that can be returned by a read at once>', // Optional // Tested in testGeneralDataRetrieval
+        'prePopulateEntities'=>'<true or false>' // Optional  // defaults to true, if true entities referenced in the params passed to CUD methods will be pre fetched using the minimum number of queries.
+
     ]
 ];
 

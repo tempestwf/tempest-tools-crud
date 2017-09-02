@@ -17,6 +17,8 @@ class DataBindHelper implements DataBindHelperContract
 
     const IGNORE_KEYS = ['assignType'];
 
+    const PRE_POPULATED_ENTITIES_KEY = 'prePopulatedEntities';
+
     /**
      * DataBindHelper constructor.
      *
@@ -149,9 +151,9 @@ class DataBindHelper implements DataBindHelperContract
         $return = is_scalar($value) ? [
             'read' => [
                 $value => [
-                    'assignType' => 'set'
-                ]
-            ]
+                    'assignType' => 'set',
+                ],
+            ],
         ] : $value;
         return $return;
     }
@@ -184,8 +186,6 @@ class DataBindHelper implements DataBindHelperContract
                     $this->bindEntities($foundEntities, $entity, $associationName);
                 }
             }
-        /*} else {
-            $entity->bindAssociation('set', $associationName, true);*/
         }
     }
 
@@ -260,14 +260,47 @@ class DataBindHelper implements DataBindHelperContract
      * @return array
      */
     public function findEntitiesFromArrayKeys (array $array):array {
-        $keys = array_keys($array);
+        [$keys, $entities] = $this->retrievePrePopulatedEntities($array);
         /** @var \TempestTools\Crud\Contracts\Orm\EntityContract|HasIdContract[] $entities */
-        $entities = $this->getRepository()->findIn('id', $keys);
+        $foundEntities = $keys !== []?$this->getRepository()->findIn('id', $keys):[];
+        $entities = array_merge($entities, $foundEntities);
         /** @var \TempestTools\Crud\Contracts\Orm\EntityContract|HasIdContract $entity */
         foreach ($entities as $entity) {
             $entity->setBindParams($array[$entity->getId()]);
         }
         return $entities;
+    }
+
+    /**
+     * @param array $array
+     * @return array
+     */
+    protected function retrievePrePopulatedEntities(array $array):array
+    {
+        $keys = array_keys($array);
+        $repo = $this->getRepository();
+        $className = $repo->getClassNameBase();
+
+        /** @noinspection NullPointerExceptionInspection */
+        /** @noinspection CallableParameterUseCaseInTypeContextInspection */
+        $array = $repo->getArrayHelper()->getArray()[static::PRE_POPULATED_ENTITIES_KEY][$className] ?? null;
+
+        if ($array !== null) {
+            $entities = [];
+            $remainingKeys = [];
+            foreach ($keys as $key) {
+                if (isset($array[$key])) {
+                    $entities[] = $array[$key];
+                } else {
+                    $remainingKeys[$key];
+                }
+            }
+            return [$remainingKeys, $entities];
+        }
+
+        return [$keys, []];
+
+
     }
 
     /**
@@ -289,6 +322,125 @@ class DataBindHelper implements DataBindHelperContract
         return $repo;
     }
 
+    /**
+     * @param array $params
+     * @param array $gathered
+     * @return array
+     * @throws \InvalidArgumentException
+     */
+    public function gatherPrePopulateEntityIds (array $params, array $gathered=[]):array
+    {
+        $repo = $this->getRepository();
+        $em = $repo->getEm();
+        $className = $repo->getClassNameBase();
+        $entityName = $repo->getEntityNameBase();
+
+        if (!isset($gathered[$className])) {
+            $gathered[$className] = [];
+        }
+
+        // Loops through associations, gather ids referenced, and recursively do the same into the repos for those associations
+        $associateNames = $em->getAssociationNames($entityName);
+        $found = [];
+        foreach ($params as $param) {
+            foreach ($associateNames as $associateName) {
+                if (isset($param[$associateName])) {
+                    $found = [];
+                    $associationInfo = $param[$associateName];
+                    if (!is_array($associationInfo)) {
+                        $found[] = $associationInfo;
+                    } else {
+                        $readInfo = $associationInfo['read'] ?? [];
+                        $updateInfo = $associationInfo['update'] ?? [];
+                        $deleteInfo = $associationInfo['delete'] ?? [];
+                        $readKeys = array_keys($readInfo);
+                        $updateKeys = array_keys($updateInfo);
+                        $deleteKeys = array_keys($deleteInfo);
+                        /** @noinspection SlowArrayOperationsInLoopInspection */
+                        $found = array_merge($found, $readKeys, $updateKeys, $deleteKeys);
+                        $subParams = array_merge($readInfo, $updateInfo, $deleteInfo);
+                        if ($subParams !== []) {
+                            $targetClass = $em->getAssociationTargetClass($entityName, $associateName);
+                            /** @var RepositoryContract $targetRepo */
+                            $targetRepo = $em->getRepository($targetClass);
+                            $gathered = $targetRepo->gatherPrePopulateEntityIds($subParams, $gathered);
+                        }
+                    }
+                }
+            }
+        }
+        $gathered[$className] = array_unique(array_merge($gathered[$className], $found));
+        return $gathered;
+    }
+    /** @noinspection MoreThanThreeArgumentsInspection */
+
+    /**
+     * @param array $params
+     * @param array $options
+     * @param array $optionOverrides
+     * @param string $action
+     * @internal param GenericEventArgsContract $args
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     */
+    public function prePopulateEntities(array $params, array $options, array $optionOverrides, string $action):void
+    {
+        $repo = $this->getRepository();
+
+        $arrayHelper = $repo->getArrayHelper();
+        $sharedArray = $arrayHelper->getArray();
+        /** @noinspection NullPointerExceptionInspection */
+        $actionSettings = $repo->getConfigArrayHelper()->getArray()[$action] ?? [];
+        /** @noinspection NullPointerExceptionInspection */
+        $prePopulateEntities = $arrayHelper->findSetting([$actionSettings, $options, $optionOverrides], 'prePopulateEntities') ?? true;
+        // If pre pop is true, if this isn't a create we get the top level ids to add to the gathered list. Then we gather the rest of the ids
+        if ($prePopulateEntities === true) {
+
+            if ($action !== 'create') {
+                $className = $repo->getClassNameBase();
+                $gathered = [
+                    $className => array_keys($params),
+                ];
+            } else {
+                $gathered = [];
+            }
+
+            $gathered = $this->gatherPrePopulateEntityIds($params, $gathered);
+
+            $this->convertGatheredToPrePopulation($gathered, $sharedArray);
+
+        }
+    }
+
+    /**
+     * @param array $gathered
+     * @param \ArrayObject $sharedArray
+     */
+    protected function convertGatheredToPrePopulation (array $gathered, \ArrayObject $sharedArray):void
+    {
+        $em = $this->getRepository()->getEm();
+        if (!isset($sharedArray[static::PRE_POPULATED_ENTITIES_KEY])) {
+            $sharedArray[static::PRE_POPULATED_ENTITIES_KEY] = [];
+        }
+        $prePopulate = [];
+
+        foreach ($gathered as $key => $ids) {
+            $prePopulate[$key] = [];
+            $targetRepo = $em->getRepository($key);
+            $foundEntities = $targetRepo->findIn('id', $ids);
+            /** @var EntityContract $foundEntity */
+            foreach ($foundEntities as $foundEntity) {
+                $prePopulate[$key][$foundEntity->getId()] = $foundEntity;
+            }
+
+            if (!isset($sharedArray[static::PRE_POPULATED_ENTITIES_KEY][$key])) {
+                $sharedArray[static::PRE_POPULATED_ENTITIES_KEY][$key] = [];
+            }
+
+            /** @noinspection SlowArrayOperationsInLoopInspection */
+            $sharedArray[static::PRE_POPULATED_ENTITIES_KEY][$key] = array_replace($sharedArray[static::PRE_POPULATED_ENTITIES_KEY][$key], $prePopulate[$key]);
+        }
+    }
 
     /**
      * @param array $params
@@ -321,7 +473,9 @@ class DataBindHelper implements DataBindHelperContract
             $params = $eventArgs->getArgs()['params'];
             $options = $eventArgs->getArgs()['options'];
             $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
+            $action = $eventArgs->getArgs()['action'];
             $this->checkBatchMax($params, $options, $optionOverrides);
+            $this->prePopulateEntities($params, $options, $optionOverrides, $action);
             foreach ($params as $batchParams) {
                 $eventArgs->getArgs()['params'] = $batchParams;
                 /** @noinspection DisconnectedForeachInstructionInspection */
@@ -406,7 +560,9 @@ class DataBindHelper implements DataBindHelperContract
             $params = $eventArgs->getArgs()['params'];
             $options = $eventArgs->getArgs()['options'];
             $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
+            $action = $eventArgs->getArgs()['action'];
             $this->checkBatchMax($params, $options, $optionOverrides);
+            $this->prePopulateEntities($params, $options, $optionOverrides, $action);
             /** @noinspection NullPointerExceptionInspection */
             /** @noinspection PhpParamsInspection */
             $entities = $this->findEntitiesFromArrayKeys($params);
@@ -480,7 +636,9 @@ class DataBindHelper implements DataBindHelperContract
             $params = $eventArgs->getArgs()['params'];
             $options = $eventArgs->getArgs()['options'];
             $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
+            $action = $eventArgs->getArgs()['action'];
             $this->checkBatchMax($params, $options, $optionOverrides);
+            $this->prePopulateEntities($params, $options, $optionOverrides, $action);
             /** @noinspection NullPointerExceptionInspection */
             /** @noinspection PhpParamsInspection */
             $entities = $this->findEntitiesFromArrayKeys($params);
