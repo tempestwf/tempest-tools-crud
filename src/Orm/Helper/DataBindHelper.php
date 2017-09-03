@@ -493,6 +493,7 @@ class DataBindHelper implements DataBindHelperContract
             $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
             $action = $eventArgs->getArgs()['action'];
             $this->checkBatchMax($params, $options, $optionOverrides);
+            $params = $this->convertSimpleParams($params, $frontEndOptions);
             $this->prePopulateEntities($params, $options, $optionOverrides, $action);
             foreach ($params as $batchParams) {
                 $eventArgs->getArgs()['params'] = $batchParams;
@@ -580,6 +581,7 @@ class DataBindHelper implements DataBindHelperContract
             $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
             $action = $eventArgs->getArgs()['action'];
             $this->checkBatchMax($params, $options, $optionOverrides);
+            $params = $this->convertSimpleParams($params, $frontEndOptions);
             $this->prePopulateEntities($params, $options, $optionOverrides, $action);
             /** @noinspection NullPointerExceptionInspection */
             /** @noinspection PhpParamsInspection */
@@ -656,6 +658,7 @@ class DataBindHelper implements DataBindHelperContract
             $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
             $action = $eventArgs->getArgs()['action'];
             $this->checkBatchMax($params, $options, $optionOverrides);
+            $params = $this->convertSimpleParams($params, $frontEndOptions);
             $this->prePopulateEntities($params, $options, $optionOverrides, $action);
             /** @noinspection NullPointerExceptionInspection */
             /** @noinspection PhpParamsInspection */
@@ -766,7 +769,125 @@ class DataBindHelper implements DataBindHelperContract
         }
     }
 
+    /**
+     * @param array $params
+     * @param array $frontEndOptions
+     * @return array
+     */
+    protected function convertSimpleParams(array $params, array $frontEndOptions):array
+    {
+        $convert = $frontEndOptions['simplifiedParams']??false;
+        if ($convert === true) {
+            return $this->doConvertSimpleParams($params, true);
+        }
 
+        return $params;
+    }
+
+    /**
+     * @param array $params
+     * @param bool $topLevel
+     * @param string $defaultAssignType
+     * @return array
+     */
+    protected function doConvertSimpleParams (array $params, bool $topLevel = false, string $defaultAssignType=null):array
+    {
+        if ($topLevel !== true) {
+            $converted = [
+                'create'=>[],
+                'read'=>[],
+                'update'=>[],
+                'delete'=>[]
+            ];
+            foreach ($params as $param) {
+                if ($defaultAssignType !== null && isset($param['assignType']) === false) {
+                    $param['assignType'] = $defaultAssignType;
+                }
+                if (
+                    // No id means it is a create
+                    $param['chainType'] === 'create'
+                    ||
+                    (
+                        isset($param['id']) === false
+                    )
+                ) {
+                    $converted['create'][] = $this->doConvertSimpleParamsChain($param);
+                } else if (
+                    //Just an id means it's a read
+                    $param['chainType'] === 'read'
+                    ||
+                    (
+                        isset($param['id']) === true
+                        &&
+                        count(array_keys($param)) === 1
+                    )
+                ) {
+                    $id = $param['id'];
+                    unset($param['id']);
+                    $converted['read'][$id] = $this->doConvertSimpleParamsChain($param);
+                } else if (
+                    // An id and other params means it's an update
+                    $param['chainType'] === 'update'
+                    ||
+                    (
+                        isset($param['id']) === true
+                        &&
+                        count(array_keys($param)) > 1
+                    )
+                ) {
+                    $id = $param['id'];
+                    unset($param['id']);
+                    $converted['update'][$id] = $this->doConvertSimpleParamsChain($param);
+                } else if (
+                    // Delete must be implicitly set
+                    $param['chainType'] === 'delete'
+                ) {
+                    $id = $param['id'];
+                    unset($param['id']);
+                    $converted['delete'][$id] = $this->doConvertSimpleParamsChain($param);
+                }
+            }
+        } else {
+            // At the top level we just need to take out the ids and put them as keys on the array
+            $converted = [];
+            foreach ($params as $param) {
+                if (isset($param['id']) === true) {
+                    $id = $param['id'];
+                    unset($param['id']);
+                    $converted[$id] = $this->doConvertSimpleParamsChain($param);
+                } else {
+                    $converted[] = $param;
+                }
+
+            }
+
+        }
+        return $converted;
+    }
+
+    /**
+     * @param array $params
+     * @return array
+     */
+    protected function doConvertSimpleParamsChain(array $params):array
+    {
+        $defaultAssignType = null;
+        $arrayHelper = $this->getRepository()->getArrayHelper();
+        foreach ($params as $key => $value) {
+            if (is_array($value)) {
+                if (isset($value['assignType']) === false) {
+                    if ($arrayHelper->isNumeric($value) === true) {
+                        $defaultAssignType = 'addSingle';
+                    } else {
+                        $value['assignType'] = 'set';
+                    }
+                }
+                $value = $arrayHelper->wrapArray($value);
+                $params[$key] = $this->doConvertSimpleParams($value, false, $defaultAssignType);
+            }
+        }
+        return $params;
+    }
 
 }
 ?>

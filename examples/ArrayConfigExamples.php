@@ -163,93 +163,6 @@ $readInfo = [
         'prePopulateEntities'=>'<true or false>' // defaults to true, if true entities referenced in the params passed to CUD methods will be pre fetched using the minimum number of queries. // Tested in testPrePopulate
     ]
 ];
-$frontEndQuery = [
-    'query'=>[
-        'where'=>[ //Tested in: testGeneralQueryBuilding
-            [
-                'field'=>'<fieldName>', //Tested in: testGeneralQueryBuilding
-                'type'=>'<and, or>', //Tested in: testGeneralQueryBuilding
-                'operator'=>'<operator name>', // make sure here that only the safe ones are even used. If operator is 'andX' or 'orX' then conditions with a nested list of conditions is used instead //Tested in: testGeneralQueryBuilding
-                'arguments'=>['<arguments that get passed to that query builder operator>'],  // If operator is 'andX' or 'orX' this is omitted. Conditions appears in instead. //Tested in: testGeneralQueryBuilding
-                'conditions'=>['<array of just like any other filter>'] // If operator is not 'andX' or 'orX' this is omitted. This allows condition nesting. //Tested in: testGeneralQueryBuilding
-            ]
-        ],
-        'having'=>[ //Tested in: testGeneralQueryBuilding
-            [
-                'field'=>'<fieldName>', //Tested in: testGeneralQueryBuilding
-                'type'=>'<and, or>', //Tested in: testGeneralQueryBuilding
-                'operator'=>'<operator name>', // make sure here that only the safe ones are even used. If operator is 'andX' or 'orX' then conditions with a nested list of conditions is used instead //Tested in: testGeneralQueryBuilding
-                'arguments'=>['<arguments that get passed to that query builder operator>'],  // If operator is 'andX' or 'orX' this is omitted. Conditions appears in instead. //Tested in: testGeneralQueryBuilding
-                'conditions'=>['<array of just like any other filter>'] // If operator is not 'andX' or 'orX' this is omitted. This allows condition nesting. //Tested in: testGeneralQueryBuilding
-            ]
-        ],
-        'orderBy'=>[ //Tested in: testGeneralQueryBuilding
-            '<field name>'=>'<ASC or DESC>' //Tested in: testGeneralQueryBuilding
-        ],
-        'groupBy'=>[ //Tested in: testGeneralQueryBuilding
-            '<field name>' //Tested in: testGeneralQueryBuilding
-        ],
-        'placeholders'=>[ //Tested in: testGeneralQueryBuilding
-            '<placeholder name>'=>[ //Tested in: testGeneralQueryBuilding
-                'value'=>'<value>', //Tested in: testGeneralQueryBuilding
-                'type'=>'<param type can be null>' //Tested in: testGeneralQueryBuilding
-            ]
-        ],
-    ],
-    'options'=>[
-        'returnCount'=>'<true or false>', // Tested in: testGeneralDataRetrieval
-        'limit'=>'<limit>', //Tested in: testGeneralQueryBuilding
-        'offset'=>'<offset>', //Tested in: testGeneralQueryBuilding
-    ]
-];
-
-$createSingleParams = [ // Tested in CudTest.php
-    '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
-    '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association. // Tested in CudTest.php
-        '<chainType>'=>[ // chainType can be: create, update, delete, read // Tested in CudTest.php
-            '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
-            'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>' // any time single is at the end of the assign type, then we strip the s off the end of the assignation name before calling the method. For instance if you have a relation of users, but you have a method of addUser you need use an assignType of addSingle. // Tested in CudTest.php
-        ]
-    ]
-];
-
-$createBatchParams = [ // Tested in CudTest.php
-    [
-        '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
-        '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association. // Tested in CudTest.php
-            '<chainType>'=>[ // chainType can be: create, update, delete, read // Tested in CudTest.php
-                '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
-                'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>' // Tested in CudTest.php
-            ]
-        ]
-    ]
-];
-
-$singleParams = [ // id will be passed as a separate argument // Tested in CudTest.php
-    '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
-    '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association. // Tested in CudTest.php
-        '<chainType>'=>[ // chainType can be: create, update, delete, read // Tested in CudTest.php
-            '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
-            'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>' // Tested in CudTest.php
-        ]
-    ]
-];
-
-$batchParams = [ // Tested in CudTest.php
-    [
-        [
-            '<id of entity>' => [ // Tested in CudTest.php
-                '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
-                '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association. // Tested in CudTest.php
-                    '<chainType>'=>[ // chainType can be: create, update, delete, read // Tested in CudTest.php
-                        '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
-                        'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>' // Tested in CudTest.php
-                    ]
-                ]
-            ]
-        ]
-    ]
-];
 
 $backendOptions = [ // note all options override query level options
     'options'=>[
@@ -415,6 +328,238 @@ $entityInfo = [
         ],
         'options'=>[
             '<custom option name>'=>'<custom option value>', // reserved for custom use cases
+        ]
+    ]
+];
+
+
+
+
+$frontEndQuery = [
+    'query'=>[
+        'where'=>[ //Tested in: testGeneralQueryBuilding
+            [
+                'field'=>'<fieldName>', //Tested in: testGeneralQueryBuilding
+                'type'=>'<and, or>', //Tested in: testGeneralQueryBuilding
+                'operator'=>'<operator name>', // make sure here that only the safe ones are even used. If operator is 'andX' or 'orX' then conditions with a nested list of conditions is used instead //Tested in: testGeneralQueryBuilding
+                'arguments'=>['<arguments that get passed to that query builder operator>'],  // If operator is 'andX' or 'orX' this is omitted. Conditions appears in instead. //Tested in: testGeneralQueryBuilding
+                'conditions'=>['<array of just like any other filter>'] // If operator is not 'andX' or 'orX' this is omitted. This allows condition nesting. //Tested in: testGeneralQueryBuilding
+            ]
+        ],
+        'having'=>[ //Tested in: testGeneralQueryBuilding
+            [
+                'field'=>'<fieldName>', //Tested in: testGeneralQueryBuilding
+                'type'=>'<and, or>', //Tested in: testGeneralQueryBuilding
+                'operator'=>'<operator name>', // make sure here that only the safe ones are even used. If operator is 'andX' or 'orX' then conditions with a nested list of conditions is used instead //Tested in: testGeneralQueryBuilding
+                'arguments'=>['<arguments that get passed to that query builder operator>'],  // If operator is 'andX' or 'orX' this is omitted. Conditions appears in instead. //Tested in: testGeneralQueryBuilding
+                'conditions'=>['<array of just like any other filter>'] // If operator is not 'andX' or 'orX' this is omitted. This allows condition nesting. //Tested in: testGeneralQueryBuilding
+            ]
+        ],
+        'orderBy'=>[ //Tested in: testGeneralQueryBuilding
+            '<field name>'=>'<ASC or DESC>' //Tested in: testGeneralQueryBuilding
+        ],
+        'groupBy'=>[ //Tested in: testGeneralQueryBuilding
+            '<field name>' //Tested in: testGeneralQueryBuilding
+        ],
+        'placeholders'=>[ //Tested in: testGeneralQueryBuilding
+            '<placeholder name>'=>[ //Tested in: testGeneralQueryBuilding
+                'value'=>'<value>', //Tested in: testGeneralQueryBuilding
+                'type'=>'<param type can be null>' //Tested in: testGeneralQueryBuilding
+            ]
+        ],
+    ],
+    'options'=>[
+        'returnCount'=>'<true or false>', // Tested in: testGeneralDataRetrieval
+        'limit'=>'<limit>', //Tested in: testGeneralQueryBuilding
+        'offset'=>'<offset>', //Tested in: testGeneralQueryBuilding
+    ]
+];
+
+// All requests from the front end should have a params and an options:
+
+$exampleFrontEndRequest = [
+    'params'=>['<see param examples below>'],
+    'options'=>[
+        'simplifiedParams'=>'<true or false>' //Defaults to false, may also be set as a different default on the controller // whether or not to process the params as standard version of simplified version. Both param examples are below.
+    ]
+];
+
+// Complex param versions, these execute more quickly but may be less like what you might expect them to look like.
+$createSingleParams = [ // Tested in CudTest.php
+    '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
+    '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association. // Tested in CudTest.php
+        '<chainType>'=>[ // chainType can be: create, update, delete, read // Tested in CudTest.php
+            '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
+            'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>' // any time single is at the end of the assign type, then we strip the s off the end of the assignation name before calling the method. For instance if you have a relation of users, but you have a method of addUser you need use an assignType of addSingle. // Tested in CudTest.php
+        ]
+    ]
+];
+
+$createBatchParams = [ // Tested in CudTest.php
+    [
+        '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
+        '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association. // Tested in CudTest.php
+            '<chainType>'=>[ // chainType can be: create, update, delete, read // Tested in CudTest.php
+                '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
+                'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>' // Tested in CudTest.php
+            ]
+        ]
+    ]
+];
+
+$singleParams = [ // id will be passed as a separate argument // Tested in CudTest.php
+    '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
+    '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association. // Tested in CudTest.php
+        '<chainType>'=>[ // chainType can be: create, update, delete, read // Tested in CudTest.php
+            '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
+            'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>' // Tested in CudTest.php
+        ]
+    ]
+];
+
+$batchParams = [ // Tested in CudTest.php
+    [
+        [
+            '<id of entity>' => [ // Tested in CudTest.php
+                '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
+                '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association. // Tested in CudTest.php
+                    '<chainType>'=>[ // chainType can be: create, update, delete, read // Tested in CudTest.php
+                        '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
+                        'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>' // Tested in CudTest.php
+                    ]
+                ]
+            ]
+        ]
+    ]
+];
+
+// simplified Param Syntax for Create Update and Delete. To active pass a front end option of 'simplifiedParams'=>true
+// Top level examples:
+$creates = [ // Note lack of id triggers create
+    [
+        '<fieldName>'=>'<fieldValue>',
+    ]
+];
+
+$updates = [ // Id triggers an update when there is another field referenced
+    [
+        'id'=>'<id of entiy>',
+        '<fieldName>'=>'<fieldValue>',
+    ]
+];
+
+$deletes = [
+    [
+        'id'=>'<id of entiy>',
+    ]
+];
+
+
+// Chaining examples, not that these are all chains from inside a update action
+
+$singleAssociationCreate = [
+    [
+        'id'=>'<id of entity>',
+        '<associationName>'=>[ // Note the lack of the id triggers the create
+            '<fieldName>'=>'<fieldValue>',
+        ],
+    ]
+];
+
+$singleAssociationUpdate = [
+    [
+        'id'=>'<id of entiy>',
+        '<associationName>'=>[ // Note the id and the field means it's an update
+            'id'=>'<id of entiy>',
+            '<fieldName>'=>'<fieldValue>',
+        ],
+    ]
+];
+
+$singleAssociationRead = [
+    [
+        'id'=>'<id of entiy>',
+        '<associationName>'=>[ // Note the just using the id triggers a read and then assigns the entity to the association
+            'id'=>'<id of entiy>',
+        ],
+    ]
+];
+
+$singleAssociationDelete = [
+    [
+        'id'=>'<id of entiy>',
+        '<associationName>'=>[ // Note that specifying chain type delete triggers a delete
+            'id'=>'<id of entiy>',
+            'chainType'=>'delete'
+        ],
+    ]
+];
+
+
+
+
+$multipleAssociationCreate = [
+    [
+        'id'=>'<id of entity>',
+        '<associationName>'=>[
+            [ // Note the lack of the id triggers the create. These will automatically be added to the association with the same assignment behaviour as assignType=>addSingle
+                '<fieldName>'=>'<fieldValue>',
+            ],
+        ]
+    ]
+];
+
+$multipleAssociationUpdate = [
+    [
+        'id'=>'<id of entiy>',
+        '<associationName>'=>[
+            [ // Note the id and the field means it's an update. These will automatically be added to the association with the same assignment behaviour as assignType=>addSingle
+                'id'=>'<id of entiy>',
+                '<fieldName>'=>'<fieldValue>',
+            ],
+        ]
+    ]
+];
+
+$singleAssociationRead = [
+    [
+        'id'=>'<id of entiy>',
+        '<associationName>'=>[ // Note, just putting an id here, instead of an array will trigger the same behaviour and is simplier still thank this example
+            [ // Note the just using the id triggers a read and then assigns the entity to the association. These will automatically be added to the association with the same assignment behaviour as assignType=>addSingle
+                'id'=>'<id of entiy>',
+            ],
+        ]
+    ]
+];
+
+$singleAssociationReadSimplierStill = [
+    [
+        'id'=>'<id of entiy>',
+        '<associationName>'=>'<id of entity>' // simplified version of the above example
+    ]
+];
+
+$singleAssociationDelete = [
+    [
+        'id'=>'<id of entiy>',
+        '<associationName>'=>[
+            [ // Note that specifying chain type delete triggers a delete. These will automatically be added to the association with the same assignment behaviour as assignType=>addSingle
+                'id'=>'<id of entiy>',
+                'chainType'=>'delete'
+            ],
+        ]
+    ]
+];
+
+// Any update, read or delete chain can cause the entity referenced to be removed instead of added to the association by using 'assignType'=>'removeSingle'. You can also use 'remove' if you have a plural in the name of your method on the entity -- IE: removeUser vs removeUsers
+$singleAssociationRead = [
+    [
+        'id'=>'<id of entiy>',
+        '<associationName>'=>[ // Note, just putting an id here, instead of an array will trigger the same behaviour and is simplier still thank this example
+            [ // Note the just using the id triggers a read and then assigns the entity to the association. These will automatically be added to the association with the same assignment behaviour as assignType=>addSingle
+                'id'=>'<id of entiy>',
+                'assignType'=>'removeSingle'
+            ],
         ]
     ]
 ];
