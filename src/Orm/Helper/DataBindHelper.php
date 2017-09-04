@@ -815,6 +815,7 @@ class DataBindHelper implements DataBindHelperContract
                         isset($param['id']) === false
                     )
                 ) {
+                    unset($param['chainType']);
                     $converted['create'][] = $this->doConvertSimpleParamsChain($param);
                 } else if (
                     //Just an id means it's a read
@@ -827,7 +828,7 @@ class DataBindHelper implements DataBindHelperContract
                     )
                 ) {
                     $id = $param['id'];
-                    unset($param['id']);
+                    unset($param['id'], $param['chainType']);
                     $converted['read'][$id] = $this->doConvertSimpleParamsChain($param);
                 } else if (
                     // An id and other params means it's an update
@@ -840,14 +841,14 @@ class DataBindHelper implements DataBindHelperContract
                     )
                 ) {
                     $id = $param['id'];
-                    unset($param['id']);
+                    unset($param['id'], $param['chainType']);
                     $converted['update'][$id] = $this->doConvertSimpleParamsChain($param);
                 } else if (
                     // Delete must be implicitly set
                     $param['chainType'] === 'delete'
                 ) {
                     $id = $param['id'];
-                    unset($param['id']);
+                    unset($param['id'], $param['chainType']);
                     $converted['delete'][$id] = $this->doConvertSimpleParamsChain($param);
                 }
             }
