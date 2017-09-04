@@ -37,6 +37,17 @@ class EntityManagerWrapper implements EntityManagerWrapperContract
 
     /**
      * @param string $entityName
+     * @return array
+     */
+    public function getFieldNames(string $entityName):array
+    {
+        /** @noinspection NullPointerExceptionInspection */
+        $metadata = $this->getEm()->getClassMetadata($entityName);
+        return $metadata->getFieldNames();
+    }
+
+    /**
+     * @param string $entityName
      * @param string $fieldName
      * @return string
      * @throws \InvalidArgumentException

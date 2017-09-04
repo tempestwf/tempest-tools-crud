@@ -29,6 +29,18 @@ class DataBindHelperException extends \RunTimeException
         return new self (sprintf('Error: More rows requested than batch max allows. count = %s, max = %s', $count, $max));
     }
 
+    /**
+     * @param string $fieldName
+     * @param string $entityName
+     * @return DataBindHelperException
+     * @internal param int $count
+     * @internal param int $max
+     */
+    public static function propertyNotAField (string $fieldName, string $entityName): DataBindHelperException
+    {
+        return new self (sprintf('Error: You attempted to access a property of an entity that wasn\'t a field. entity name = %s, property name = %s', $entityName, $fieldName));
+    }
+
 
 }
 

@@ -69,4 +69,10 @@ interface EntityManagerWrapperContract
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      */
     public function remove(EntityContract $entity): void;
+
+    /**
+     * @param string $entityName
+     * @return array
+     */
+    public function getFieldNames(string $entityName):array;
 }

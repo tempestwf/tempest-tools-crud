@@ -143,6 +143,7 @@ class DataBindHelper implements DataBindHelperContract
         $entityName = get_class($entity);
         /** @noinspection NullPointerExceptionInspection */
         $associateNames = $this->getRepository()->getEm()->getAssociationNames($entityName);
+        $fieldNames = $this->getRepository()->getEm()->getFieldNames($entityName);
         foreach ($params as $fieldName => $value) {
             if (in_array($fieldName, $associateNames, true)) {
 
@@ -151,6 +152,9 @@ class DataBindHelper implements DataBindHelperContract
                 $value = $this->fixScalarAssociationValue($value);
                 $this->bindAssociation($entity, $fieldName, $value, $targetClass);
             } else if (!in_array($fieldName, static::IGNORE_KEYS, true)) {
+                if (!in_array($fieldName, $fieldNames, true)) {
+                    throw DataBindHelperException::propertyNotAField(get_class($entity), $fieldName);
+                }
                 $entity->setField($fieldName, $value);
             }
         }
