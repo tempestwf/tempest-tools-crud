@@ -390,7 +390,7 @@ $createSingleParams = [ // Tested in CudTest.php
     '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association. // Tested in CudTest.php
         '<chainType>'=>[ // chainType can be: create, update, delete, read // Tested in CudTest.php
             '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
-            'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>' // any time single is at the end of the assign type, then we strip the s off the end of the assignation name before calling the method. For instance if you have a relation of users, but you have a method of addUser you need use an assignType of addSingle. // Tested in CudTest.php
+            'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle, null (in quotes)>' // any time single is at the end of the assign type, then we strip the s off the end of the assignation name before calling the method. For instance if you have a relation of users, but you have a method of addUser you need use an assignType of addSingle. // Tested in CudTest.php
         ]
     ]
 ];
@@ -401,7 +401,7 @@ $createBatchParams = [ // Tested in CudTest.php
         '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association. // Tested in CudTest.php
             '<chainType>'=>[ // chainType can be: create, update, delete, read // Tested in CudTest.php
                 '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
-                'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>' // Tested in CudTest.php
+                'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle, null (in quotes)>' // Tested in CudTest.php
             ]
         ]
     ]
@@ -412,7 +412,7 @@ $singleParams = [ // id will be passed as a separate argument // Tested in CudTe
     '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association. // Tested in CudTest.php
         '<chainType>'=>[ // chainType can be: create, update, delete, read // Tested in CudTest.php
             '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
-            'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>' // Tested in CudTest.php
+            'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle, null (in quotes)>' // Tested in CudTest.php
         ]
     ]
 ];
@@ -425,7 +425,7 @@ $batchParams = [ // Tested in CudTest.php
                 '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association. // Tested in CudTest.php
                     '<chainType>'=>[ // chainType can be: create, update, delete, read // Tested in CudTest.php
                         '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
-                        'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle>' // Tested in CudTest.php
+                        'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle, null (in quotes)>' // Tested in CudTest.php
                     ]
                 ]
             ]

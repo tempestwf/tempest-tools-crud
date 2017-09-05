@@ -153,7 +153,7 @@ class DataBindHelper implements DataBindHelperContract
                 $this->bindAssociation($entity, $fieldName, $value, $targetClass);
             } else if (!in_array($fieldName, static::IGNORE_KEYS, true)) {
                 if (!in_array($fieldName, $fieldNames, true)) {
-                    throw DataBindHelperException::propertyNotAField(get_class($entity), $fieldName);
+                    throw DataBindHelperException::propertyNotAField($fieldName, get_class($entity));
                 }
                 $entity->setField($fieldName, $value);
             }
@@ -801,51 +801,54 @@ class DataBindHelper implements DataBindHelperContract
                 'create'=>[],
                 'read'=>[],
                 'update'=>[],
-                'delete'=>[]
+                'delete'=>[],
             ];
             foreach ($params as $param) {
                 if ($defaultAssignType !== null && isset($param['assignType']) === false) {
                     $param['assignType'] = $defaultAssignType;
                 }
+                $keys = array_keys($param);
+                $keys = array_diff($keys, ['assignType', 'chainType']);
+                $keysCount = count($keys);
                 if (
                     // No id means it is a create
-                    $param['chainType'] === 'create'
+                    isset($param['id']) === false
                     ||
-                    (
-                        isset($param['id']) === false
-                    )
+                    (isset($param['chainType']) === true && $param['chainType'] === 'create')
+
                 ) {
                     unset($param['chainType']);
                     $converted['create'][] = $this->doConvertSimpleParamsChain($param);
                 } else if (
                     //Just an id means it's a read
-                    $param['chainType'] === 'read'
-                    ||
                     (
                         isset($param['id']) === true
                         &&
-                        count(array_keys($param)) === 1
+                        $keysCount === 1
                     )
+                    ||
+                    (isset($param['chainType']) === true && $param['chainType'] === 'read')
                 ) {
                     $id = $param['id'];
                     unset($param['id'], $param['chainType']);
                     $converted['read'][$id] = $this->doConvertSimpleParamsChain($param);
                 } else if (
                     // An id and other params means it's an update
-                    $param['chainType'] === 'update'
-                    ||
                     (
                         isset($param['id']) === true
                         &&
-                        count(array_keys($param)) > 1
+                        $keysCount > 1
                     )
+                    ||
+                    (isset($param['chainType']) === true && $param['chainType'] === 'update')
+
                 ) {
                     $id = $param['id'];
                     unset($param['id'], $param['chainType']);
                     $converted['update'][$id] = $this->doConvertSimpleParamsChain($param);
                 } else if (
                     // Delete must be implicitly set
-                    $param['chainType'] === 'delete'
+                    isset($param['chainType']) === true && $param['chainType'] === 'delete'
                 ) {
                     $id = $param['id'];
                     unset($param['id'], $param['chainType']);
@@ -861,7 +864,7 @@ class DataBindHelper implements DataBindHelperContract
                     unset($param['id']);
                     $converted[$id] = $this->doConvertSimpleParamsChain($param);
                 } else {
-                    $converted[] = $param;
+                    $converted[] = $this->doConvertSimpleParamsChain($param);
                 }
 
             }

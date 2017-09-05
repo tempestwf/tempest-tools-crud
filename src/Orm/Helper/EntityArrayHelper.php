@@ -291,7 +291,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
             $this->canAssign($entity, $associationName, $assignType);
         }
 
-        if ($assignType !== null) {
+        if ($assignType !== null && $assignType !== 'null') {
             $methodName = $this->accessorMethodName($assignType, $associationName);
             $entity->$methodName($entityToBind);
         }
