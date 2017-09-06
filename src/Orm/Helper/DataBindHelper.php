@@ -225,7 +225,7 @@ class DataBindHelper implements DataBindHelperContract
                 $targetEntity->bindAssociation($assignType, $associationName, $foundEntity);
             }
         } else {
-            $targetEntity->bindAssociation('setNull', $associationName, null);
+            $targetEntity->bindAssociation('setNull', $associationName);
         }
 
     }
@@ -503,6 +503,7 @@ class DataBindHelper implements DataBindHelperContract
             $params = $eventArgs->getArgs()['params'];
             $options = $eventArgs->getArgs()['options'];
             $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
+            $frontEndOptions = $eventArgs->getArgs()['frontEndOptions'];
             $action = $eventArgs->getArgs()['action'];
             $this->checkBatchMax($params, $options, $optionOverrides);
             $params = $this->convertSimpleParams($params, $frontEndOptions);
@@ -591,6 +592,7 @@ class DataBindHelper implements DataBindHelperContract
             $params = $eventArgs->getArgs()['params'];
             $options = $eventArgs->getArgs()['options'];
             $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
+            $frontEndOptions = $eventArgs->getArgs()['frontEndOptions'];
             $action = $eventArgs->getArgs()['action'];
             $this->checkBatchMax($params, $options, $optionOverrides);
             $params = $this->convertSimpleParams($params, $frontEndOptions);
@@ -668,6 +670,7 @@ class DataBindHelper implements DataBindHelperContract
             $params = $eventArgs->getArgs()['params'];
             $options = $eventArgs->getArgs()['options'];
             $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
+            $frontEndOptions = $eventArgs->getArgs()['frontEndOptions'];
             $action = $eventArgs->getArgs()['action'];
             $this->checkBatchMax($params, $options, $optionOverrides);
             $params = $this->convertSimpleParams($params, $frontEndOptions);

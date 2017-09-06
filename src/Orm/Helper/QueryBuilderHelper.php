@@ -86,6 +86,9 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $params = $eventArgs->getArgs()['params'];
         $options = $eventArgs->getArgs()['options'];
         $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
+        $frontEndOptions = $eventArgs->getArgs()['frontEndOptions'];
+        $params = $this->convertGetParams($params, $frontEndOptions);
+
         $this->checkQueryMaxParams($params, $options, $optionOverrides);
         $qbWrapper = $repo->createQueryWrapper();
         /** @noinspection NullPointerExceptionInspection */
@@ -95,6 +98,97 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $evm->dispatchEvent(RepositoryEventsConstants::POST_READ, $eventArgs);
 
         return $eventArgs->getArgs()['results'];
+    }
+
+    /**
+     * @param array $params
+     * @param array $frontEndOptions
+     * @return array
+     */
+    protected function convertGetParams(array $params, array $frontEndOptions):array
+    {
+        $convert = $frontEndOptions['useGetParams']??false;
+        if ($convert === true) {
+            return $this->doConvertGetParams($params);
+        }
+
+        return $params;
+    }
+
+    /**
+     * @param array $params
+     * @return array
+     */
+    protected function doConvertGetParams(array $params):array
+    {
+        $result = [];
+        foreach ($params as $key => $value) {
+            if (preg_match('/^((and|or)_(where|having))|(orderBy|groupBy|option|placeholder)/', $key)) {
+                $parts = explode('_', $key);
+                if ($parts[0] === 'and' || $parts[0] === 'or') {
+                    if ($parts[1] === 'where') {
+                        if (isset($result['where']) === false) {
+                            $result['where'] = [];
+                        }
+                        $result['where'][] = $this->doConvertFilterParam($parts, $value);
+                    } else if ($parts[1] === 'having') {
+                        if (isset($result['having']) === false) {
+                            $result['having'] = [];
+                        }
+                        $result['having'][] = $this->doConvertFilterParam($parts, $value);
+
+                    }
+                } else if ($parts[0] === 'orderBy') {
+                    if (isset($result['orderBy']) === false) {
+                        $result['orderBy'] = [];
+                    }
+                    $result['orderBy'][$parts[1]] = $value;
+                } else if ($parts[0] === 'groupBy') {
+                    $result['groupBy'] = $value;
+                } else if ($parts[0] === 'placeholder') {
+                    if (isset($result['placeholders']) === false) {
+                        $result['placeholders'] = [];
+                    }
+                    $placeholder = [
+                        'value'=>$value
+                    ];
+                    if (isset($parts[2]) === true) {
+                        $placeholder['type'] = $parts[2];
+                    }
+                    $result['placeholders'][$parts[1]] = $placeholder;
+                } else if ($parts[0] === 'option') {
+                    if (isset($result['options']) === false) {
+                        $result['options'] = [];
+                    }
+                    $value = $parts[1] === 'returnCount'?(bool)$value:$value;
+                    $result['options'][$parts[1]] = $value;
+                }
+            }
+        }
+        return $result;
+    }
+
+
+    /**
+     * @param array $parts
+     * @param $value
+     * @return array
+     */
+    protected function doConvertFilterParam(array $parts, $value):array
+    {
+        $condition = [];
+        if ($parts[0] === 'and' || $parts[0] === 'or') {
+            $condition['type'] = $parts[0];
+            $condition['field'] = $parts[2];
+            $condition['operator'] = $parts[3];
+            if ($condition['operator'] === 'andX' || $condition['operator'] === 'orX') {
+                $condition['conditions'] = json_decode($value);
+                $condition['arguments'] = [];
+            } else {
+                $condition['arguments'] = is_array($value) === false?$value:[$value];
+            }
+        }
+        return $condition;
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection */

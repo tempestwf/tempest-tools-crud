@@ -375,6 +375,24 @@ $frontEndQuery = [
     ]
 ];
 
+// Note: A front end option of useGetParams (which triggers processing of the query as get params), is also accepted by the ORM code, but it would not be passed in the format above.
+
+// Get param query syntax:
+// Where or having: <and|or>_<where|having>_<fieldName>_<operator>=<value>
+// Where operator is 'in' or 'between' then use an array for the addition arguments: IE:
+// <and|or>_<where|having>_<fieldName>_<operator>[]=value1
+// <and|or>_<where|having>_<fieldName>_<operator>[]=value2
+// When using an andX or orX operator. Json encode the value using standard syntax described above
+
+
+// orderBy: orderBy_<field>=<direction>
+
+// groupBy: groupBy[]=<field name to group by>
+
+// placeholder: placeholder_<name>_<optional type>=<value>
+
+// option: option_<option name>=<value>
+
 // All requests from the front end should have a params and an options:
 
 $exampleFrontEndRequest = [
