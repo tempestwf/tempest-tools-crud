@@ -96,7 +96,7 @@ trait EntityCoreTrait
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function bindAssociation(string $assignType=null, string $associationName, EntityContract $entityToBind, $force = false):void
+    public function bindAssociation(string $assignType=null, string $associationName, EntityContract $entityToBind=null, $force = false):void
     {
         /** @noinspection NullPointerExceptionInspection */
         /** @noinspection PhpParamsInspection */

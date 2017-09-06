@@ -84,7 +84,7 @@ interface EntityContract
      * @param EntityContract $entityToBind
      * @param bool $force
      */
-    public function bindAssociation(string $assignType = null, string $associationName, EntityContract $entityToBind, $force = false): void;
+    public function bindAssociation(string $assignType = null, string $associationName, EntityContract $entityToBind =null, $force = false): void;
 
     /**
      * Subscribes to the available events that are present on the class

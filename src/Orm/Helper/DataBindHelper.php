@@ -165,8 +165,9 @@ class DataBindHelper implements DataBindHelperContract
      * @param mixed $value
      * @return array
      */
-    protected function fixScalarAssociationValue($value):array {
-        $return = is_scalar($value) ? [
+    protected function fixScalarAssociationValue($value):?array
+    {
+        $return = is_scalar($value) && $value !== null? [
             'read' => [
                 $value => [
                     'assignType' => 'set',
@@ -204,6 +205,8 @@ class DataBindHelper implements DataBindHelperContract
                     $this->bindEntities($foundEntities, $entity, $associationName);
                 }
             }
+        } else {
+            $this->bindEntities(null, $entity, $associationName);
         }
     }
 
@@ -213,13 +216,18 @@ class DataBindHelper implements DataBindHelperContract
      * @param string $associationName
      * @throws \RuntimeException
      */
-    public function bindEntities (array $entities, EntityContract $targetEntity, string $associationName): void
+    public function bindEntities (array $entities=null, EntityContract $targetEntity, string $associationName): void
     {
-        foreach ($entities as $foundEntity) {
-            $params = $foundEntity->getBindParams();
-            $assignType = $params['assignType'] ?? null;
-            $targetEntity->bindAssociation($assignType, $associationName, $foundEntity);
+        if ($entities !== null) {
+            foreach ($entities as $foundEntity) {
+                $params = $foundEntity->getBindParams();
+                $assignType = $params['assignType'] ?? null;
+                $targetEntity->bindAssociation($assignType, $associationName, $foundEntity);
+            }
+        } else {
+            $targetEntity->bindAssociation('setNull', $associationName, null);
         }
+
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection */
@@ -797,12 +805,7 @@ class DataBindHelper implements DataBindHelperContract
     protected function doConvertSimpleParams (array $params, bool $topLevel = false, string $defaultAssignType=null):array
     {
         if ($topLevel !== true) {
-            $converted = [
-                'create'=>[],
-                'read'=>[],
-                'update'=>[],
-                'delete'=>[],
-            ];
+            $converted = [];
             foreach ($params as $param) {
                 if ($defaultAssignType !== null && isset($param['assignType']) === false) {
                     $param['assignType'] = $defaultAssignType;
@@ -812,16 +815,25 @@ class DataBindHelper implements DataBindHelperContract
                 $keysCount = count($keys);
                 if (
                     // No id means it is a create
-                    isset($param['id']) === false
+                    (
+                        isset($param['id']) === false
+                        &&
+                        isset($param['chainType']) === false
+                    )
                     ||
                     (isset($param['chainType']) === true && $param['chainType'] === 'create')
 
                 ) {
                     unset($param['chainType']);
+                    if (isset($converted['create']) === false) {
+                        $converted['create'] = [];
+                    }
                     $converted['create'][] = $this->doConvertSimpleParamsChain($param);
                 } else if (
                     //Just an id means it's a read
                     (
+                        isset($param['chainType']) === false
+                        &&
                         isset($param['id']) === true
                         &&
                         $keysCount === 1
@@ -831,10 +843,15 @@ class DataBindHelper implements DataBindHelperContract
                 ) {
                     $id = $param['id'];
                     unset($param['id'], $param['chainType']);
+                    if (isset($converted['read']) === false) {
+                        $converted['read'] = [];
+                    }
                     $converted['read'][$id] = $this->doConvertSimpleParamsChain($param);
                 } else if (
                     // An id and other params means it's an update
                     (
+                        isset($param['chainType']) === false
+                        &&
                         isset($param['id']) === true
                         &&
                         $keysCount > 1
@@ -845,6 +862,9 @@ class DataBindHelper implements DataBindHelperContract
                 ) {
                     $id = $param['id'];
                     unset($param['id'], $param['chainType']);
+                    if (isset($converted['update']) === false) {
+                        $converted['update'] = [];
+                    }
                     $converted['update'][$id] = $this->doConvertSimpleParamsChain($param);
                 } else if (
                     // Delete must be implicitly set
@@ -852,6 +872,9 @@ class DataBindHelper implements DataBindHelperContract
                 ) {
                     $id = $param['id'];
                     unset($param['id'], $param['chainType']);
+                    if (isset($converted['delete']) === false) {
+                        $converted['delete'] = [];
+                    }
                     $converted['delete'][$id] = $this->doConvertSimpleParamsChain($param);
                 }
             }

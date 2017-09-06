@@ -104,7 +104,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     {
         $extra = ['associationName'=>$associationName, 'assignType'=> $assignType, 'self'=>$entity];
         $assignType = $assignType ?? 'null';
-        if (!in_array($assignType, ['set', 'add', 'remove', 'setSingle', 'addSingle', 'removeSingle', 'null'], true)) {
+        if (!in_array($assignType, ['set', 'add', 'remove', 'setSingle', 'addSingle', 'removeSingle', 'null', 'setNull'], true)) {
             throw EntityArrayHelperException::assignTypeMustBe($assignType);
         }
 
@@ -284,17 +284,20 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param bool $force
      * @throws \RuntimeException
      */
-    public function bindAssociation(EntityContract $entity, string $assignType=null, string $associationName, EntityContract $entityToBind, $force = false):void
+    public function bindAssociation(EntityContract $entity, string $assignType=null, string $associationName, EntityContract $entityToBind=null, $force = false):void
     {
         if ($force === false) {
             /** @noinspection NullPointerExceptionInspection */
             $this->canAssign($entity, $associationName, $assignType);
         }
-
-        if ($assignType !== null && $assignType !== 'null') {
+        if ($assignType === 'setNull') {
+            $methodName = $this->accessorMethodName('set', $associationName);
+            $entity->$methodName(null);
+        } else if ($assignType !== null && $assignType !== 'null') {
             $methodName = $this->accessorMethodName($assignType, $associationName);
             $entity->$methodName($entityToBind);
         }
+
     }
 
     /**

@@ -98,7 +98,7 @@ interface EntityArrayHelperContract extends ArrayHelperContract
      * @param EntityContract $entityToBind
      * @param bool $force
      */
-    public function bindAssociation(EntityContract $entity, string $assignType = null, string $associationName, EntityContract $entityToBind, $force = false): void;
+    public function bindAssociation(EntityContract $entity, string $assignType = null, string $associationName, EntityContract $entityToBind=null, $force = false): void;
 
     /**
      * On an entity with HasLifecycleCallbacks it will run the special features of tt entities before persist
