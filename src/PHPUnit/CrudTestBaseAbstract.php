@@ -164,6 +164,7 @@ abstract class CrudTestBaseAbstract extends \TestCase
             'offset'=>1,
         ];
     }
+
     /**
      * @return array
      */
@@ -324,6 +325,65 @@ abstract class CrudTestBaseAbstract extends \TestCase
         ];
     }
 
+    /**
+     * @return array
+     */
+    protected function makeTestFrontEndQueryArtistGetParams(): array
+    {
+        return [
+            'and_where_andX'=>json_encode([
+                [
+                    'field'=>'t.name',
+                    'operator'=>'eq',
+                    'arguments'=>['BEETHOVEN1']
+                ],
+                [
+                    'field'=>'t.name',
+                    'operator'=>'neq',
+                    'arguments'=>['Bob Marley']
+                ]
+            ],true),
+            'and_where_eq_t-name'=>'BEETHOVEN3',
+            'and_where_eq_t-name_2'=>'BEETHOVEN4',
+            'and_where_neq_t-name'=>'Blink 182',
+            'and_where_lt_t-id'=>99999991,
+            'and_where_lte_t-id'=>99999992,
+            'and_where_gt_t-id'=>-1,
+            'and_where_gte_t-id'=>-2,
+            'and_where_in_t-name'=>['BEETHOVEN5'],
+            'and_where_notIn_t-name'=>['Vanilla Ice'],
+            'and_where_isNull_t-name'=>'',
+            'and_where_isNotNull_t-name'=>'',
+            'and_where_like_t-name'=>'%BEETHOV%',
+            'and_where_notLike_t-name'=>'%The Ruttles%',
+            'and_where_between_t-id'=>[0,99999993],
+            'or_where_orX'=>json_encode([
+                [
+                    'field'=>'t.name',
+                    'operator'=>'eq',
+                    'arguments'=>['BEETHOVEN2']
+                ],
+                [
+                    'field'=>'t.name',
+                    'operator'=>'neq',
+                    'arguments'=>['Urethra Franklin']
+                ]
+            ]),
+            'and_having_eq_t-name'=>'BEETHOVEN7',
+            'and_having_eq_t-name_2'=>'BEETHOVEN6',
+            'orderBy_t-name'=>'ASC',
+            'orderBy_t-id'=>'DESC',
+            'groupBy'=>[
+                't-name',
+                't-id'
+            ],
+            'placeholder_frontEndTestPlaceholder_integer'=>777,
+            'placeholder_frontEndTestPlaceholder2_string'=>'stuff2',
+            'option_returnCount'=>1,
+            'option_limit'=>1,
+            'option_offset'=>0,
+        ];
+    }
 
 
 

@@ -117,37 +117,40 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
 
     /**
      * @param array $params
+     * @param array $frontEndOptions
      * @return array
      */
     protected function doConvertGetParams(array $params, array $frontEndOptions):array
     {
-        $result = [];
+        $query = [];
         foreach ($params as $key => $value) {
+            $key = str_replace('-', '.', $key);
             if (preg_match('/^((and|or)_(where|having))|(orderBy|groupBy|option|placeholder)/', $key)) {
                 $parts = explode('_', $key);
                 if ($parts[0] === 'and' || $parts[0] === 'or') {
                     if ($parts[1] === 'where') {
-                        if (isset($result['where']) === false) {
-                            $result['where'] = [];
+                        if (isset($query['where']) === false) {
+                            $query['where'] = [];
                         }
-                        $result['where'][] = $this->doConvertFilterParam($parts, $value);
+                        $query['where'][] = $this->doConvertFilterParam($parts, $value);
                     } else if ($parts[1] === 'having') {
-                        if (isset($result['having']) === false) {
-                            $result['having'] = [];
+                        if (isset($query['having']) === false) {
+                            $query['having'] = [];
                         }
-                        $result['having'][] = $this->doConvertFilterParam($parts, $value);
+                        $query['having'][] = $this->doConvertFilterParam($parts, $value);
 
                     }
                 } else if ($parts[0] === 'orderBy') {
-                    if (isset($result['orderBy']) === false) {
+                    if (isset($query['orderBy']) === false) {
                         $result['orderBy'] = [];
                     }
-                    $result['orderBy'][$parts[1]] = $value;
+                    $query['orderBy'][$parts[1]] = $value;
                 } else if ($parts[0] === 'groupBy') {
-                    $result['groupBy'] = $value;
+                    $value = str_replace('-', '.', $value);
+                    $query['groupBy'] = $value;
                 } else if ($parts[0] === 'placeholder') {
-                    if (isset($result['placeholders']) === false) {
-                        $result['placeholders'] = [];
+                    if (isset($query['placeholders']) === false) {
+                        $query['placeholders'] = [];
                     }
                     $placeholder = [
                         'value'=>$value
@@ -155,14 +158,14 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
                     if (isset($parts[2]) === true) {
                         $placeholder['type'] = $parts[2];
                     }
-                    $result['placeholders'][$parts[1]] = $placeholder;
+                    $query['placeholders'][$parts[1]] = $placeholder;
                 } else if ($parts[0] === 'option' && isset($frontEndOptions[$parts[1]]) === false) {
                     $value = $parts[1] === 'returnCount'?(bool)$value:$value;
                     $frontEndOptions[$parts[1]] = $value;
                 }
             }
         }
-        return [$result,$frontEndOptions];
+        return [['query'=>$query],$frontEndOptions];
     }
 
 
@@ -176,13 +179,19 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $condition = [];
         if ($parts[0] === 'and' || $parts[0] === 'or') {
             $condition['type'] = $parts[0];
-            $condition['field'] = $parts[2];
-            $condition['operator'] = $parts[3];
+            $condition['operator'] = $parts[2];
+            $condition['field'] = $parts[3] ?? null;
+
             if ($condition['operator'] === 'andX' || $condition['operator'] === 'orX') {
                 $condition['conditions'] = json_decode($value);
                 $condition['arguments'] = [];
             } else {
                 $condition['arguments'] = is_array($value) === false?$value:[$value];
+                if ($condition['operator'] === 'in' || $condition['operator'] === 'notIn') {
+                    $condition['arguments'] = [$condition['arguments']];
+                } else if ($condition['operator'] === 'isNull' || $condition['operator'] === 'isNotNull') {
+                    $condition['arguments'] = [];
+                }
             }
         }
         return $condition;

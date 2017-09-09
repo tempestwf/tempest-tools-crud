@@ -375,15 +375,17 @@ $frontEndQuery = [
     ]
 ];
 
+// Tested in: testGeneralQueryBuildingWithGetParams
 // Note: A front end option of useGetParams (which triggers processing of the query as get params), is also accepted by the ORM code, but it would not be passed in the format above.
-
+// Note the optional number at the end is so you can have conditions that are are identical in key name, but have different values
 // Get param query syntax:
-// Where or having: <and|or>_<where|having>_<fieldName>_<operator>=<value>
+// Where or having: <and|or>_<where|having>_<operator>_<fieldName>_<optional number>=<value>
 // Where operator is 'in' or 'between' then use an array for the addition arguments: IE:
-// <and|or>_<where|having>_<fieldName>_<operator>[]=value1
-// <and|or>_<where|having>_<fieldName>_<operator>[]=value2
+// <and|or>_<where|having>_<operator>_<fieldName>_<optional number>[]=value1
+// <and|or>_<where|having>_<operator>_<fieldName>_<optional number>[]=value2
 // When using an andX or orX operator. Json encode the value using standard syntax described above
 
+// Note in field names always replace the dot (such as t.name) with a dash.
 
 // orderBy: orderBy_<field>=<direction>
 
