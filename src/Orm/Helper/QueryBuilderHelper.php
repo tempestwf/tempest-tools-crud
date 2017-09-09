@@ -87,7 +87,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $options = $eventArgs->getArgs()['options'];
         $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
         $frontEndOptions = $eventArgs->getArgs()['frontEndOptions'];
-        $params = $this->convertGetParams($params, $frontEndOptions);
+        [$params, $frontEndOptions] = $this->convertGetParams($params, $frontEndOptions);
 
         $this->checkQueryMaxParams($params, $options, $optionOverrides);
         $qbWrapper = $repo->createQueryWrapper();
@@ -109,17 +109,17 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     {
         $convert = $frontEndOptions['useGetParams']??false;
         if ($convert === true) {
-            return $this->doConvertGetParams($params);
+            return $this->doConvertGetParams($params, $frontEndOptions);
         }
 
-        return $params;
+        return [$params, $frontEndOptions];
     }
 
     /**
      * @param array $params
      * @return array
      */
-    protected function doConvertGetParams(array $params):array
+    protected function doConvertGetParams(array $params, array $frontEndOptions):array
     {
         $result = [];
         foreach ($params as $key => $value) {
@@ -156,16 +156,13 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
                         $placeholder['type'] = $parts[2];
                     }
                     $result['placeholders'][$parts[1]] = $placeholder;
-                } else if ($parts[0] === 'option') {
-                    if (isset($result['options']) === false) {
-                        $result['options'] = [];
-                    }
+                } else if ($parts[0] === 'option' && isset($frontEndOptions[$parts[1]]) === false) {
                     $value = $parts[1] === 'returnCount'?(bool)$value:$value;
-                    $result['options'][$parts[1]] = $value;
+                    $frontEndOptions[$parts[1]] = $value;
                 }
             }
         }
-        return $result;
+        return [$result,$frontEndOptions];
     }
 
 
