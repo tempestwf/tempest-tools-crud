@@ -318,7 +318,6 @@ abstract class CrudTestBaseAbstract extends \TestCase
                     ],
                     'frontEndTestPlaceholder2'=>[
                         'value'=>'stuff2',
-                        'type'=>'string'
                     ]
                 ]
             ]
@@ -378,7 +377,7 @@ abstract class CrudTestBaseAbstract extends \TestCase
                 't-id'
             ],
             'placeholder_frontEndTestPlaceholder_integer'=>777,
-            'placeholder_frontEndTestPlaceholder2_string'=>'stuff2',
+            'placeholder_frontEndTestPlaceholder2'=>'stuff2',
             'option_returnCount'=>1,
             'option_limit'=>1,
             'option_offset'=>0,

@@ -188,7 +188,11 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
             } else {
                 $condition['arguments'] = is_array($value) === false?$value:[$value];
                 if ($condition['operator'] === 'in' || $condition['operator'] === 'notIn') {
-                    $condition['arguments'] = [$condition['arguments']];
+                    if (is_array($value) === true) {
+                        $condition['arguments'] = [$condition['arguments']];
+                    } else {
+                        $condition['arguments'] = json_decode($value);
+                    }
                 } else if ($condition['operator'] === 'isNull' || $condition['operator'] === 'isNotNull') {
                     $condition['arguments'] = [];
                 }
