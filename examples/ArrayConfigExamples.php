@@ -372,6 +372,7 @@ $frontEndQuery = [
         'returnCount'=>'<true or false>', // Tested in: testGeneralDataRetrieval
         'limit'=>'<limit>', //Tested in: testGeneralQueryBuilding
         'offset'=>'<offset>', //Tested in: testGeneralQueryBuilding
+        'useGetParams'=>'<true or false>'// whether or not to expect the params to be in get format as illustrated below
     ]
 ];
 
