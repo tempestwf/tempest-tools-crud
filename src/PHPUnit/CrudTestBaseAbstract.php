@@ -369,7 +369,7 @@ abstract class CrudTestBaseAbstract extends \TestCase
                 ]
             ]),
             'and_having_eq_t-name'=>'BEETHOVEN7',
-            'and_having_eq_t-name_2'=>'BEETHOVEN6',
+            'or_having_eq_t-name_2'=>'BEETHOVEN6',
             'orderBy_t-name'=>'ASC',
             'orderBy_t-id'=>'DESC',
             'groupBy'=>[
@@ -380,7 +380,7 @@ abstract class CrudTestBaseAbstract extends \TestCase
             'placeholder_frontEndTestPlaceholder2'=>'stuff2',
             'option_returnCount'=>1,
             'option_limit'=>1,
-            'option_offset'=>0,
+            'option_offset'=>1,
         ];
     }
 

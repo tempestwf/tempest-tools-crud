@@ -183,18 +183,21 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
             $condition['field'] = $parts[3] ?? null;
 
             if ($condition['operator'] === 'andX' || $condition['operator'] === 'orX') {
-                $condition['conditions'] = json_decode($value);
+                $condition['conditions'] = json_decode($value, true);
                 $condition['arguments'] = [];
             } else {
-                $condition['arguments'] = is_array($value) === false?$value:[$value];
+                $condition['arguments'] = is_array($value) === true?$value:[$value];
                 if ($condition['operator'] === 'in' || $condition['operator'] === 'notIn') {
                     if (is_array($value) === true) {
                         $condition['arguments'] = [$condition['arguments']];
                     } else {
-                        $condition['arguments'] = json_decode($value);
+                        $decoded = json_decode($value, true);
+                        $condition['arguments'] = [$decoded];
                     }
                 } else if ($condition['operator'] === 'isNull' || $condition['operator'] === 'isNotNull') {
                     $condition['arguments'] = [];
+                } else if (is_string($value) && $condition['operator'] === 'between') {
+                    $condition['arguments'] = json_decode($value, true);
                 }
             }
         }
