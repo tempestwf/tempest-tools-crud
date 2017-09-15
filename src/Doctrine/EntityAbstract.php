@@ -42,29 +42,28 @@ abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityC
         $arrayHelper = $this->getArrayHelper();
         $path = $this->getTTPath();
         $fallBack = $this->getTTFallBack();
-        if ($propertyValue instanceof EntityContract) {
-            return $propertyValue->toArray('read', $arrayHelper, $path, $fallBack, $force);
-        }
-
-        if ($propertyValue instanceof DateTimeInterface) {
-            $format = $settings['format'] ?? static::DEFAULT_DATE_TIME_FORMAT;
-            return [
-                'timezoneName'=>$propertyValue->getTimezone()->getName(),
-                'timestamp'=>$propertyValue->getTimestamp(),
-                'offset'=>$propertyValue->getOffset(),
-                'formatted'=>$propertyValue->format($format),
-            ];
-        }
-
-        if ($propertyValue instanceof Collection) {
-            $return = [];
-            foreach ($propertyValue as $entity) {
-                $return[] = $entity->toArray('read', $arrayHelper, $path, $fallBack, $force);
-            }
-            return $return;
-        }
-
         if (is_object ($propertyValue) === true) {
+            if ($propertyValue instanceof EntityContract) {
+                return $propertyValue->toArray('read', $arrayHelper, $path, $fallBack, $force);
+            }
+
+            if ($propertyValue instanceof DateTimeInterface) {
+                $format = $settings['format'] ?? static::DEFAULT_DATE_TIME_FORMAT;
+                return [
+                    'timezoneName'=>$propertyValue->getTimezone()->getName(),
+                    'timestamp'=>$propertyValue->getTimestamp(),
+                    'offset'=>$propertyValue->getOffset(),
+                    'formatted'=>$propertyValue->format($format),
+                ];
+            }
+
+            if ($propertyValue instanceof Collection) {
+                $return = [];
+                foreach ($propertyValue as $entity) {
+                    $return[] = $entity->toArray('read', $arrayHelper, $path, $fallBack, $force);
+                }
+                return $return;
+            }
 
             if (method_exists($propertyValue, 'toString')) {
                 return $propertyValue->toString();
@@ -73,7 +72,6 @@ abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityC
             if (method_exists($propertyValue, 'toArray')) {
                 return $propertyValue->toArray();
             }
-
         }
 
         return $propertyValue;
