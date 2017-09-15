@@ -61,6 +61,16 @@ trait EntityCoreTrait
      */
     public function toArray(string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false):array
     {
+        $eventArgs = $this->makeEventArgs(['defaultMode'=>$defaultMode, 'defaultArrayHelper'=>$defaultArrayHelper, 'defaultPath'=>$defaultPath, 'defaultFallBack'=>$defaultFallBack, 'force'=>$force]);
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getEventManager()->dispatchEvent(EntityEventsConstants::PRE_TO_ARRAY, $eventArgs);
+        $args = $eventArgs->getArgs();
+        $defaultMode = $args['defaultMode'];
+        $defaultArrayHelper = $args['defaultArrayHelper'];
+        $defaultPath = $args['defaultPath'];
+        $defaultFallBack = $args['defaultFallBack'];
+        $force = $args['force'];
+
         $mode = $this->getLastMode() ?? $defaultMode;
         $this->init($mode, $defaultArrayHelper, $defaultPath, $defaultFallBack, $force);
 
@@ -70,6 +80,7 @@ trait EntityCoreTrait
         $arrayHelper = $this->getArrayHelper();
         $toArray = $config['toArray'] ?? null;
         $returnArray = [];
+
         if ($toArray !== null) {
             foreach ($toArray as $key => $value) {
                 $propertyValue = null;
@@ -92,6 +103,12 @@ trait EntityCoreTrait
 
             }
         }
+
+        $eventArgs = $this->makeEventArgs(['returnArray'=>$returnArray]);
+        /** @noinspection NullPointerExceptionInspection */
+        $this->getEventManager()->dispatchEvent(EntityEventsConstants::POST_TO_ARRAY, $eventArgs);
+        $returnArray = $eventArgs->getArgs()['returnArray'];
+
         return $returnArray;
     }
 
