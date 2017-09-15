@@ -1,6 +1,7 @@
 <?php
 namespace TempestTools\Crud\Doctrine;
 
+use DateTimeInterface;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\EventSubscriber;
 use TempestTools\AclMiddleware\Contracts\HasIdContract;
@@ -18,7 +19,7 @@ abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityC
 {
     use EntityCoreTrait, CreateEventManagerWrapperTrait;
 
-
+    const DEFAULT_DATE_TIME_FORMAT = 'Y-m-d H:i:s';
     /**
      * Makes event args to use
      *
@@ -32,16 +33,27 @@ abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityC
 
     /**
      * @param $propertyValue
+     * @param array $settings
      * @param bool $force
      * @return mixed
      * @throws \RuntimeException
      */
-    protected function parseToArrayPropertyValue($propertyValue, bool $force = false) {
+    protected function parseToArrayPropertyValue($propertyValue, array $settings = [], bool $force = false) {
         $arrayHelper = $this->getArrayHelper();
         $path = $this->getTTPath();
         $fallBack = $this->getTTFallBack();
         if ($propertyValue instanceof EntityContract) {
             return $propertyValue->toArray('read', $arrayHelper, $path, $fallBack, $force);
+        }
+
+        if ($propertyValue instanceof DateTimeInterface) {
+            $format = $settings['format'] ?? static::DEFAULT_DATE_TIME_FORMAT;
+            return [
+                'timezoneName'=>$propertyValue->getTimezone()->getName(),
+                'timestamp'=>$propertyValue->getTimestamp(),
+                'offset'=>$propertyValue->getOffset(),
+                'formatted'=>$propertyValue->format($format),
+            ];
         }
 
         if ($propertyValue instanceof Collection) {
@@ -51,6 +63,19 @@ abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityC
             }
             return $return;
         }
+
+        if (is_object ($propertyValue) === true) {
+
+            if (method_exists($propertyValue, 'toString')) {
+                return $propertyValue->toString();
+            }
+
+            if (method_exists($propertyValue, 'toArray')) {
+                return $propertyValue->toArray();
+            }
+
+        }
+
         return $propertyValue;
 
     }

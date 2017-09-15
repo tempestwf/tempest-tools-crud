@@ -88,7 +88,7 @@ trait EntityCoreTrait
                             break;
                     }
                 }
-                $returnArray[$key] = $this->parseToArrayPropertyValue($propertyValue, $force);
+                $returnArray[$key] = $this->parseToArrayPropertyValue($propertyValue, $value, $force);
 
             }
         }
@@ -97,10 +97,12 @@ trait EntityCoreTrait
 
     /** @noinspection MoreThanThreeArgumentsInspection
      * @param $propertyValue
+     * @param array $settings
      * @param bool $force
      * @return mixed
+     * @internal param array $value
      */
-    abstract protected function parseToArrayPropertyValue($propertyValue, bool $force = false);
+    abstract protected function parseToArrayPropertyValue($propertyValue, array $settings = [], bool $force = false);
 
     /**
      * @param bool $force
