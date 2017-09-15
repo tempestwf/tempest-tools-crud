@@ -38,7 +38,7 @@ abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityC
      * @return mixed
      * @throws \RuntimeException
      */
-    protected function parseToArrayPropertyValue($propertyValue, array $settings = [], bool $force = false) {
+    public function parseToArrayPropertyValue($propertyValue, array $settings = [], bool $force = false) {
         $arrayHelper = $this->getArrayHelper();
         $path = $this->getTTPath();
         $fallBack = $this->getTTFallBack();

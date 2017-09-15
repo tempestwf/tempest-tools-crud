@@ -4,6 +4,7 @@ namespace TempestTools\Crud\Orm\Helper;
 
 use ArrayObject;
 use RuntimeException;
+use TempestTools\Common\Contracts\ArrayHelperContract;
 use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Common\Utility\AccessorMethodNameTrait;
 use TempestTools\Crud\Constants\EntityEventsConstants;
@@ -48,6 +49,67 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         parent::__construct($array);
     }
 
+    /** @noinspection MoreThanThreeArgumentsInspection */
+
+    /**
+     * @param EntityContract $entity
+     * @param string|null $defaultMode
+     * @param ArrayHelperContract|null $defaultArrayHelper
+     * @param array|null $defaultPath
+     * @param array|null $defaultFallBack
+     * @param bool $force
+     * @return array
+     * @throws \RuntimeException
+     */
+    public function toArray(EntityContract $entity, string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false):array
+    {
+        $eventArgs = $entity->makeEventArgs(['defaultMode'=>$defaultMode, 'defaultArrayHelper'=>$defaultArrayHelper, 'defaultPath'=>$defaultPath, 'defaultFallBack'=>$defaultFallBack, 'force'=>$force]);
+        /** @noinspection NullPointerExceptionInspection */
+        $entity->getEventManager()->dispatchEvent(EntityEventsConstants::PRE_TO_ARRAY, $eventArgs);
+        $args = $eventArgs->getArgs()['params'];
+        $defaultMode = $args['defaultMode'];
+        $defaultArrayHelper = $args['defaultArrayHelper'];
+        $defaultPath = $args['defaultPath'];
+        $defaultFallBack = $args['defaultFallBack'];
+        $force = $args['force'];
+
+        $mode = $entity->getLastMode() ?? $defaultMode;
+        $entity->init($mode, $defaultArrayHelper, $defaultPath, $defaultFallBack, $force);
+
+        /** @noinspection NullPointerExceptionInspection */
+        $configArrayHelper = $entity->getConfigArrayHelper();
+        $config = $this->getArray();
+        $arrayHelper = $entity->getArrayHelper();
+        $toArray = $config['toArray'] ?? null;
+        $returnArray = [];
+
+        if ($toArray !== null) {
+            foreach ($toArray as $key => $value) {
+                $propertyValue = null;
+                if ($value !== null) {
+                    $type = $value['type'] ?? 'get';
+                    switch ($type) {
+                        case 'get':
+                            $methodName = $configArrayHelper->accessorMethodName('get', $key);
+                            $propertyValue = $this->$methodName();
+                            break;
+                        case 'literal':
+                            $propertyValue = $arrayHelper->parse($value['value'], ['self'=>$this, 'key'=>$key, 'value'=>$value, 'config'=>$config, 'toArrayConfig'=>$toArray, 'arrayHelper'=>$arrayHelper, 'configArrayHelper'=>$configArrayHelper]);
+                            break;
+                    }
+                }
+                $returnArray[$key] = $entity->parseToArrayPropertyValue($propertyValue, $value, $force);
+
+            }
+        }
+
+        $eventArgs = $entity->makeEventArgs(['returnArray'=>$returnArray]);
+        /** @noinspection NullPointerExceptionInspection */
+        $entity->getEventManager()->dispatchEvent(EntityEventsConstants::POST_TO_ARRAY, $eventArgs);
+        $returnArray = $eventArgs->getArgs()['params']['returnArray'];
+
+        return $returnArray;
+    }
 
     /**
      * @param string $fieldName
@@ -228,6 +290,8 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
             }
         }
     }
+
+
 
     /**
      * @param EntityContract $entity

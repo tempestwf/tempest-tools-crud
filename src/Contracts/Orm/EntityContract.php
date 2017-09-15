@@ -259,4 +259,12 @@ interface EntityContract
      * @throws \RuntimeException
      */
     public function toArray(string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false):array;
+
+    /**
+     * @param $propertyValue
+     * @param array $settings
+     * @param bool $force
+     * @return mixed
+     */
+    public function parseToArrayPropertyValue($propertyValue, array $settings = [], bool $force = false);
 }

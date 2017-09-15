@@ -212,7 +212,7 @@ $entityInfo = [
         ],
         'toArray'=>[ // Note when an entity or collection of entities is found
             '<key name>'=>[
-                'type'=>'<raw, get, literal>',// Defaults to raw.If 'raw' then the key is a property name and we retrieve it with out calling get, if 'get' then the key is a property but we get it by calling get<Property name>, this will cause an eager load so is rarely recommended. If 'literal' then a value property must be included, the value property may be a closure that returns a value.
+                'type'=>'<get, literal>',// Defaults to get. if 'get' then the key is a property but we get it by calling get<Property name>. If 'literal' then a value property must be included, the value property may be a closure that returns a value.
                 'value'=>'<literal value>', // The value to set the key to if it's a literal, a closure or array expression closure may be used
                 'format'=>'<literal value>' // format used if this is a date time field. By default sql date format is used
             ]
@@ -264,7 +264,7 @@ $entityInfo = [
         ],
         'toArray'=>[ // Note when an entity or collection of entities is found
             '<key name>'=>[
-                'type'=>'<raw, get, literal>',// Defaults to raw.If 'raw' then the key is a property name and we retrieve it with out calling get, if 'get' then the key is a property but we get it by calling get<Property name>, this will cause an eager load so is rarely recommended. If 'literal' then a value property must be included, the value property may be a closure that returns a value.
+                'type'=>'<get, literal>',// Defaults to get. if 'get' then the key is a property but we get it by calling get<Property name>. If 'literal' then a value property must be included, the value property may be a closure that returns a value.
                 'value'=>'<literal value>', // The value to set the key to if it's a literal, a closure or array expression closure may be used
                 'format'=>'<literal value>' // format used if this is a date time field. By default sql date format is used
             ]
@@ -316,7 +316,7 @@ $entityInfo = [
         ],
         'toArray'=>[ // Note when an entity or collection of entities is found
             '<key name>'=>[
-                'type'=>'<raw, get, literal>',// Defaults to raw.If 'raw' then the key is a property name and we retrieve it with out calling get, if 'get' then the key is a property but we get it by calling get<Property name>, this will cause an eager load so is rarely recommended. If 'literal' then a value property must be included, the value property may be a closure that returns a value.
+                'type'=>'<get, literal>',// Defaults to get. if 'get' then the key is a property but we get it by calling get<Property name>. If 'literal' then a value property must be included, the value property may be a closure that returns a value.
                 'value'=>'<literal value>', // The value to set the key to if it's a literal, a closure or array expression closure may be used
                 'format'=>'<literal value>' // format used if this is a date time field. By default sql date format is used
             ]
@@ -354,7 +354,7 @@ $entityInfo = [
     'read'=>[
         'toArray'=>[ // Note when an entity or collection of entities is found
             '<key name>'=>[
-                'type'=>'<raw, get, literal>',// Defaults to raw.If 'raw' then the key is a property name and we retrieve it with out calling get, if 'get' then the key is a property but we get it by calling get<Property name>, this will cause an eager load so is rarely recommended. If 'literal' then a value property must be included, the value property may be a closure that returns a value.
+                'type'=>'<get, literal>',// Defaults to get. if 'get' then the key is a property but we get it by calling get<Property name>. If 'literal' then a value property must be included, the value property may be a closure that returns a value.
                 'value'=>'<literal value>', // The value to set the key to if it's a literal, a closure or array expression closure may be used
                 'format'=>'<literal value>' // format used if this is a date time field. By default sql date format is used
             ]

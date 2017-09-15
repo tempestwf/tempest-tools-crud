@@ -145,4 +145,18 @@ interface EntityArrayHelperContract extends ArrayHelperContract
      */
     public function setPrePersistEntityBuilder(PrePersistEntityBuilderContract $prePersistEntityBuilder);
 
+    /** @noinspection MoreThanThreeArgumentsInspection */
+
+    /**
+     * @param EntityContract $entity
+     * @param string|null $defaultMode
+     * @param ArrayHelperContract|null $defaultArrayHelper
+     * @param array|null $defaultPath
+     * @param array|null $defaultFallBack
+     * @param bool $force
+     * @return array
+     * @throws \RuntimeException
+     */
+    public function toArray(EntityContract $entity, string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false):array;
+
 }
