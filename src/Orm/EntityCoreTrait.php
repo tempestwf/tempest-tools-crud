@@ -48,6 +48,60 @@ trait EntityCoreTrait
         $this->setLastMode($mode);
     }
 
+    /** @noinspection MoreThanThreeArgumentsInspection */
+
+    /**
+     * @param string|null $defaultMode
+     * @param ArrayHelperContract|null $defaultArrayHelper
+     * @param array|null $defaultPath
+     * @param array|null $defaultFallBack
+     * @param bool $force
+     * @return array
+     * @throws \RuntimeException
+     */
+    public function toArray(string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false):array
+    {
+        $mode = $this->getLastMode() ?? $defaultMode;
+        $this->init($mode, $defaultArrayHelper, $defaultPath, $defaultFallBack, $force);
+
+        /** @noinspection NullPointerExceptionInspection */
+        $configArrayHelper = $this->getConfigArrayHelper();
+        $config = $configArrayHelper->getArray();
+        $arrayHelper = $this->getArrayHelper();
+        $toArray = $config['toArray'] ?? null;
+        $returnArray = [];
+        if ($toArray !== null) {
+            foreach ($toArray as $key => $value) {
+                $propertyValue = null;
+                if ($value !== null) {
+                    $type = $value['type'] ?? 'raw';
+                    switch ($type) {
+                        case 'raw':
+                            $propertyValue = $this->$key;
+                            break;
+                        case 'get':
+                            $methodName = $configArrayHelper->accessorMethodName('get', $key);
+                            $propertyValue = $this->$methodName();
+                            break;
+                        case 'literal':
+                            $propertyValue = $arrayHelper->parse($value['value'], ['self'=>$this, 'key'=>$key, 'value'=>$value, 'config'=>$config, 'toArrayConfig'=>$toArray, 'arrayHelper'=>$arrayHelper, 'configArrayHelper'=>$configArrayHelper]);
+                            break;
+                    }
+                }
+                $returnArray[$key] = $this->parseToArrayPropertyValue($propertyValue, $force);
+
+            }
+        }
+        return $returnArray;
+    }
+
+    /** @noinspection MoreThanThreeArgumentsInspection
+     * @param $propertyValue
+     * @param bool $force
+     * @return mixed
+     */
+    abstract protected function parseToArrayPropertyValue($propertyValue, bool $force = false);
+
     /**
      * @param bool $force
      * @param string $mode

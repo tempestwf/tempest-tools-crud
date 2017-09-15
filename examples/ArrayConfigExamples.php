@@ -210,6 +210,12 @@ $entityInfo = [
                 'customAttributes'=>['<customAttributes>'],
             ],
         ],
+        'toArray'=>[ // Note when an entity or collection of entities is found
+            '<key name>'=>[
+                'type'=>'<raw, get, literal>',// Defaults to raw.If 'raw' then the key is a property name and we retrieve it with out calling get, if 'get' then the key is a property but we get it by calling get<Property name>, this will cause an eager load so is rarely recommended. If 'literal' then a value property must be included, the value property may be a closure that returns a value.
+                'value'=>'<literal value>' // The value to set the key to if it's a literal, a closure or array expression closure may be used
+            ]
+        ],
         'fields'=>[
             '<field name>'=>[
                 'permissive'=>'<true or false>', //Tested in: testPermissiveWorks1 / testPermissiveWorks2
@@ -254,6 +260,12 @@ $entityInfo = [
             'enforce'=>'<array of field names with values to make sure they match, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist>', // Tested in: testEnforceTopLevelWorks
             'closure'=>'<validation closure>', // Tested in: testTopLevelClosure
             'mutate'=>'<mutate closure>', // Tested In: testTopLevelSetToAndMutate
+        ],
+        'toArray'=>[ // Note when an entity or collection of entities is found
+            '<key name>'=>[
+                'type'=>'<raw, get, literal>',// Defaults to raw.If 'raw' then the key is a property name and we retrieve it with out calling get, if 'get' then the key is a property but we get it by calling get<Property name>, this will cause an eager load so is rarely recommended. If 'literal' then a value property must be included, the value property may be a closure that returns a value.
+                'value'=>'<literal value>' // The value to set the key to if it's a literal, a closure or array expression closure may be used
+            ]
         ],
         'fields'=>[
             '<field name>'=>[
@@ -300,6 +312,12 @@ $entityInfo = [
             'closure'=>'<validation closure>', // Tested in: testTopLevelClosure
             'mutate'=>'<mutate closure>', // Tested In: testTopLevelSetToAndMutate
         ],
+        'toArray'=>[ // Note when an entity or collection of entities is found
+            '<key name>'=>[
+                'type'=>'<raw, get, literal>',// Defaults to raw.If 'raw' then the key is a property name and we retrieve it with out calling get, if 'get' then the key is a property but we get it by calling get<Property name>, this will cause an eager load so is rarely recommended. If 'literal' then a value property must be included, the value property may be a closure that returns a value.
+                'value'=>'<literal value>' // The value to set the key to if it's a literal, a closure or array expression closure may be used
+            ]
+        ],
         'fields'=>[
             '<field name>'=>[
                 'permissive'=>'<true or false>', //Tested in: testPermissiveWorks1 / testPermissiveWorks2
@@ -324,6 +342,17 @@ $entityInfo = [
                     'delete'=>'<true or false>', //Tested in: testMultiDeleteAndEvents
                     'read'=>'<true or false>' //Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
                 ]
+            ]
+        ],
+        'options'=>[
+            '<custom option name>'=>'<custom option value>', // reserved for custom use cases
+        ]
+    ],
+    'read'=>[
+        'toArray'=>[ // Note when an entity or collection of entities is found
+            '<key name>'=>[
+                'type'=>'<raw, get, literal>',// Defaults to raw.If 'raw' then the key is a property name and we retrieve it with out calling get, if 'get' then the key is a property but we get it by calling get<Property name>, this will cause an eager load so is rarely recommended. If 'literal' then a value property must be included, the value property may be a closure that returns a value.
+                'value'=>'<literal value>' // The value to set the key to if it's a literal, a closure or array expression closure may be used
             ]
         ],
         'options'=>[
@@ -372,7 +401,7 @@ $frontEndQuery = [
         'returnCount'=>'<true or false>', // Tested in: testGeneralDataRetrieval
         'limit'=>'<limit>', //Tested in: testGeneralQueryBuilding
         'offset'=>'<offset>', //Tested in: testGeneralQueryBuilding
-        'useGetParams'=>'<true or false>'// whether or not to expect the params to be in get format as illustrated below
+        'useGetParams'=>'<true or false>'// whether or not to expect the params to be in get format as illustrated below. Tested in testGeneralQueryBuildingWithGetParams
     ]
 ];
 

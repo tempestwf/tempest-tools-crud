@@ -245,4 +245,18 @@ interface EntityContract
      * @param bool $prePopulated
      */
     public function setPrePopulated(bool $prePopulated): void;
+
+    /** @noinspection MoreThanThreeArgumentsInspection */
+
+
+    /**
+     * @param string|null $defaultMode
+     * @param ArrayHelperContract|null $defaultArrayHelper
+     * @param array|null $defaultPath
+     * @param array|null $defaultFallBack
+     * @param bool $force
+     * @return array
+     * @throws \RuntimeException
+     */
+    public function toArray(string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false):array;
 }

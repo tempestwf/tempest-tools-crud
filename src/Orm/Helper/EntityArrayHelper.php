@@ -48,6 +48,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         parent::__construct($array);
     }
 
+
     /**
      * @param string $fieldName
      * @param string $keyName
