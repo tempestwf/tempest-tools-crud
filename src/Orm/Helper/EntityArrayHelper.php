@@ -82,9 +82,15 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $config = $this->getArray();
         $arrayHelper = $entity->getArrayHelper();
         $toArray = $config['toArray'] ?? null;
+        $toArrayDeep = $config['toArrayDeep'] ?? false;
+        $array = $arrayHelper->getArray();
+        if (isset($array['entitiesTransformedToArray']) === false) {
+            $array['entitiesTransformedToArray'] = [];
+        }
         $returnArray = [];
-        $loopDetected = in_array($entity, $slatedToTransform, true);
+        $loopDetected = $toArrayDeep === true?in_array($entity, $slatedToTransform, true):in_array($entity, $array['entitiesTransformedToArray'], true);
         $slatedToTransform[] = $entity;
+        $array['entitiesTransformedToArray'][] = $entity;
         if ($toArray !== null) {
             foreach ($toArray as $key => $value) {
                 $propertyValue = null;
