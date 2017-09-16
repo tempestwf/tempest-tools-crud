@@ -255,16 +255,19 @@ interface EntityContract
      * @param array|null $defaultPath
      * @param array|null $defaultFallBack
      * @param bool $force
+     * @param array $slatedToTransform
      * @return array
-     * @throws \RuntimeException
      */
-    public function toArray(string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false):array;
+    public function toArray(string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false, array $slatedToTransform = []):array;
+
+    /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
      * @param $propertyValue
      * @param array $settings
      * @param bool $force
+     * @param array $slatedToTransform
      * @return mixed
      */
-    public function parseToArrayPropertyValue($propertyValue, array $settings = [], bool $force = false);
+    public function parseToArrayPropertyValue($propertyValue, array $settings = [], bool $force = false, array $slatedToTransform = []);
 }

@@ -58,14 +58,16 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param array|null $defaultPath
      * @param array|null $defaultFallBack
      * @param bool $force
+     * @param array $slatedToTransform
      * @return array
      * @throws \RuntimeException
      */
-    public function toArray(EntityContract $entity, string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false):array
+    public function toArray(EntityContract $entity, string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false, array $slatedToTransform = []):array
     {
         $eventArgs = $entity->makeEventArgs(['defaultMode'=>$defaultMode, 'defaultArrayHelper'=>$defaultArrayHelper, 'defaultPath'=>$defaultPath, 'defaultFallBack'=>$defaultFallBack, 'force'=>$force]);
+        $eventManager = $entity->getEventManager();
         /** @noinspection NullPointerExceptionInspection */
-        $entity->getEventManager()->dispatchEvent(EntityEventsConstants::PRE_TO_ARRAY, $eventArgs);
+        $eventManager->dispatchEvent(EntityEventsConstants::PRE_TO_ARRAY, $eventArgs);
         $args = $eventArgs->getArgs()['params'];
         $defaultMode = $args['defaultMode'];
         $defaultArrayHelper = $args['defaultArrayHelper'];
@@ -77,12 +79,12 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $entity->init($mode, $defaultArrayHelper, $defaultPath, $defaultFallBack, $force);
 
         /** @noinspection NullPointerExceptionInspection */
-        $configArrayHelper = $entity->getConfigArrayHelper();
         $config = $this->getArray();
         $arrayHelper = $entity->getArrayHelper();
         $toArray = $config['toArray'] ?? null;
         $returnArray = [];
-
+        $loopDetected = in_array($entity, $slatedToTransform, true);
+        $slatedToTransform[] = $entity;
         if ($toArray !== null) {
             foreach ($toArray as $key => $value) {
                 $propertyValue = null;
@@ -90,22 +92,23 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
                     $type = $value['type'] ?? 'get';
                     switch ($type) {
                         case 'get':
-                            $methodName = $configArrayHelper->accessorMethodName('get', $key);
-                            $propertyValue = $this->$methodName();
+                            $methodName = $this->accessorMethodName('get', $key);
+                            $propertyValue = $entity->$methodName();
                             break;
                         case 'literal':
-                            $propertyValue = $arrayHelper->parse($value['value'], ['self'=>$this, 'key'=>$key, 'value'=>$value, 'config'=>$config, 'toArrayConfig'=>$toArray, 'arrayHelper'=>$arrayHelper, 'configArrayHelper'=>$configArrayHelper]);
+                            $propertyValue = $arrayHelper->parse($value['value'], ['self'=>$entity, 'key'=>$key, 'value'=>$value, 'config'=>$config, 'toArrayConfig'=>$toArray, 'arrayHelper'=>$arrayHelper, 'configArrayHelper'=>$this]);
                             break;
                     }
                 }
-                $returnArray[$key] = $entity->parseToArrayPropertyValue($propertyValue, $value, $force);
-
+                if ($loopDetected === false || is_object($propertyValue) === false) {
+                    $returnArray[$key] = $entity->parseToArrayPropertyValue($propertyValue, $value, $force, $slatedToTransform);
+                }
             }
         }
 
         $eventArgs = $entity->makeEventArgs(['returnArray'=>$returnArray]);
         /** @noinspection NullPointerExceptionInspection */
-        $entity->getEventManager()->dispatchEvent(EntityEventsConstants::POST_TO_ARRAY, $eventArgs);
+        $eventManager->dispatchEvent(EntityEventsConstants::POST_TO_ARRAY, $eventArgs);
         $returnArray = $eventArgs->getArgs()['params']['returnArray'];
 
         return $returnArray;

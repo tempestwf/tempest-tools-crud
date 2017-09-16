@@ -56,14 +56,14 @@ trait EntityCoreTrait
      * @param array|null $defaultPath
      * @param array|null $defaultFallBack
      * @param bool $force
+     * @param array $slatedToTransform
      * @return array
-     * @throws \RuntimeException
      */
-    public function toArray(string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false):array
+    public function toArray(string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false, array $slatedToTransform = []):array
     {
         /** @noinspection NullPointerExceptionInspection */
         /** @noinspection PhpParamsInspection */
-        return $this->getConfigArrayHelper()->toArray($this, $defaultMode, $defaultArrayHelper, $defaultPath, $defaultFallBack, $force);
+        return $this->getConfigArrayHelper()->toArray($this, $defaultMode, $defaultArrayHelper, $defaultPath, $defaultFallBack, $force, $slatedToTransform);
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection

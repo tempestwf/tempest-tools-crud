@@ -154,9 +154,9 @@ interface EntityArrayHelperContract extends ArrayHelperContract
      * @param array|null $defaultPath
      * @param array|null $defaultFallBack
      * @param bool $force
+     * @param array $slatedToTransform
      * @return array
-     * @throws \RuntimeException
      */
-    public function toArray(EntityContract $entity, string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false):array;
+    public function toArray(EntityContract $entity, string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false, array $slatedToTransform = []):array;
 
 }
