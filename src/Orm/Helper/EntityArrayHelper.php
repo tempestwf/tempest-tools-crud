@@ -82,13 +82,13 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $config = $this->getArray();
         $arrayHelper = $entity->getArrayHelper();
         $toArray = $config['toArray'] ?? null;
-        $toArrayDeep = $config['toArrayDeep'] ?? false;
+        $toArrayCompleteness = $config['toArrayCompleteness'] ?? 'limited';
         $array = $arrayHelper->getArray();
         if (isset($array['entitiesTransformedToArray']) === false) {
             $array['entitiesTransformedToArray'] = [];
         }
         $returnArray = [];
-        $loopDetected = $toArrayDeep === true?in_array($entity, $slatedToTransform, true):in_array($entity, $array['entitiesTransformedToArray'], true);
+        $loopDetected = $toArrayCompleteness === 'full'?in_array($entity, $slatedToTransform, true):in_array($entity, $array['entitiesTransformedToArray'], true);
         $slatedToTransform[] = $entity;
         $array['entitiesTransformedToArray'][] = $entity;
         if ($toArray !== null) {
@@ -106,7 +106,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
                             break;
                     }
                 }
-                if ($loopDetected === false || is_object($propertyValue) === false) {
+                if ($loopDetected === false || ($toArrayCompleteness !== 'minimal' && is_object($propertyValue) === false)) {
                     $returnArray[$key] = $entity->parseToArrayPropertyValue($propertyValue, $value, $force, $slatedToTransform);
                 }
             }
