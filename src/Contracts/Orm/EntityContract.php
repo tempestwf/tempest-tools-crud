@@ -255,10 +255,11 @@ interface EntityContract
      * @param array|null $defaultPath
      * @param array|null $defaultFallBack
      * @param bool $force
+     * @param array $frontEndOptions
      * @param array $slatedToTransform
      * @return array
      */
-    public function toArray(string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false, array $slatedToTransform = []):array;
+    public function toArray(string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false, array $frontEndOptions = [], array $slatedToTransform = []):array;
 
     /** @noinspection MoreThanThreeArgumentsInspection */
 
@@ -266,8 +267,9 @@ interface EntityContract
      * @param $propertyValue
      * @param array $settings
      * @param bool $force
+     * @param array $frontEndOptions
      * @param array $slatedToTransform
      * @return mixed
      */
-    public function parseToArrayPropertyValue($propertyValue, array $settings = [], bool $force = false, array $slatedToTransform = []);
+    public function parseToArrayPropertyValue($propertyValue, array $settings = [], bool $force = false, array $frontEndOptions = [], array $slatedToTransform = []);
 }

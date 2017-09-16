@@ -210,7 +210,6 @@ $entityInfo = [
                 'customAttributes'=>['<customAttributes>'],
             ],
         ],
-        'toArrayCompleteness'=>'<full, limited, minimal>', // Defaults to limited, if 'full' then all data will be shown so long as it wouldn't trigger an infinite loop, if 'limited' then all data will be shown but relations leading to already processed entities will not be shown, if 'minimal' the same entity will never be shown twice in the return and an empty array will be in it's place
         'toArray'=>[ // Note when an entity or collection of entities is found
             '<key name>'=>[
                 'type'=>'<get, literal>',// Defaults to get. if 'get' then the key is a property but we get it by calling get<Property name>. If 'literal' then a value property must be included, the value property may be a closure that returns a value.
@@ -435,7 +434,8 @@ $frontEndQuery = [
 $exampleFrontEndRequest = [
     'params'=>['<see param examples below>'],
     'options'=>[
-        'simplifiedParams'=>'<true or false>' //Defaults to false, may also be set as a different default on the controller // whether or not to process the params as standard version of simplified version. Both param examples are below.
+        'simplifiedParams'=>'<true or false>', //Defaults to false, may also be set as a different default on the controller // whether or not to process the params as standard version of simplified version. Both param examples are below.
+        'toArrayCompleteness'=>'<full, limited, minimal>', // Defaults to limited, if 'full' then all data will be shown so long as it wouldn't trigger an infinite loop, if 'limited' then all data will be shown but relations leading to already processed entities will not be shown, if 'minimal' the same entity will never be shown twice in the return and an empty array will be in it's place
     ]
 ];
 

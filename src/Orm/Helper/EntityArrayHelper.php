@@ -58,13 +58,14 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param array|null $defaultPath
      * @param array|null $defaultFallBack
      * @param bool $force
+     * @param array $frontEndOptions
      * @param array $slatedToTransform
      * @return array
      * @throws \RuntimeException
      */
-    public function toArray(EntityContract $entity, string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false, array $slatedToTransform = []):array
+    public function toArray(EntityContract $entity, string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false, array $frontEndOptions = [], array $slatedToTransform = []):array
     {
-        $eventArgs = $entity->makeEventArgs(['defaultMode'=>$defaultMode, 'defaultArrayHelper'=>$defaultArrayHelper, 'defaultPath'=>$defaultPath, 'defaultFallBack'=>$defaultFallBack, 'force'=>$force]);
+        $eventArgs = $entity->makeEventArgs(['defaultMode'=>$defaultMode, 'defaultArrayHelper'=>$defaultArrayHelper, 'defaultPath'=>$defaultPath, 'defaultFallBack'=>$defaultFallBack, 'frontEndOptions'=>$frontEndOptions, 'force'=>$force]);
         $eventManager = $entity->getEventManager();
         /** @noinspection NullPointerExceptionInspection */
         $eventManager->dispatchEvent(EntityEventsConstants::PRE_TO_ARRAY, $eventArgs);
@@ -73,6 +74,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $defaultArrayHelper = $args['defaultArrayHelper'];
         $defaultPath = $args['defaultPath'];
         $defaultFallBack = $args['defaultFallBack'];
+        $frontEndOptions = $args['frontEndOptions'];
         $force = $args['force'];
 
         $mode = $entity->getLastMode() ?? $defaultMode;
@@ -82,7 +84,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $config = $this->getArray();
         $arrayHelper = $entity->getArrayHelper();
         $toArray = $config['toArray'] ?? null;
-        $toArrayCompleteness = $config['toArrayCompleteness'] ?? 'limited';
+        $toArrayCompleteness = $frontEndOptions['toArrayCompleteness'] ?? 'limited';
         $array = $arrayHelper->getArray();
         if (isset($array['entitiesTransformedToArray']) === false) {
             $array['entitiesTransformedToArray'] = [];

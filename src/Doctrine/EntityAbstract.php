@@ -35,17 +35,17 @@ abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityC
      * @param $propertyValue
      * @param array $settings
      * @param bool $force
+     * @param array $frontEndOptions
      * @param array $slatedToTransform
      * @return mixed
-     * @throws \RuntimeException
      */
-    public function parseToArrayPropertyValue($propertyValue, array $settings = [], bool $force = false, array $slatedToTransform = []) {
+    public function parseToArrayPropertyValue($propertyValue, array $settings = [], bool $force = false, array $frontEndOptions = [], array $slatedToTransform = []) {
         $arrayHelper = $this->getArrayHelper();
         $path = $this->getTTPath();
         $fallBack = $this->getTTFallBack();
         if (is_object ($propertyValue) === true) {
             if ($propertyValue instanceof EntityContract) {
-                return $propertyValue->toArray('read', $arrayHelper, $path, $fallBack, $force, $slatedToTransform);
+                return $propertyValue->toArray('read', $arrayHelper, $path, $fallBack, $force, $frontEndOptions, $slatedToTransform);
             }
 
             if ($propertyValue instanceof DateTimeInterface) {
@@ -61,7 +61,7 @@ abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityC
             if ($propertyValue instanceof Collection) {
                 $return = [];
                 foreach ($propertyValue as $entity) {
-                    $return[] = $entity->toArray('read', $arrayHelper, $path, $fallBack, $force, $slatedToTransform);
+                    $return[] = $entity->toArray('read', $arrayHelper, $path, $fallBack, $force, $frontEndOptions, $slatedToTransform);
                 }
                 return $return;
             }
