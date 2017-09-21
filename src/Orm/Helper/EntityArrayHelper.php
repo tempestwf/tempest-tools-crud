@@ -84,15 +84,16 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $config = $this->getArray();
         $arrayHelper = $entity->getArrayHelper();
         $toArray = $config['toArray'] ?? null;
-        $completeness = $frontEndOptions['frontEndOptions']['completeness'] ?? 'full';
-        $maxDepth  = $frontEndOptions['frontEndOptions']['maxDepth'] ?? null;
-        $excludeKeys  = $frontEndOptions['frontEndOptions']['excludeKeys'] ?? [];
+        $completeness = $frontEndOptions['toArray']['completeness'] ?? 'full';
+        $maxDepth  = $frontEndOptions['toArray']['maxDepth'] ?? null;
+        $excludeKeys  = $frontEndOptions['toArray']['excludeKeys'] ?? [];
 
         $array = $arrayHelper->getArray();
         if (isset($array['entitiesTransformedToArray']) === false) {
             $array['entitiesTransformedToArray'] = [];
         }
         $returnArray = [];
+
         $loopDetected = $completeness === 'full'?in_array($entity, $slatedToTransform, true):in_array($entity, $array['entitiesTransformedToArray'], true);
         $slatedToTransform[] = $entity;
 
