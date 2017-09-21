@@ -4,6 +4,7 @@ namespace TempestTools\Crud\Doctrine;
 use DateTimeInterface;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\EventSubscriber;
+use Doctrine\ORM\PersistentCollection;
 use TempestTools\AclMiddleware\Contracts\HasIdContract;
 use TempestTools\Crud\Contracts\Orm\EntityContract;
 use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
@@ -59,10 +60,22 @@ abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityC
             }
 
             if ($propertyValue instanceof Collection) {
+                $allowLazyLoad = $settings['allowLazyLoad'] ?? false;
+                $allowExtraLazyLoad = $settings['allowExtraLazyLoad'] ?? false;
                 $return = [];
-                foreach ($propertyValue as $entity) {
-                    $return[] = $entity->toArray('read', $arrayHelper, $path, $fallBack, $force, $frontEndOptions, $slatedToTransform);
+                /** @var PersistentCollection $propertyValue */
+                if (
+                    ($allowExtraLazyLoad === true && $propertyValue->count() > 0)
+                    ||
+                    ($allowLazyLoad === true || $propertyValue instanceof PersistentCollection === false || $propertyValue->isInitialized())
+                ) {
+                    foreach ($propertyValue as $entity) {
+                        if ($entity instanceof EntityContract) {
+                            $return[] = $entity->toArray('read', $arrayHelper, $path, $fallBack, $force, $frontEndOptions, $slatedToTransform);
+                        }
+                    }
                 }
+
                 return $return;
             }
 

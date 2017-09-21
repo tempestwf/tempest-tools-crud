@@ -62,9 +62,31 @@ trait EntityCoreTrait
      */
     public function toArray(string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false, array $frontEndOptions = [], array $slatedToTransform = []):array
     {
+        $mode = $this->getLastMode() ?? $defaultMode;
+        $this->init($mode, $defaultArrayHelper, $defaultPath, $defaultFallBack, $force);
+
+        $eventArgs = $this->makeEventArgs(['defaultMode'=>$defaultMode, 'defaultArrayHelper'=>$defaultArrayHelper, 'defaultPath'=>$defaultPath, 'defaultFallBack'=>$defaultFallBack, 'frontEndOptions'=>$frontEndOptions, 'force'=>$force]);
+        $eventManager = $this->getEventManager();
+        /** @noinspection NullPointerExceptionInspection */
+        $eventManager->dispatchEvent(EntityEventsConstants::PRE_TO_ARRAY, $eventArgs);
+        $args = $eventArgs->getArgs()['params'];
+        $defaultMode = $args['defaultMode'];
+        $defaultArrayHelper = $args['defaultArrayHelper'];
+        $defaultPath = $args['defaultPath'];
+        $defaultFallBack = $args['defaultFallBack'];
+        $frontEndOptions = $args['frontEndOptions'];
+        $force = $args['force'];
+
         /** @noinspection NullPointerExceptionInspection */
         /** @noinspection PhpParamsInspection */
-        return $this->getConfigArrayHelper()->toArray($this, $defaultMode, $defaultArrayHelper, $defaultPath, $defaultFallBack, $force, $frontEndOptions, $slatedToTransform);
+        $returnArray =  $this->getConfigArrayHelper()->toArray($this, $defaultMode, $defaultArrayHelper, $defaultPath, $defaultFallBack, $force, $frontEndOptions, $slatedToTransform);
+
+        $eventArgs = $this->makeEventArgs(['returnArray'=>$returnArray]);
+        /** @noinspection NullPointerExceptionInspection */
+        $eventManager->dispatchEvent(EntityEventsConstants::POST_TO_ARRAY, $eventArgs);
+        $returnArray = $eventArgs->getArgs()['params']['returnArray'];
+
+        return $returnArray;
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection

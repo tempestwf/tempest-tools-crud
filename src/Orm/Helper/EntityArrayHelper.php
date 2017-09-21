@@ -65,20 +65,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      */
     public function toArray(EntityContract $entity, string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false, array $frontEndOptions = [], array $slatedToTransform = []):array
     {
-        $eventArgs = $entity->makeEventArgs(['defaultMode'=>$defaultMode, 'defaultArrayHelper'=>$defaultArrayHelper, 'defaultPath'=>$defaultPath, 'defaultFallBack'=>$defaultFallBack, 'frontEndOptions'=>$frontEndOptions, 'force'=>$force]);
-        $eventManager = $entity->getEventManager();
-        /** @noinspection NullPointerExceptionInspection */
-        $eventManager->dispatchEvent(EntityEventsConstants::PRE_TO_ARRAY, $eventArgs);
-        $args = $eventArgs->getArgs()['params'];
-        $defaultMode = $args['defaultMode'];
-        $defaultArrayHelper = $args['defaultArrayHelper'];
-        $defaultPath = $args['defaultPath'];
-        $defaultFallBack = $args['defaultFallBack'];
-        $frontEndOptions = $args['frontEndOptions'];
-        $force = $args['force'];
 
-        $mode = $entity->getLastMode() ?? $defaultMode;
-        $entity->init($mode, $defaultArrayHelper, $defaultPath, $defaultFallBack, $force);
 
         /** @noinspection NullPointerExceptionInspection */
         $config = $this->getArray();
@@ -124,11 +111,6 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
                 }
             }
         }
-
-        $eventArgs = $entity->makeEventArgs(['returnArray'=>$returnArray]);
-        /** @noinspection NullPointerExceptionInspection */
-        $eventManager->dispatchEvent(EntityEventsConstants::POST_TO_ARRAY, $eventArgs);
-        $returnArray = $eventArgs->getArgs()['params']['returnArray'];
 
         return $returnArray;
     }
