@@ -435,7 +435,11 @@ $exampleFrontEndRequest = [
     'params'=>['<see param examples below>'],
     'options'=>[
         'simplifiedParams'=>'<true or false>', //Defaults to false, may also be set as a different default on the controller // whether or not to process the params as standard version of simplified version. Both param examples are below.
-        'toArrayCompleteness'=>'<full, limited, minimal, none>', // Defaults to limited, if 'full' then all data will be shown so long as it wouldn't trigger an infinite loop, if 'limited' then all data will be shown but relations leading to already processed entities will not be shown, if 'minimal' the same entity will never be shown twice in the return and an empty array will be in it's place, if 'none' nothing is returned
+        'toArray'=>[
+            'completeness'=>'<full, limited, minimal, none>', // Defaults to limited, if 'full' then all data will be shown so long as it wouldn't trigger an infinite loop, if 'limited' then all data will be shown but relations leading to already processed entities will not be shown, if 'minimal' the same entity will never be shown twice in the return and an empty array will be in it's place, if 'none' nothing is returned
+            'maxDepth'=>'<number or null>', // how deep should the to array go
+            'excludeKeys'=> ['<list of keys to expclude>'] // Use this to prevent certain keys from being converted to array to trim the return
+        ]
     ]
 ];
 

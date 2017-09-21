@@ -84,32 +84,42 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $config = $this->getArray();
         $arrayHelper = $entity->getArrayHelper();
         $toArray = $config['toArray'] ?? null;
-        $toArrayCompleteness = $frontEndOptions['toArrayCompleteness'] ?? 'limited';
+        $completeness = $frontEndOptions['frontEndOptions']['completeness'] ?? 'limited';
+        $maxDepth  = $frontEndOptions['frontEndOptions']['maxDepth'] ?? null;
+        $excludeKeys  = $frontEndOptions['frontEndOptions']['excludeKeys'] ?? [];
+
         $array = $arrayHelper->getArray();
         if (isset($array['entitiesTransformedToArray']) === false) {
             $array['entitiesTransformedToArray'] = [];
         }
         $returnArray = [];
-        $loopDetected = $toArrayCompleteness === 'full'?in_array($entity, $slatedToTransform, true):in_array($entity, $array['entitiesTransformedToArray'], true);
+        $loopDetected = $completeness === 'full'?in_array($entity, $slatedToTransform, true):in_array($entity, $array['entitiesTransformedToArray'], true);
         $slatedToTransform[] = $entity;
+
+        if ($completeness === 'none' || ($maxDepth !== null && count($slatedToTransform) > $maxDepth)) {
+            return [];
+        }
+
         $array['entitiesTransformedToArray'][] = $entity;
         if ($toArray !== null) {
             foreach ($toArray as $key => $value) {
-                $propertyValue = null;
-                if ($value !== null) {
-                    $type = $value['type'] ?? 'get';
-                    switch ($type) {
-                        case 'get':
-                            $methodName = $this->accessorMethodName('get', $key);
-                            $propertyValue = $entity->$methodName();
-                            break;
-                        case 'literal':
-                            $propertyValue = $arrayHelper->parse($value['value'], ['self'=>$entity, 'key'=>$key, 'value'=>$value, 'config'=>$config, 'toArrayConfig'=>$toArray, 'arrayHelper'=>$arrayHelper, 'configArrayHelper'=>$this]);
-                            break;
+                if (in_array($key, $excludeKeys, true) === false) {
+                    $propertyValue = null;
+                    if ($value !== null) {
+                        $type = $value['type'] ?? 'get';
+                        switch ($type) {
+                            case 'get':
+                                $methodName = $this->accessorMethodName('get', $key);
+                                $propertyValue = $entity->$methodName();
+                                break;
+                            case 'literal':
+                                $propertyValue = $arrayHelper->parse($value['value'], ['self'=>$entity, 'key'=>$key, 'value'=>$value, 'config'=>$config, 'toArrayConfig'=>$toArray, 'arrayHelper'=>$arrayHelper, 'configArrayHelper'=>$this]);
+                                break;
+                        }
                     }
-                }
-                if ($loopDetected === false || ($toArrayCompleteness !== 'minimal' && is_object($propertyValue) === false)) {
-                    $returnArray[$key] = $entity->parseToArrayPropertyValue($propertyValue, $value, $force, $slatedToTransform);
+                    if ($loopDetected === false || ($completeness !== 'minimal' && is_object($propertyValue) === false)) {
+                        $returnArray[$key] = $entity->parseToArrayPropertyValue($propertyValue, $value, $force, $slatedToTransform);
+                    }
                 }
             }
         }
