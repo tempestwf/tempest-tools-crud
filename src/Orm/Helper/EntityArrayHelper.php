@@ -84,7 +84,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $config = $this->getArray();
         $arrayHelper = $entity->getArrayHelper();
         $toArray = $config['toArray'] ?? null;
-        $completeness = $frontEndOptions['frontEndOptions']['completeness'] ?? 'limited';
+        $completeness = $frontEndOptions['frontEndOptions']['completeness'] ?? 'full';
         $maxDepth  = $frontEndOptions['frontEndOptions']['maxDepth'] ?? null;
         $excludeKeys  = $frontEndOptions['frontEndOptions']['excludeKeys'] ?? [];
 
@@ -118,7 +118,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
                         }
                     }
                     if ($loopDetected === false || ($completeness !== 'minimal' && is_object($propertyValue) === false)) {
-                        $returnArray[$key] = $entity->parseToArrayPropertyValue($propertyValue, $value, $force, $slatedToTransform);
+                        $returnArray[$key] = $entity->parseToArrayPropertyValue($propertyValue, $value, $force, $frontEndOptions, $slatedToTransform);
                     }
                 }
             }
