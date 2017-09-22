@@ -59,14 +59,12 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param array|null $defaultFallBack
      * @param bool $force
      * @param array $frontEndOptions
-     * @param array $slatedToTransform
+     * @param mixed $slatedToTransform
      * @return array
      * @throws \RuntimeException
      */
-    public function toArray(EntityContract $entity, string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false, array $frontEndOptions = [], array $slatedToTransform = []):array
+    public function toArray(EntityContract $entity, string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false, array $frontEndOptions = [], $slatedToTransform = null):array
     {
-
-
         /** @noinspection NullPointerExceptionInspection */
         $config = $this->getArray();
         $arrayHelper = $entity->getArrayHelper();
@@ -75,20 +73,21 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $maxDepth  = $frontEndOptions['toArray']['maxDepth'] ?? null;
         $excludeKeys  = $frontEndOptions['toArray']['excludeKeys'] ?? [];
 
+        $slatedToTransform = $slatedToTransform ?? $completeness === 'full'?[]:new ArrayObject();
+
         $array = $arrayHelper->getArray();
         if (isset($array['entitiesTransformedToArray']) === false) {
             $array['entitiesTransformedToArray'] = [];
         }
         $returnArray = [];
 
-        $loopDetected = $completeness === 'full'?in_array($entity, $slatedToTransform, true):in_array($entity, $array['entitiesTransformedToArray'], true);
+        $loopDetected = in_array($entity, $slatedToTransform, true);
         $slatedToTransform[] = $entity;
 
         if ($completeness === 'none' || ($maxDepth !== null && count($slatedToTransform) > $maxDepth)) {
             return [];
         }
 
-        $array['entitiesTransformedToArray'][] = $entity;
         if ($toArray !== null) {
             foreach ($toArray as $key => $value) {
                 if (in_array($key, $excludeKeys, true) === false) {

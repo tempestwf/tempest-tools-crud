@@ -37,10 +37,10 @@ abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityC
      * @param array $settings
      * @param bool $force
      * @param array $frontEndOptions
-     * @param array $slatedToTransform
+     * @param mixed $slatedToTransform
      * @return mixed
      */
-    public function parseToArrayPropertyValue($propertyValue, array $settings = [], bool $force = false, array $frontEndOptions = [], array $slatedToTransform = []) {
+    public function parseToArrayPropertyValue($propertyValue, array $settings = [], bool $force = false, array $frontEndOptions = [], $slatedToTransform = null) {
         $arrayHelper = $this->getArrayHelper();
         $path = $this->getTTPath();
         $fallBack = $this->getTTFallBack();

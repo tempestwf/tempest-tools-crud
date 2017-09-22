@@ -57,10 +57,10 @@ trait EntityCoreTrait
      * @param array|null $defaultFallBack
      * @param bool $force
      * @param array $frontEndOptions
-     * @param array $slatedToTransform
+     * @param mixed $slatedToTransform
      * @return array
      */
-    public function toArray(string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false, array $frontEndOptions = [], array $slatedToTransform = []):array
+    public function toArray(string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false, array $frontEndOptions = [], $slatedToTransform = null):array
     {
         $mode = $this->getLastMode() ?? $defaultMode;
         $this->init($mode, $defaultArrayHelper, $defaultPath, $defaultFallBack, $force);
