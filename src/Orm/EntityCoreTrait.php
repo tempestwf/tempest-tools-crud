@@ -225,9 +225,9 @@ trait EntityCoreTrait
     }
 
     /**
-     * @return array
+     * @return array|null
      */
-    public function getBindParams(): array
+    public function getBindParams(): ?array
     {
         return $this->bindParams;
     }

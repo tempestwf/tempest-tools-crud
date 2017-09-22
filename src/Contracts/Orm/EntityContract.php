@@ -126,9 +126,9 @@ interface EntityContract
     public function getValuesOfFields(array $fields = []): array;
 
     /**
-     * @return array
+     * @return array|null
      */
-    public function getBindParams(): array;
+    public function getBindParams(): ?array;
 
     /**
      * @param array $bindParams

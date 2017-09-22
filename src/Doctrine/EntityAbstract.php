@@ -61,13 +61,14 @@ abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityC
 
             if ($propertyValue instanceof Collection) {
                 $allowLazyLoad = $settings['allowLazyLoad'] ?? false;
-                $allowExtraLazyLoad = $settings['allowExtraLazyLoad'] ?? false;
                 $return = [];
                 /** @var PersistentCollection $propertyValue */
                 if (
-                    ($allowExtraLazyLoad === true && $propertyValue->count() > 0)
+                    $allowLazyLoad === true
                     ||
-                    ($allowLazyLoad === true || $propertyValue instanceof PersistentCollection === false || $propertyValue->isInitialized())
+                    $propertyValue instanceof PersistentCollection === false
+                    ||
+                    $propertyValue->isInitialized()
                 ) {
                     foreach ($propertyValue as $entity) {
                         if ($entity instanceof EntityContract) {

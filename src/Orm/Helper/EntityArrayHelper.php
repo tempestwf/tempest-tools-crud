@@ -74,7 +74,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $excludeKeys = $frontEndOptions['toArray']['excludeKeys'] ?? [];
         $allowOnlyRequestedParams = $frontEndOptions['toArray']['allowOnlyRequestedParams'] ?? true;
         $forceIncludeKeys = $frontEndOptions['toArray']['forceIncludeKeys'] ?? ['id'];
-        $boundParams = $entity->getBindParams();
+        $boundParams = $entity->getBindParams() ?? [];
 
         if ($slatedToTransform === null) {
             $slatedToTransform = $completeness === 'full' ? [] : new ArrayObject();
