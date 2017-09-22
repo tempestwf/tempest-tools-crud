@@ -71,20 +71,24 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $toArray = $config['toArray'] ?? null;
         $completeness = $frontEndOptions['toArray']['completeness'] ?? 'full';
         $maxDepth  = $frontEndOptions['toArray']['maxDepth'] ?? null;
-        $excludeKeys  = $frontEndOptions['toArray']['excludeKeys'] ?? [];
+        $excludeKeys = $frontEndOptions['toArray']['excludeKeys'] ?? [];
+        $allowOnlyRequestedParams = $frontEndOptions['toArray']['allowOnlyRequestedParams'] ?? true;
+        $forceIncludeKeys = $frontEndOptions['toArray']['forceIncludeKeys'] ?? ['id'];
+        $boundParams = $entity->getBindParams();
 
-        $slatedToTransform = $slatedToTransform ?? $completeness === 'full'?[]:new ArrayObject();
-
-        $array = $arrayHelper->getArray();
-        if (isset($array['entitiesTransformedToArray']) === false) {
-            $array['entitiesTransformedToArray'] = [];
+        if ($slatedToTransform === null) {
+            $slatedToTransform = $completeness === 'full' ? [] : new ArrayObject();
+            $slatedToTransform['objects'] = [];
+            $slatedToTransform['depth'] = 1;
         }
+
         $returnArray = [];
 
-        $loopDetected = in_array($entity, $slatedToTransform, true);
-        $slatedToTransform[] = $entity;
+        $loopDetected = in_array($entity, $slatedToTransform['objects'], true);
+        $slatedToTransform['objects'][] = $entity;
+        $slatedToTransform['depth']++;
 
-        if ($completeness === 'none' || ($maxDepth !== null && count($slatedToTransform) > $maxDepth)) {
+        if ($completeness === 'none' || ($maxDepth !== null && $slatedToTransform['depth'] > $maxDepth)) {
             return [];
         }
 
@@ -104,13 +108,30 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
                                 break;
                         }
                     }
-                    if ($loopDetected === false || ($completeness !== 'minimal' && is_object($propertyValue) === false)) {
+                    if (
+                        (
+                            $loopDetected === false
+                            ||
+                            (
+                                $completeness !== 'minimal' && is_object($propertyValue) === false
+                            )
+                        )
+                        &&
+                        (
+                            $allowOnlyRequestedParams === false
+                            ||
+                            array_key_exists($key, $boundParams) === true
+                            ||
+                            in_array($key, $forceIncludeKeys, true) === true
+                        )
+
+                    ) {
                         $returnArray[$key] = $entity->parseToArrayPropertyValue($propertyValue, $value, $force, $frontEndOptions, $slatedToTransform);
                     }
                 }
             }
         }
-
+        $slatedToTransform['depth']--;
         return $returnArray;
     }
 

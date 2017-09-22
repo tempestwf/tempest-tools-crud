@@ -358,7 +358,7 @@ $entityInfo = [
                 'value'=>'<literal value>', // The value to set the key to if it's a literal, a closure or array expression closure may be used
                 'format'=>'<literal value>', // format used if this is a date time field. By default sql date format is used
                 'allowLazyLoad'=>'<true of false>', // Defaults to false, if true then when a collection is encountered that isn't loaded, during the course of calling a get method, it will be lazy loaded from the db. Be careful because this can cause huge amounts of load if used with out caution
-                'allowExtraLazyLoad'=>'<true of false>' // Defaults to false, if true detection of whether or not to process the too array will depend on the extra lazy settings for this relation. That is to say that if you used the extra lazy feature http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/tutorials/extra-lazy-associations.html then count will be checked before calling the relation
+                'allowExtraLazyLoad'=>'<true of false>', // Defaults to false, if true detection of whether or not to process the too array will depend on the extra lazy settings for this relation. That is to say that if you used the extra lazy feature http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/tutorials/extra-lazy-associations.html then count will be checked before calling the relation
             ]
         ],
         'options'=>[
@@ -440,7 +440,9 @@ $exampleFrontEndRequest = [
         'toArray'=>[
             'completeness'=>'<full, limited, minimal, none>', // Defaults to full, if 'full' then all data will be shown so long as it wouldn't trigger an infinite loop, if 'limited' then all data will be shown but relations leading to already processed entities will not be shown, if 'minimal' the same entity will never be shown twice in the return and an empty array will be in it's place, if 'none' nothing is returned. Tested in: testToArrayBasicFunctionality
             'maxDepth'=>'<number or null>', // how deep should the to array go. Tested in: testToArrayBasicFunctionality
-            'excludeKeys'=> ['<list of keys to expclude>'] // Use this to prevent certain keys from being converted to array to trim the return. Tested in: testToArrayBasicFunctionality
+            'excludeKeys'=> ['<list of keys to exclude>'], // Use this to prevent certain keys from being converted to array to trim the return. Tested in: testToArrayBasicFunctionality
+            'allowOnlyRequestedParams'=>'<true or false>',// Defaults to true, if true only the params that you requested to be changed on the entity will be shown in the return. This filters out any fields or associations that you did not request to be set directly with this request. Tested in: testToArrayBasicFunctionality
+            'forceIncludeKeys'=>['<list of keys to include>'] // Defaults to: ['id'], these are keys to include in the result even if you didn't request to change them. Tested in: testToArrayBasicFunctionality
         ]
     ]
 ];
