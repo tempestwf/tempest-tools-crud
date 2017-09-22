@@ -82,6 +82,7 @@ $readInfo = [
         'permissions'=>[
             'allowed'=>'<true or false>', // Tested in testReadPermissions
             'maxLimit'=>'<max limit>', // Tested in testGeneralDataRetrieval
+            'fixedLimit'=>'<a number that represents that all limits and offsets from the must be divisable by this number>',
             'where'=>[ // Tested in testReadPermissions
                 'permissive'=>'<true or false>', // Tested in testReadPermissions
                 'fields'=>[ // Tested in testReadPermissions
@@ -190,7 +191,8 @@ $backendOptions = [ // note all options override query level options
         'queryMaxParams' => '<the max number of query params that can be passed in to a read request.>', // Optional // Tested in testGeneralDataRetrieval
         'maxLimit' => '<The maxium number of rows that can be returned by a read at once>', // Optional // Tested in testGeneralDataRetrieval
         'prePopulateEntities'=>'<true or false>', // Optional  // defaults to true, if true entities referenced in the params passed to CUD methods will be pre fetched using the minimum number of queries. // Tested in testPrePopulate
-        'clearPrePopulatedEntitiesOnFlush'=>'<true or false>' // whether or not when a flush occurred the pre populated entities should be cleared // Tested in testPrePopulate
+        'clearPrePopulatedEntitiesOnFlush'=>'<true or false>', // whether or not when a flush occurred the pre populated entities should be cleared // Tested in testPrePopulate
+        'fixedLimit'=>'<a number that represents that all limits and offsets from the must be divisable by this number>'
     ]
 ];
 

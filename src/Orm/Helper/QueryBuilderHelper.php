@@ -292,27 +292,38 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $limit = isset($frontEndOptions['limit']) ? (int)$frontEndOptions['limit']:static::DEFAULT_LIMIT;
         $offset = isset($frontEndOptions['offset']) ? (int)$frontEndOptions['offset']:static::DEFAULT_OFFSET;
 
-        $this->verifyLimitAndOffset($limit, $extra);
+        $this->verifyLimitAndOffset($limit, $offset, $extra);
         $qb->setLimitAndOffset($limit, $offset);
     }
 
 
     /**
      * @param int $limit
+     * @param int $offset
      * @param array $extra
      * @internal param array $extra
      * @internal param array $extra
      * @throws \RuntimeException
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\QueryBuilderHelperException
      */
-    protected function verifyLimitAndOffset (int $limit, array $extra):void
+    protected function verifyLimitAndOffset (int $limit, int $offset, array $extra):void
     {
         $options = $extra['options'];
         $optionOverrides = $extra['optionOverrides'];
         $maxLimit = $this->findSetting([$this->getArray()['read']['permissions'] ?? [], $options, $optionOverrides], 'maxLimit');
         $maxLimit = $maxLimit ?? static::DEFAULT_MAX_LIMIT;
+
+        $fixedLimit = $this->findSetting([$this->getArray()['read']['permissions'] ?? [], $options, $optionOverrides], 'fixedLimit');
+
         /** @noinspection NullPointerExceptionInspection */
         $maxLimit = (int)$this->getRepository()->getArrayHelper()->parse($maxLimit, $extra);
+
+        /** @noinspection NullPointerExceptionInspection */
+        $fixedLimit = (int)$this->getRepository()->getArrayHelper()->parse($fixedLimit, $extra);
+
+        if ($fixedLimit !== null && ($offset + $limit) % $fixedLimit !== 0) {
+            throw QueryBuilderHelperException::fixedLimit($limit, $offset, $fixedLimit);
+        }
+
         if ($limit > $maxLimit) {
             throw QueryBuilderHelperException::maxLimitHit($limit, $maxLimit);
         }

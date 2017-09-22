@@ -53,6 +53,17 @@ class QueryBuilderHelperException extends \RunTimeException
     /**
      * @param int $arg
      * @param int $arg2
+     * @param int $arg3
+     * @return QueryBuilderHelperException
+     */
+    public static function fixedLimit (int $arg, int $arg2, int $arg3): QueryBuilderHelperException
+    {
+        return new self (sprintf('Error: Requested limit and offset are not divisible by the fixed limit. limit = %s, offset = %s, fixed limit = %s', $arg, $arg2, $arg3));
+    }
+
+    /**
+     * @param int $arg
+     * @param int $arg2
      * @return QueryBuilderHelperException
      */
     public static function maxLimitHit (int $arg, int $arg2): QueryBuilderHelperException
