@@ -32,16 +32,21 @@ trait RestfulControllerTrait
     /** @var SimpleTransformerContract $transformer*/
     protected $transformer;
 
+    /** @var array  $options */
+    protected $options = [];
+
     /**
      * Display a listing of the resource.
      *
+     * @param Request $request
      * @return Response
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $bob = 'your uncle';
+        //event(new Init());
+        //return response()->json($result);
     }
-
     /**
      * Show the form for creating a new resource.
      *
@@ -66,10 +71,11 @@ trait RestfulControllerTrait
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
+     * @param Request $request
      * @return Response
      */
-    public function show($id): Response
+    public function show($id, Request $request): Response
     {
         //
     }
@@ -77,10 +83,11 @@ trait RestfulControllerTrait
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
+     * @param Request $request
      * @return Response
      */
-    public function edit($id): Response
+    public function edit($id, Request $request): Response
     {
         //
     }
@@ -100,10 +107,11 @@ trait RestfulControllerTrait
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int $id
+     * @param Request $request
      * @return Response
      */
-    public function destroy($id): Response
+    public function destroy($id, Request $request): Response
     {
         //
     }
@@ -129,6 +137,10 @@ trait RestfulControllerTrait
         $events->listen(
             PostIndex::class,
             static::class . '@PostIndex'
+        );
+        $events->listen(
+            PreStore::class,
+            static::class . '@PreStore'
         );
 
         $events->listen(
@@ -193,5 +205,21 @@ trait RestfulControllerTrait
     public function setTransformer(SimpleTransformerContract $transformer):void
     {
         $this->transformer = $transformer;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
+    }
+
+    /**
+     * @param array $options
+     */
+    public function setOptions(array $options):void
+    {
+        $this->options = $options;
     }
 }
