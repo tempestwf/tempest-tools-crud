@@ -11,6 +11,18 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use TempestTools\Common\Contracts\Doctrine\Transformers\SimpleTransformerContract;
 use TempestTools\Crud\Contracts\Orm\RepositoryContract;
+use TempestTools\Crud\Laravel\Events\Controller\Init;
+use TempestTools\Crud\Laravel\Events\Controller\PostDestroy;
+use TempestTools\Crud\Laravel\Events\Controller\PostIndex;
+use TempestTools\Crud\Laravel\Events\Controller\PostShow;
+use TempestTools\Crud\Laravel\Events\Controller\PostStore;
+use TempestTools\Crud\Laravel\Events\Controller\PostUpdate;
+use TempestTools\Crud\Laravel\Events\Controller\PreDestroy;
+use TempestTools\Crud\Laravel\Events\Controller\PreIndex;
+use TempestTools\Crud\Laravel\Events\Controller\PreShow;
+use TempestTools\Crud\Laravel\Events\Controller\PreStore;
+use TempestTools\Crud\Laravel\Events\Controller\PreUpdate;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
 trait RestfulControllerTrait
 {
@@ -28,7 +40,6 @@ trait RestfulControllerTrait
     public function index(): Response
     {
         $bob = 'your uncle';
-
     }
 
     /**
@@ -96,6 +107,61 @@ trait RestfulControllerTrait
     {
         //
     }
+
+    /**
+     * Register the listeners for the subscriber.
+     *
+     * @param DispatcherContract|\Illuminate\Events\Dispatcher $events
+     */
+    public function subscribe(DispatcherContract $events):void
+    {
+
+        $events->listen(
+            Init::class,
+            static::class . '@Init'
+        );
+
+        $events->listen(
+            PreIndex::class,
+            static::class . '@PreIndex'
+        );
+
+        $events->listen(
+            PostIndex::class,
+            static::class . '@PostIndex'
+        );
+
+        $events->listen(
+            PostStore::class,
+            static::class . '@PostStore'
+        );
+        $events->listen(
+            PreShow::class,
+            static::class . '@PreShow'
+        );
+        $events->listen(
+            PostShow::class,
+            static::class . '@PostShow'
+        );
+        $events->listen(
+            PreUpdate::class,
+            static::class . '@PreUpdate'
+        );
+        $events->listen(
+            PostUpdate::class,
+            static::class . '@PostUpdate'
+        );
+        $events->listen(
+            PreDestroy::class,
+            static::class . '@PreDestroy'
+        );
+        $events->listen(
+            PostDestroy::class,
+            static::class . '@PostDestroy'
+        );
+
+    }
+
 
     /**
      * @return RepositoryContract
