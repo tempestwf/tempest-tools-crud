@@ -123,7 +123,6 @@ trait RestfulControllerTrait
      */
     public function subscribe(DispatcherContract $events):void
     {
-
         $events->listen(
             Init::class,
             static::class . '@Init'
