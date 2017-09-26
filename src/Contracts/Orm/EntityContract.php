@@ -250,26 +250,20 @@ interface EntityContract
 
 
     /**
-     * @param string|null $defaultMode
-     * @param ArrayHelperContract|null $defaultArrayHelper
-     * @param array|null $defaultPath
-     * @param array|null $defaultFallBack
-     * @param bool $force
-     * @param array $frontEndOptions
+     * @param array $settings
      * @param mixed $slatedToTransform
      * @return array
      */
-    public function toArray(string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false, array $frontEndOptions = [], $slatedToTransform = null):array;
+    public function toArray(array $settings, $slatedToTransform = null):array;
 
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
      * @param $propertyValue
      * @param array $settings
-     * @param bool $force
-     * @param array $frontEndOptions
+     * @param array $requestedSettings
      * @param mixed $slatedToTransform
      * @return mixed
      */
-    public function parseToArrayPropertyValue($propertyValue, array $settings = [], bool $force = false, array $frontEndOptions = [], $slatedToTransform = null);
+    public function parseToArrayPropertyValue($propertyValue, array $settings = [], array $requestedSettings, $slatedToTransform = null);
 }

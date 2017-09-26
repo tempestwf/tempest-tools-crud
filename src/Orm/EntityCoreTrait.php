@@ -51,37 +51,37 @@ trait EntityCoreTrait
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
-     * @param string|null $defaultMode
-     * @param ArrayHelperContract|null $defaultArrayHelper
-     * @param array|null $defaultPath
-     * @param array|null $defaultFallBack
-     * @param bool $force
-     * @param array $frontEndOptions
+     * @param array $settings
      * @param mixed $slatedToTransform
      * @return array
      */
-    public function toArray(string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false, array $frontEndOptions = [], $slatedToTransform = null):array
+    public function toArray(array $settings, $slatedToTransform = null):array
     {
-        $mode = $this->getLastMode() ?? $defaultMode;
-        $this->init($mode, $defaultArrayHelper, $defaultPath, $defaultFallBack, $force);
+        $settings['defaultMode'] = $settings['defaultMode'] ?? 'read';
+        $settings['defaultArrayHelper'] = $settings['defaultArrayHelper'] ?? null;
+        $settings['defaultPath'] = $settings['defaultPath'] ?? null;
+        $settings['defaultFallBack'] = $settings['defaultFallBack'] ?? null;
+        $settings['force'] = $settings['force'] ?? false;
+        $settings['store'] = $settings['store'] ?? true;
+        $settings['recompute'] = $settings['recompute'] ?? false;
+        $settings['useStored'] = $settings['recompute'] ?? true;
+        $settings['frontEndOptions'] = $settings['frontEndOptions'] ?? [];
 
-        $eventArgs = $this->makeEventArgs(['defaultMode'=>$defaultMode, 'defaultArrayHelper'=>$defaultArrayHelper, 'defaultPath'=>$defaultPath, 'defaultFallBack'=>$defaultFallBack, 'frontEndOptions'=>$frontEndOptions, 'force'=>$force]);
+        $mode = $this->getLastMode() ?? $settings['defaultMode'];
+        $this->init($mode, $settings['defaultArrayHelper'], $settings['defaultPath'], $settings['defaultFallBack'], $settings['force']);
+
+        $eventArgs = $this->makeEventArgs($settings);
         $eventManager = $this->getEventManager();
         /** @noinspection NullPointerExceptionInspection */
         $eventManager->dispatchEvent(EntityEventsConstants::PRE_TO_ARRAY, $eventArgs);
         $args = $eventArgs->getArgs()['params'];
-        $defaultMode = $args['defaultMode'];
-        $defaultArrayHelper = $args['defaultArrayHelper'];
-        $defaultPath = $args['defaultPath'];
-        $defaultFallBack = $args['defaultFallBack'];
-        $frontEndOptions = $args['frontEndOptions'];
-        $force = $args['force'];
 
         /** @noinspection NullPointerExceptionInspection */
         /** @noinspection PhpParamsInspection */
-        $returnArray =  $this->getConfigArrayHelper()->toArray($this, $defaultMode, $defaultArrayHelper, $defaultPath, $defaultFallBack, $force, $frontEndOptions, $slatedToTransform);
+        $returnArray =  $this->getConfigArrayHelper()->toArray($this, $args, $slatedToTransform);
 
-        $eventArgs = $this->makeEventArgs(['returnArray'=>$returnArray]);
+        $args['returnArray'] = $returnArray;
+        $eventArgs = $this->makeEventArgs($args);
         /** @noinspection NullPointerExceptionInspection */
         $eventManager->dispatchEvent(EntityEventsConstants::POST_TO_ARRAY, $eventArgs);
         $returnArray = $eventArgs->getArgs()['params']['returnArray'];

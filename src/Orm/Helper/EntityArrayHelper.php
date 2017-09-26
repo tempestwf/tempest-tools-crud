@@ -4,7 +4,6 @@ namespace TempestTools\Crud\Orm\Helper;
 
 use ArrayObject;
 use RuntimeException;
-use TempestTools\Common\Contracts\ArrayHelperContract;
 use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Common\Utility\AccessorMethodNameTrait;
 use TempestTools\Crud\Constants\EntityEventsConstants;
@@ -53,22 +52,18 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
 
     /**
      * @param EntityContract $entity
-     * @param string|null $defaultMode
-     * @param ArrayHelperContract|null $defaultArrayHelper
-     * @param array|null $defaultPath
-     * @param array|null $defaultFallBack
-     * @param bool $force
-     * @param array $frontEndOptions
-     * @param mixed $slatedToTransform
+     * @param array $settings
+     * @param null $slatedToTransform
      * @return array
      * @throws \RuntimeException
      */
-    public function toArray(EntityContract $entity, string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false, array $frontEndOptions = [], $slatedToTransform = null):array
+    public function toArray(EntityContract $entity, array $settings, $slatedToTransform = null):array
     {
         /** @noinspection NullPointerExceptionInspection */
         $config = $this->getArray();
         $arrayHelper = $entity->getArrayHelper();
         $toArray = $config['toArray'] ?? null;
+        $frontEndOptions = $settings['frontEndOptions'] ?? [];
         $completeness = $frontEndOptions['toArray']['completeness'] ?? 'full';
         $maxDepth  = $frontEndOptions['toArray']['maxDepth'] ?? null;
         $excludeKeys = $frontEndOptions['toArray']['excludeKeys'] ?? [];
@@ -77,6 +72,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $boundParams = $entity->getBindParams() ?? [];
 
         if ($slatedToTransform === null) {
+            /** @noinspection CallableParameterUseCaseInTypeContextInspection */
             $slatedToTransform = $completeness === 'full' ? [] : new ArrayObject();
             $slatedToTransform['objects'] = [];
             $slatedToTransform['depth'] = 1;
@@ -104,7 +100,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
                                 $propertyValue = $entity->$methodName();
                                 break;
                             case 'literal':
-                                $propertyValue = $arrayHelper->parse($value['value'], ['self'=>$entity, 'key'=>$key, 'value'=>$value, 'config'=>$config, 'toArrayConfig'=>$toArray, 'arrayHelper'=>$arrayHelper, 'configArrayHelper'=>$this]);
+                                $propertyValue = $arrayHelper->parse($value['value'], ['self'=>$entity, 'key'=>$key, 'value'=>$value, 'config'=>$config, 'toArrayConfig'=>$toArray, 'arrayHelper'=>$arrayHelper, 'configArrayHelper'=>$this, 'settings'=>$settings]);
                                 break;
                         }
                     }
@@ -126,7 +122,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
                         )
 
                     ) {
-                        $returnArray[$key] = $entity->parseToArrayPropertyValue($propertyValue, $value, $force, $frontEndOptions, $slatedToTransform);
+                        $returnArray[$key] = $entity->parseToArrayPropertyValue($propertyValue, $value, $settings, $slatedToTransform);
                     }
                 }
             }

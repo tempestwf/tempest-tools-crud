@@ -149,15 +149,10 @@ interface EntityArrayHelperContract extends ArrayHelperContract
 
     /**
      * @param EntityContract $entity
-     * @param string|null $defaultMode
-     * @param ArrayHelperContract|null $defaultArrayHelper
-     * @param array|null $defaultPath
-     * @param array|null $defaultFallBack
-     * @param bool $force
-     * @param array $frontEndOptions
+     * @param array $settings
      * @param mixed $slatedToTransform
      * @return array
      */
-    public function toArray(EntityContract $entity, string $defaultMode = 'read', ArrayHelperContract $defaultArrayHelper = null, array $defaultPath = null, array $defaultFallBack = null, bool $force = false, array $frontEndOptions = [], $slatedToTransform = null):array;
+    public function toArray(EntityContract $entity, array $settings, $slatedToTransform = null):array;
 
 }
