@@ -1,7 +1,6 @@
 <?php
 namespace TempestTools\Crud\Orm\Helper;
 
-
 use ArrayObject;
 use RuntimeException;
 use TempestTools\Common\Helper\ArrayHelper;

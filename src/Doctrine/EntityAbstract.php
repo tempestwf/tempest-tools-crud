@@ -40,12 +40,12 @@ abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityC
      * @return mixed
      */
     public function parseToArrayPropertyValue($propertyValue, array $settings = [], array $requestedSettings, $slatedToTransform = null) {
-        $settings['defaultArrayHelper'] = $this->getArrayHelper();
-        $settings['defaultPath'] = $this->getTTPath();
-        $settings['fallBack'] = $this->getTTFallBack();
+        $requestedSettings['defaultArrayHelper'] = $this->getArrayHelper();
+        $requestedSettings['defaultPath'] = $this->getTTPath();
+        $requestedSettings['defaultFallBack'] = $this->getTTFallBack();
         if (is_object ($propertyValue) === true) {
             if ($propertyValue instanceof EntityContract) {
-                return $propertyValue->toArray($settings, $slatedToTransform);
+                return $propertyValue->toArray($requestedSettings, $slatedToTransform);
             }
 
             if ($propertyValue instanceof DateTimeInterface) {
@@ -71,7 +71,7 @@ abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityC
                 ) {
                     foreach ($propertyValue as $entity) {
                         if ($entity instanceof EntityContract) {
-                            $return[] = $entity->toArray( $settings, $slatedToTransform);
+                            $return[] = $entity->toArray($requestedSettings, $slatedToTransform);
                         }
                     }
                 }
