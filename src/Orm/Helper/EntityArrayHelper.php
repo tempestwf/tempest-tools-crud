@@ -106,12 +106,8 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         /** @noinspection NullPointerExceptionInspection */
         $config = $this->getArray();
         $arrayHelper = $entity->getArrayHelper();
-        if ($settings['substituteToArrayConfig'] !== null) {
-            $toArray = $settings['substituteToArrayConfig'];
-        } else {
-            $toArray = $config['toArray'] ?? null;
-        }
 
+        $toArray = $config['toArray'] ?? null;
         $frontEndOptions = $settings['frontEndOptions'] ?? [];
         $completeness = $frontEndOptions['toArray']['completeness'] ?? 'full';
         $maxDepth  = $frontEndOptions['toArray']['maxDepth'] ?? null;

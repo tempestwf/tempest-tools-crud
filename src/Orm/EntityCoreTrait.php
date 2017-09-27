@@ -70,7 +70,6 @@ trait EntityCoreTrait
         $settings['recompute'] = $settings['recompute'] ?? false;
         $settings['useStored'] = $settings['useStored'] ?? true;
         $settings['frontEndOptions'] = $settings['frontEndOptions'] ?? [];
-        $settings['substituteToArrayConfig'] = $settings['substituteToArrayConfig'] ?? null;
         $mode = $this->getLastMode() ?? $settings['defaultMode'];
         $this->init($mode, $settings['defaultArrayHelper'], $settings['defaultPath'], $settings['defaultFallBack'], $settings['force']);
 
