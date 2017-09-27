@@ -333,7 +333,7 @@ trait RestfulControllerTrait
                 $options = ['useGetParams'=>true];
                 break;
         }
-        $controllerOptions = array_replace_recursive($this->getOptions()[$key] ?? [], $this->getOptionsOverrides());
+        $controllerOptions = array_replace_recursive($this->getOptions(), $this->getOptionsOverrides())[$key]??[];
         $overrides = $options['overrides'] ?? [];
 
         if ($id !== null) {
@@ -365,7 +365,7 @@ trait RestfulControllerTrait
         $input = $request->input();
         $params = $input['params'] ?? [];
         $options = $input['options'] ?? [];
-        $controllerOptions = array_replace_recursive($this->getOptions()[$key] ?? [], $this->getOptionsOverrides());
+        $controllerOptions = array_replace_recursive($this->getOptions(), $this->getOptionsOverrides())[$key]??[];
         $overrides = $options['overrides'] ?? [];
         if ($id !== null ) {
             $params = [$id=>$params];
