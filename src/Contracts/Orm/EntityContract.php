@@ -266,4 +266,13 @@ interface EntityContract
      * @return mixed
      */
     public function parseToArrayPropertyValue($propertyValue, array $settings = [], array $requestedSettings, $slatedToTransform = null);
+
+    /**
+     * @return mixed
+     */
+    public function getLastToArray():?array;
+    /**
+     * @param array $lastToArray
+     */
+    public function setLastToArray(array $lastToArray=null):void;
 }

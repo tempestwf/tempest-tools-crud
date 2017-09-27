@@ -47,6 +47,51 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         parent::__construct($array);
     }
 
+
+    /** @noinspection MoreThanThreeArgumentsInspection */
+
+    /**
+     * @param EntityContract $entity
+     * @param array $settings
+     * @param mixed $slatedToTransform
+     * @return array
+     * @throws \RuntimeException
+     */
+    public function toArray(EntityContract $entity, array $settings, $slatedToTransform = null):array
+    {
+
+        $eventArgs = $entity->makeEventArgs($settings);
+        $eventManager = $entity->getEventManager();
+        /** @noinspection NullPointerExceptionInspection */
+        $eventManager->dispatchEvent(EntityEventsConstants::PRE_TO_ARRAY, $eventArgs);
+        $args = $eventArgs->getArgs()['params'];
+
+        if ($settings['recompute'] === true) {
+            $entity->setLastToArray();
+        }
+
+        if ($settings['useStored'] === true && $entity->getLastToArray() !== null) {
+            return $entity->getLastToArray();
+        }
+
+        /** @noinspection NullPointerExceptionInspection */
+        /** @noinspection PhpParamsInspection */
+        $returnArray =  $this->toArrayCore($entity, $args, $slatedToTransform);
+
+        $args['returnArray'] = $returnArray;
+        $eventArgs = $entity->makeEventArgs($args);
+        /** @noinspection NullPointerExceptionInspection */
+        $eventManager->dispatchEvent(EntityEventsConstants::POST_TO_ARRAY, $eventArgs);
+        $returnArray = $eventArgs->getArgs()['params']['returnArray'];
+
+        if ($settings['store'] === true) {
+            $entity->setLastToArray($returnArray);
+        }
+
+        return $returnArray;
+    }
+
+
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
@@ -56,12 +101,17 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @return array
      * @throws \RuntimeException
      */
-    public function toArray(EntityContract $entity, array $settings, $slatedToTransform = null):array
+    public function toArrayCore(EntityContract $entity, array $settings, $slatedToTransform = null):array
     {
         /** @noinspection NullPointerExceptionInspection */
         $config = $this->getArray();
         $arrayHelper = $entity->getArrayHelper();
-        $toArray = $config['toArray'] ?? null;
+        if ($settings['substituteToArrayConfig'] !== null) {
+            $toArray = $settings['substituteToArrayConfig'];
+        } else {
+            $toArray = $config['toArray'] ?? null;
+        }
+
         $frontEndOptions = $settings['frontEndOptions'] ?? [];
         $completeness = $frontEndOptions['toArray']['completeness'] ?? 'full';
         $maxDepth  = $frontEndOptions['toArray']['maxDepth'] ?? null;

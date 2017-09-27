@@ -28,6 +28,10 @@ trait EntityCoreTrait
      */
     protected $lastMode;
 
+    /** @var  array $lastToArray */
+    protected $lastToArray;
+
+    /** @var  bool $prePopulated */
     protected $prePopulated = false;
 
     /** @noinspection MoreThanThreeArgumentsInspection */
@@ -64,29 +68,14 @@ trait EntityCoreTrait
         $settings['force'] = $settings['force'] ?? false;
         $settings['store'] = $settings['store'] ?? true;
         $settings['recompute'] = $settings['recompute'] ?? false;
-        $settings['useStored'] = $settings['recompute'] ?? true;
+        $settings['useStored'] = $settings['useStored'] ?? true;
         $settings['frontEndOptions'] = $settings['frontEndOptions'] ?? [];
-
+        $settings['substituteToArrayConfig'] = $settings['substituteToArrayConfig'] ?? null;
         $mode = $this->getLastMode() ?? $settings['defaultMode'];
         $this->init($mode, $settings['defaultArrayHelper'], $settings['defaultPath'], $settings['defaultFallBack'], $settings['force']);
 
-        $eventArgs = $this->makeEventArgs($settings);
-        $eventManager = $this->getEventManager();
-        /** @noinspection NullPointerExceptionInspection */
-        $eventManager->dispatchEvent(EntityEventsConstants::PRE_TO_ARRAY, $eventArgs);
-        $args = $eventArgs->getArgs()['params'];
-
-        /** @noinspection NullPointerExceptionInspection */
         /** @noinspection PhpParamsInspection */
-        $returnArray =  $this->getConfigArrayHelper()->toArray($this, $args, $slatedToTransform);
-
-        $args['returnArray'] = $returnArray;
-        $eventArgs = $this->makeEventArgs($args);
-        /** @noinspection NullPointerExceptionInspection */
-        $eventManager->dispatchEvent(EntityEventsConstants::POST_TO_ARRAY, $eventArgs);
-        $returnArray = $eventArgs->getArgs()['params']['returnArray'];
-
-        return $returnArray;
+        return $this->getConfigArrayHelper()->toArray($this, $settings, $slatedToTransform);
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection
@@ -298,6 +287,22 @@ trait EntityCoreTrait
     public function setPrePopulated(bool $prePopulated): void
     {
         $this->prePopulated = $prePopulated;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLastToArray():?array
+    {
+        return $this->lastToArray;
+    }
+
+    /**
+     * @param array $lastToArray
+     */
+    public function setLastToArray(array $lastToArray=null):void
+    {
+        $this->lastToArray = $lastToArray;
     }
 
 }

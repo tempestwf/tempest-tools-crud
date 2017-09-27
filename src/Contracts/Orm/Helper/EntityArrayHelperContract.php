@@ -155,4 +155,14 @@ interface EntityArrayHelperContract extends ArrayHelperContract
      */
     public function toArray(EntityContract $entity, array $settings, $slatedToTransform = null):array;
 
+    /** @noinspection MoreThanThreeArgumentsInspection */
+
+    /**
+     * @param EntityContract $entity
+     * @param array $settings
+     * @param mixed $slatedToTransform
+     * @return array
+     */
+    public function toArrayCore(EntityContract $entity, array $settings, $slatedToTransform = null):array;
+
 }
