@@ -18,7 +18,6 @@ class EntityException extends \RunTimeException
     public static function prePersistValidatorFails (): EntityException
     {
         return new self (sprintf('Error: Validation failed on pre-persist.'));
-
     }
 
 }

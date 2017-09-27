@@ -415,6 +415,8 @@ $frontEndQuery = [
     ]
 ];
 
+// From the front end, pass one of the following get param to the index to let it know where to look for your query:
+// queryLocation = '<body, singleParam, params>' -- if body they the query was passed as a json in the body of the request, if singleParam it was passed in another get param called 'query' as a json encoded string, if params the query was passed as param syntax listed below
 // Tested in: testGeneralQueryBuildingWithGetParams
 // Note: A front end option of useGetParams (which triggers processing of the query as get params), is also accepted by the ORM code, but it would not be passed in the format above.
 // Note the optional number at the end is so you can have conditions that are are identical in key name, but have different values
