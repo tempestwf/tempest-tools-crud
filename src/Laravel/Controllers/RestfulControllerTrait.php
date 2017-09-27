@@ -368,7 +368,12 @@ trait RestfulControllerTrait
         $controllerOptions = array_replace_recursive($this->getOptions(), $this->getOptionsOverrides())[$key]??[];
         $overrides = $options['overrides'] ?? [];
         if ($id !== null ) {
-            $params = [$id=>$params];
+            if ($options['simplifiedParams'] !== null && $options['simplifiedParams'] === true) {
+                $params['id'] = $id;
+            } else {
+                $params = [$id=>$params];
+            }
+
         }
         return new ArrayObject(['params'=>$params, 'frontEntOptions'=>$options, 'overrides'=>$overrides, 'controllerOptions'=>$controllerOptions, 'request'=>$request, 'controller'=>$this]);
     }
