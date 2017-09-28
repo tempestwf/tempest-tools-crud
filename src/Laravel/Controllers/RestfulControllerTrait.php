@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use TempestTools\Common\Contracts\ArrayHelperContract;
 use TempestTools\Common\Contracts\Doctrine\Transformers\SimpleTransformerContract;
+use TempestTools\Common\Utility\TTConfigTrait;
 use TempestTools\Crud\Contracts\Orm\RepositoryContract;
 use TempestTools\Crud\Exceptions\Laravel\Controller\ControllerException;
 use TempestTools\Crud\Laravel\Events\Controller\Init;
@@ -29,6 +30,7 @@ use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
 trait RestfulControllerTrait
 {
+    use TTConfigTrait;
     /** @var RepositoryContract $repo */
     protected $repo;
 
@@ -41,11 +43,6 @@ trait RestfulControllerTrait
     /** @var array $optionsOverrides */
     protected $optionsOverrides = [];
 
-    /** @var array $path */
-    protected $path;
-
-    /** @var array $fallback */
-    protected $fallback;
 
     /**
      * Display a listing of the resource.
@@ -62,7 +59,7 @@ trait RestfulControllerTrait
         event(new Init($settings));
         event(new PreIndex($settings));
         $repo = $this->getRepo();
-        $repo->init($this->getArrayHelper(), $this->getPath(), $this->getFallback());
+        $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
         $result = $repo->read($settings['query'], $settings['frontEndOptions'], $settings['overrides']);
         $settings['result'] = $result;
         event(new PostIndex($settings));
@@ -100,7 +97,7 @@ trait RestfulControllerTrait
         event(new Init($settings));
         event(new PreStore($settings));
         $repo = $this->getRepo();
-        $repo->init($this->getArrayHelper(), $this->getPath(), $this->getFallback());
+        $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
         $result = $repo->create($settings['params'], $settings['frontEndOptions'], $settings['overrides']);
         $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
         $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
@@ -124,7 +121,7 @@ trait RestfulControllerTrait
         event(new Init($settings));
         event(new PreIndex($settings));
         $repo = $this->getRepo();
-        $repo->init($this->getArrayHelper(), $this->getPath(), $this->getFallback());
+        $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
         $result = $repo->read($settings['query'], $settings['frontEndOptions'], $settings['overrides']);
         $settings['result'] = $result;
         event(new PostIndex($settings));
@@ -161,7 +158,7 @@ trait RestfulControllerTrait
         event(new Init($settings));
         event(new PreUpdate($settings));
         $repo = $this->getRepo();
-        $repo->init($this->getArrayHelper(), $this->getPath(), $this->getFallback());
+        $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
         $result = $repo->update($settings['params'], $settings['frontEndOptions'], $settings['overrides']);
         $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
         $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
@@ -188,7 +185,7 @@ trait RestfulControllerTrait
         event(new Init($settings));
         event(new PreDestroy($settings));
         $repo = $this->getRepo();
-        $repo->init($this->getArrayHelper(), $this->getPath(), $this->getFallback());
+        $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
         $result = $repo->update($settings['params'], $settings['frontEndOptions'], $settings['overrides']);
         $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
         $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
@@ -392,38 +389,6 @@ trait RestfulControllerTrait
     public function setOptionsOverrides(array $optionsOverrides):void
     {
         $this->optionsOverrides = $optionsOverrides;
-    }
-
-    /**
-     * @return array
-     */
-    public function getPath(): array
-    {
-        return $this->path;
-    }
-
-    /**
-     * @param array $path
-     */
-    public function setPath(array $path):void
-    {
-        $this->path = $path;
-    }
-
-    /**
-     * @return array
-     */
-    public function getFallback(): array
-    {
-        return $this->fallback;
-    }
-
-    /**
-     * @param array $fallback
-     */
-    public function setFallback(array $fallback):void
-    {
-        $this->fallback = $fallback;
     }
 
     /**
