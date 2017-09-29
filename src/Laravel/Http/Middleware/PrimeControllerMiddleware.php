@@ -10,11 +10,10 @@ namespace TempestTools\Crud\Laravel\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use TempestTools\Common\Contracts\HasArrayHelperContract;
 use TempestTools\Common\Exceptions\Laravel\Http\Middleware\CommonMiddlewareException;
 use TempestTools\Common\Helper\ArrayHelper;
-use TempestTools\Crud\Contracts\HasOptionsOverrideContract;
-use TempestTools\Crud\Contracts\HasPathAndFallBackContract;
+use TempestTools\Crud\Contracts\Controller\ControllerContract;
+
 
 
 class PrimeControllerMiddleware
@@ -31,31 +30,19 @@ class PrimeControllerMiddleware
     {
         $controller = $request->route()->getController();
 
-        if ($controller instanceof HasArrayHelperContract === false) {
-            throw CommonMiddlewareException::controllerDoesNotImplement('HasArrayHelperContract');
+        if ($controller instanceof ControllerContract === false) {
+            throw CommonMiddlewareException::controllerDoesNotImplement('ControllerContract');
         }
 
-        if ($controller instanceof HasPathAndFallBackContract === false) {
-            throw CommonMiddlewareException::controllerDoesNotImplement('HasPathAndFallBackContract');
-        }
-
-        if ($controller instanceof HasOptionsOverrideContract === false) {
-            throw CommonMiddlewareException::controllerDoesNotImplement('HasOptionsOverrideContract');
-        }
-
+        /** @var  ControllerContract $controller */
         $arrayHelper = $controller->getArrayHelper() ?? new ArrayHelper();
-        $controller->setArrayHelper($arrayHelper);
 
         $actions = $request->route()->getAction();
         $ttPath = $actions['ttPath'] ?? ['default'];
         $ttFallBack = $actions['ttFallBack'] ?? ['default'];
-        $optionsOverrides = $actions['optionsOverrides'] ?? [];
-        /** @var  HasPathAndFallBackContract $controller */
-        $controller->setTTPath($ttPath);
-        $controller->setTTPath($ttFallBack);
-
-        /** @var HasOptionsOverrideContract $controller */
-        $controller->setOptionsOverrides($optionsOverrides);
+        $configOverrides = $actions['configOverrides'] ?? [];
+        $controller->setOverrides($configOverrides);
+        $controller->init($request->getMethod(), $arrayHelper, $ttPath, $ttFallBack);
 
         return $next($request);
     }

@@ -22,7 +22,6 @@ trait EntityCoreTrait
      * @var array $bindParams
      */
     protected $bindParams;
-
     /**
      * @var string|null $lastMode
      */

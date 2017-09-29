@@ -8,12 +8,15 @@
 
 namespace TempestTools\Crud\Laravel\Controllers;
 use ArrayObject;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use TempestTools\Common\Contracts\ArrayHelperContract;
 use TempestTools\Common\Contracts\Doctrine\Transformers\SimpleTransformerContract;
 use TempestTools\Common\Utility\TTConfigTrait;
 use TempestTools\Crud\Contracts\Orm\RepositoryContract;
+use TempestTools\Crud\Controller\Helper\ControllerArrayHelper;
+use TempestTools\Crud\Controller\Helper\ControllerArrayHelperContract;
 use TempestTools\Crud\Exceptions\Laravel\Controller\ControllerException;
 use TempestTools\Crud\Laravel\Events\Controller\Init;
 use TempestTools\Crud\Laravel\Events\Controller\PostDestroy;
@@ -37,32 +40,75 @@ trait RestfulControllerTrait
     /** @var SimpleTransformerContract $transformer*/
     protected $transformer;
 
-    /** @var array $options */
-    protected $options = [];
+    /** @var array $overrides */
+    protected $overrides = [];
+    /**
+     * @var string|null $lastMode
+     */
+    protected $lastMode;
 
-    /** @var array $optionsOverrides */
-    protected $optionsOverrides = [];
+    /** @noinspection MoreThanThreeArgumentsInspection */
 
+    /**
+     * @param string $mode
+     * @param ArrayHelperContract|null $arrayHelper
+     * @param array|null $path
+     * @param array|null $fallBack
+     * @param bool $force
+     * @throws \RuntimeException
+     */
+    public function init(string $mode, ArrayHelperContract $arrayHelper = null, array $path = null, array $fallBack = null, bool $force = false):void
+    {
+        $settings = new ArrayObject(['self'=>$this, 'mode'=>$mode, 'arrayHelper'=>$arrayHelper, 'path'=>$path, 'fallBack'=>$fallBack, 'force'=>$force]);
+        event(new Init($settings));
+        $force = $this->coreInit($settings['arrayHelper'], $settings['path'], $settings['fallBack'], $settings['force'], $settings['mode']);
+        $this->controllerArrayHelperInit($force, $settings['mode']);
+        $this->setLastMode($settings['mode']);
+    }
+
+    /**
+     * @param bool $force
+     * @param string $mode
+     * @throws \RuntimeException
+     */
+    protected function controllerArrayHelperInit(bool $force = false, string $mode):void
+    {
+        if ($force === true || $this->getConfigArrayHelper() === null || $mode !== $this->getLastMode()) {
+            $controllerArrayHelper = new ControllerArrayHelper(null, $this);
+            $this->parseTTConfig($controllerArrayHelper);
+        }
+    }
 
     /**
      * Display a listing of the resource.
      *
      * @param Request $request
      * @return Response
+     * @throws \Exception
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\DBAL\ConnectionException
      * @throws \RuntimeException
      * @throws \Doctrine\ORM\ORMException
      * @throws \LogicException
      */
     public function index(Request $request): Response
     {
-        $settings = $this->transformGetRequest($request, 'index');
-        event(new Init($settings));
-        event(new PreIndex($settings));
-        $repo = $this->getRepo();
-        $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
-        $result = $repo->read($settings['query'], $settings['frontEndOptions'], $settings['overrides']);
-        $settings['result'] = $result;
-        event(new PostIndex($settings));
+
+        try {
+            $settings = $this->getConfigArrayHelper()->transformGetRequest($request->input(), $request->json());
+            event(new PreIndex($settings));
+            $this->getConfigArrayHelper()->start();
+            $repo = $this->getRepo();
+            $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
+            $result = $repo->read($settings['query'], $settings['frontEndOptions'], $settings['overrides']);
+            $settings['result'] = $result;
+            event(new PostIndex($settings));
+            $this->getConfigArrayHelper()->stop();
+        } catch (Exception $e) {
+            $this->getConfigArrayHelper()->stop(true);
+            throw $e;
+        }
+
         return response()->json($settings['result']);
     }
 
@@ -85,7 +131,7 @@ trait RestfulControllerTrait
      * @return Response
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
-     * @throws \Exception
+     * @throws Exception
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\DBAL\ConnectionException
@@ -93,38 +139,50 @@ trait RestfulControllerTrait
      */
     public function store(Request $request): Response
     {
-        $settings = $this->transformNoneGetRequest($request, 'store');
-        event(new Init($settings));
-        event(new PreStore($settings));
-        $repo = $this->getRepo();
-        $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
-        $result = $repo->create($settings['params'], $settings['frontEndOptions'], $settings['overrides']);
-        $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
-        $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
-        event(new PostStore($settings));
+        try {
+            $settings = $this->getConfigArrayHelper()->transformNoneGetRequest($request->input());
+            event(new PreStore($settings));
+            $repo = $this->getRepo();
+            $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
+            $result = $repo->create($settings['params'], $settings['frontEndOptions'], $settings['overrides']);
+            $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
+            $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
+            event(new PostStore($settings));
+        } catch (Exception $e) {
+            $this->getConfigArrayHelper()->stop(true);
+            throw $e;
+        }
         return response()->json($settings['result']);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int $id
      * @param Request $request
+     * @param  int $id
      * @return Response
+     * @throws \Exception
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\DBAL\ConnectionException
      * @throws \RuntimeException
      * @throws \Doctrine\ORM\ORMException
      * @throws \LogicException
      */
-    public function show($id, Request $request): Response
+    public function show(Request $request, $id=null): Response
     {
-        $settings = $this->transformGetRequest($request, 'show', $id);
-        event(new Init($settings));
-        event(new PreIndex($settings));
-        $repo = $this->getRepo();
-        $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
-        $result = $repo->read($settings['query'], $settings['frontEndOptions'], $settings['overrides']);
-        $settings['result'] = $result;
-        event(new PostIndex($settings));
+        try {
+            $settings = $this->getConfigArrayHelper()->transformGetRequest($request->input(), $request->json(), $id);
+            event(new PreIndex($settings));
+            $repo = $this->getRepo();
+            $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
+            $result = $repo->read($settings['query'], $settings['frontEndOptions'], $settings['overrides']);
+            $settings['result'] = $result;
+            event(new PostIndex($settings));
+        } catch (Exception $e) {
+            $this->getConfigArrayHelper()->stop(true);
+            throw $e;
+        }
+
         return response()->json($settings['result']);
     }
 
@@ -146,7 +204,7 @@ trait RestfulControllerTrait
      * @return Response
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
-     * @throws \Exception
+     * @throws Exception
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\DBAL\ConnectionException
@@ -154,15 +212,19 @@ trait RestfulControllerTrait
      */
     public function update(Request $request, $id=null): Response
     {
-        $settings = $this->transformNoneGetRequest($request, 'update', $id);
-        event(new Init($settings));
-        event(new PreUpdate($settings));
-        $repo = $this->getRepo();
-        $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
-        $result = $repo->update($settings['params'], $settings['frontEndOptions'], $settings['overrides']);
-        $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
-        $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
-        event(new PostUpdate($settings));
+        try {
+            $settings = $this->getConfigArrayHelper()->transformNoneGetRequest($request->input(), $id);
+            event(new PreUpdate($settings));
+            $repo = $this->getRepo();
+            $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
+            $result = $repo->update($settings['params'], $settings['frontEndOptions'], $settings['overrides']);
+            $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
+            $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
+            event(new PostUpdate($settings));
+        } catch (Exception $e) {
+            $this->getConfigArrayHelper()->stop(true);
+            throw $e;
+        }
         return response()->json($settings['result']);
     }
 
@@ -174,22 +236,26 @@ trait RestfulControllerTrait
      * @return Response
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
-     * @throws \Exception
+     * @throws Exception
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\DBAL\ConnectionException
      */
     public function destroy(Request $request, $id = null): Response
     {
-        $settings = $this->transformNoneGetRequest($request, 'destroy', $id);
-        event(new Init($settings));
-        event(new PreDestroy($settings));
-        $repo = $this->getRepo();
-        $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
-        $result = $repo->update($settings['params'], $settings['frontEndOptions'], $settings['overrides']);
-        $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
-        $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
-        event(new PostDestroy($settings));
+        try {
+            $settings = $this->getConfigArrayHelper()->transformNoneGetRequest($request->input(), $id);
+            event(new PreDestroy($settings));
+            $repo = $this->getRepo();
+            $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
+            $result = $repo->update($settings['params'], $settings['frontEndOptions'], $settings['overrides']);
+            $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
+            $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
+            event(new PostDestroy($settings));
+        } catch (Exception $e) {
+            $this->getConfigArrayHelper()->stop(true);
+            throw $e;
+        }
         return response()->json($settings['result']);
     }
 
@@ -286,114 +352,41 @@ trait RestfulControllerTrait
     /**
      * @return array
      */
-    public function getOptions(): array
+    public function getOverrides(): array
     {
-        return $this->options;
+        return $this->overrides;
     }
 
     /**
-     * @param array $options
+     * @param array $overrides
      */
-    public function setOptions(array $options):void
+    public function setOverrides(array $overrides):void
     {
-        $this->options = $options;
-    }
-
-
-    /**
-     * @param Request $request
-     * @param string $key
-     * @param null $id
-     * @return ArrayObject
-     * @throws \LogicException
-     */
-    protected function transformGetRequest (Request $request, string $key, $id = null):ArrayObject
-    {
-        $input = $request->input();
-        $queryLocation = $input['queryLocation'] ?? 'params';
-        $query = [];
-        $options = [];
-        switch ($queryLocation) {
-            case 'body':
-                $params = json_decode($request->getContent(), true);
-                $query = $params['query'];
-                $options = $params['options'];
-                break;
-            case 'singleParam':
-                $params = json_decode($request->getContent(),  true);
-                $query = $params['query'];
-                $options = $params['options'];
-                break;
-            case 'params':
-                $query = $input;
-                unset($query['queryLocation']);
-                $options = ['useGetParams'=>true];
-                break;
-        }
-        $controllerOptions = array_replace_recursive($this->getOptions(), $this->getOptionsOverrides())[$key]??[];
-        $overrides = $options['overrides'] ?? [];
-
-        if ($id !== null) {
-            $alias = $controllerOptions['alias'] ?? $this->getRepo()->getEntityAlias();
-            $query = [
-                'where'=>[
-                    [
-                        'field'=>$alias . '.id',
-                        'type'=>'and',
-                        'operator'=>'eq',
-                        'arguments'=>[$id]
-                    ],
-                ]
-            ];
-        }
-
-        return new ArrayObject(['query'=>$query, 'frontEntOptions'=>$options, 'controllerOptions'=>$controllerOptions, 'overrides'=>$overrides, 'request'=>$request, 'controller'=>$this]);
-    }
-
-
-    /**
-     * @param Request $request
-     * @param string $key
-     * @param $id
-     * @return ArrayObject
-     */
-    protected function transformNoneGetRequest (Request $request, string $key, $id = null):ArrayObject
-    {
-        $input = $request->input();
-        $params = $input['params'] ?? [];
-        $options = $input['options'] ?? [];
-        $controllerOptions = array_replace_recursive($this->getOptions(), $this->getOptionsOverrides())[$key]??[];
-        $overrides = $options['overrides'] ?? [];
-        if ($id !== null ) {
-            if ($options['simplifiedParams'] !== null && $options['simplifiedParams'] === true) {
-                $params['id'] = $id;
-            } else {
-                $params = [$id=>$params];
-            }
-
-        }
-        return new ArrayObject(['params'=>$params, 'frontEntOptions'=>$options, 'overrides'=>$overrides, 'controllerOptions'=>$controllerOptions, 'request'=>$request, 'controller'=>$this]);
+        $this->overrides = $overrides;
     }
 
     /**
-     * @return array
+     * @param null|string $lastMode
      */
-    public function getOptionsOverrides(): array
+    public function setLastMode(string $lastMode = null):void
     {
-        return $this->optionsOverrides;
+        $this->lastMode = $lastMode;
     }
 
     /**
-     * @param array $optionsOverrides
+     * @return NULL|ControllerArrayHelperContract
      */
-    public function setOptionsOverrides(array $optionsOverrides):void
+    public function getConfigArrayHelper():?ControllerArrayHelperContract
     {
-        $this->optionsOverrides = $optionsOverrides;
+        return $this->configArrayHelper;
     }
 
     /**
-     * @return null|ArrayHelperContract
+     * @param ControllerArrayHelperContract $configArrayHelper
      */
-    abstract public function getArrayHelper():?ArrayHelperContract;
+    public function setConfigArrayHelper(ControllerArrayHelperContract $configArrayHelper):void
+    {
+        $this->configArrayHelper = $configArrayHelper;
+    }
 
 }
