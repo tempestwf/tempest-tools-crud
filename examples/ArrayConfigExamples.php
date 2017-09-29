@@ -372,7 +372,11 @@ $entityInfo = [
 ];
 
 
-
+$controllerConfig = [
+    'transaction'=>'<true or false>', // whether or not an additional transactions should be started at the controller level. This is useful if you mean to call one more than 1 repo in the controller
+    'overrides'=>['<override key and value pairs>'], // overrides passed to the repo
+    'transformerSettings'=>['<settings to be passed to the transformer, generally toArray settings>']
+];
 
 $frontEndQuery = [
     'query'=>[
