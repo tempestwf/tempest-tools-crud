@@ -10,8 +10,9 @@ namespace TempestTools\Crud\Laravel\Events;
 
 
 use ArrayObject;
+use \TempestTools\Crud\Contracts\Events\SimpleEventContract;
 
-abstract class SimpleEventAbstract
+abstract class SimpleEventAbstract implements SimpleEventContract
 {
     /** @var  ArrayObject  $eventArgs*/
     protected $eventArgs;

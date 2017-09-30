@@ -63,4 +63,9 @@ interface ControllerContract extends HasTTConfig
      * @param bool $force
      */
     public function init(string $mode, ArrayHelperContract $arrayHelper = null, array $path = null, array $fallBack = null, bool $force = false):void;
+
+    /**
+     * @return array
+     */
+    public function getTTConfig(): array;
 }

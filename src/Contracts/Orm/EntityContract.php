@@ -275,4 +275,5 @@ interface EntityContract
      * @param array $lastToArray
      */
     public function setLastToArray(array $lastToArray=null):void;
+
 }

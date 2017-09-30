@@ -268,50 +268,50 @@ trait RestfulControllerTrait
     {
         $events->listen(
             Init::class,
-            static::class . '@Init'
+            static::class . '@onInit'
         );
 
         $events->listen(
             PreIndex::class,
-            static::class . '@PreIndex'
+            static::class . '@onPreIndex'
         );
 
         $events->listen(
             PostIndex::class,
-            static::class . '@PostIndex'
+            static::class . '@onPostIndex'
         );
         $events->listen(
             PreStore::class,
-            static::class . '@PreStore'
+            static::class . '@onPreStore'
         );
 
         $events->listen(
             PostStore::class,
-            static::class . '@PostStore'
+            static::class . '@onPostStore'
         );
         $events->listen(
             PreShow::class,
-            static::class . '@PreShow'
+            static::class . '@onPreShow'
         );
         $events->listen(
             PostShow::class,
-            static::class . '@PostShow'
+            static::class . '@onPostShow'
         );
         $events->listen(
             PreUpdate::class,
-            static::class . '@PreUpdate'
+            static::class . '@onPreUpdate'
         );
         $events->listen(
             PostUpdate::class,
-            static::class . '@PostUpdate'
+            static::class . '@onPostUpdate'
         );
         $events->listen(
             PreDestroy::class,
-            static::class . '@PreDestroy'
+            static::class . '@onPreDestroy'
         );
         $events->listen(
             PostDestroy::class,
-            static::class . '@PostDestroy'
+            static::class . '@onPostDestroy'
         );
 
     }
@@ -389,4 +389,8 @@ trait RestfulControllerTrait
         $this->configArrayHelper = $configArrayHelper;
     }
 
+    /**
+     * @return array
+     */
+    abstract public function getTTConfig(): array;
 }

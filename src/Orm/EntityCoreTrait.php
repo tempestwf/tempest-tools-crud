@@ -303,5 +303,10 @@ trait EntityCoreTrait
         $this->lastToArray = $lastToArray;
     }
 
+    /**
+     * @return array
+     */
+    abstract public function getTTConfig(): array;
+
 }
 ?>
