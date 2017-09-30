@@ -39,7 +39,7 @@ class PrimeControllerMiddleware
 
         $actions = $request->route()->getAction();
         $ttPath = $actions['ttPath'] ?? ['default'];
-        $ttFallBack = $actions['ttFallBack'] ?? ['default'];
+        $ttFallBack = $actions['ttFallback'] ?? ['default'];
         $configOverrides = $actions['configOverrides'] ?? [];
         $controller->setOverrides($configOverrides);
         $controller->init($request->getMethod(), $arrayHelper, $ttPath, $ttFallBack);
