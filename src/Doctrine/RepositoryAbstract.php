@@ -4,7 +4,6 @@ namespace TempestTools\Crud\Doctrine;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
-use TempestTools\Crud\Contracts\HasTTConfig;
 use TempestTools\Crud\Contracts\Orm\Wrapper\EntityManagerWrapperContract;
 use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
 use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
@@ -17,7 +16,7 @@ use TempestTools\Crud\Doctrine\Wrapper\QueryBuilderSqlWrapper;
 use TempestTools\Crud\Exceptions\Orm\RepositoryException;
 use TempestTools\Crud\Orm\RepositoryCoreTrait;
 
-abstract class RepositoryAbstract extends EntityRepository implements EventSubscriber, RepositoryContract, HasTTConfig
+abstract class RepositoryAbstract extends EntityRepository implements EventSubscriber, RepositoryContract
 {
     use RepositoryCoreTrait, CreateEventManagerWrapperTrait;
 

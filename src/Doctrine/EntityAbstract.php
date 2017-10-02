@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\PersistentCollection;
 use TempestTools\AclMiddleware\Contracts\HasIdContract;
-use TempestTools\Crud\Contracts\HasTTConfig;
 use TempestTools\Crud\Contracts\Orm\EntityContract;
 use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
 use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
@@ -17,7 +16,7 @@ use TempestTools\Crud\Orm\EntityCoreTrait;
 /** @noinspection PhpSuperClassIncompatibleWithInterfaceInspection
  * Note: PHP Storm is mistaken, this does match with the contract
  */
-abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityContract, HasTTConfig
+abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityContract
 {
     use EntityCoreTrait, CreateEventManagerWrapperTrait;
 

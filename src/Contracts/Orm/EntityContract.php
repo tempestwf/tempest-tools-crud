@@ -8,8 +8,9 @@ use Doctrine\ORM\Mapping as ORM;
 use TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract;
 use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
 use TempestTools\Crud\Contracts\Orm\Helper\EntityArrayHelperContract;
+use TempestTools\Crud\Contracts\HasTTConfig;
 
-interface EntityContract
+interface EntityContract extends HasTTConfig
 {
 
     /**
@@ -180,61 +181,6 @@ interface EntityContract
      * @internal param string $permission
      */
     public function getId();
-
-    /**
-     * @return array
-     */
-    public function getTTConfig(): array;
-
-    /**
-     * @param array $ttPath
-     */
-    public function setTTPath(array $ttPath): void;
-
-    /**
-     * @param array $ttFallBack
-     */
-    public function setTTFallBack(array $ttFallBack): void;
-
-    /**
-     * @return NULL|array
-     */
-    public function getTTPath(): ?array;
-
-    /**
-     * @return NULL|array
-     */
-    public function getTTFallBack(): ?array;
-
-    /** @noinspection MoreThanThreeArgumentsInspection */
-
-    /**
-     * Common logic for checking if the permissive settings allow something to be don
-     *
-     * @param array|\ArrayObject $high
-     * @param array $low
-     * @param string $canDo
-     * @param string $target
-     * @return bool
-     */
-    public function permissivePermissionCheck($high, array $low, string $canDo, string $target): bool;
-
-    /**
-     * @param array|\ArrayObject $high
-     * @param array $low
-     * @param string $setting
-     * @return bool|mixed|null
-     */
-    public function highLowSettingCheck($high, array $low = null, string $setting);
-
-    /**
-     * Common logic for checking if the permissive settings allow something to be don
-     *
-     * @param array|\ArrayObject $high
-     * @param array $low
-     * @return bool
-     */
-    public function permissiveAllowedCheck($high, array $low): bool;
 
     /**
      * @return bool

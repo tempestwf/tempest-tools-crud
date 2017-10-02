@@ -39,12 +39,12 @@ interface HasTTConfig
     /**
      * @return NULL|ArrayHelperContract
      */
-    public function getConfigArrayHelper():?ArrayHelperContract;
+    //public function getConfigArrayHelper():?ArrayHelperContract;
 
     /**
      * @param ArrayHelperContract $configArrayHelper
      */
-    public function setConfigArrayHelper(ArrayHelperContract $configArrayHelper): void;
+    //public function setConfigArrayHelper(ArrayHelperContract $configArrayHelper): void;
 
     /** @noinspection MoreThanThreeArgumentsInspection */
     /**

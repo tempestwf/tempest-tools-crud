@@ -11,6 +11,7 @@ namespace TempestTools\Crud\Contracts\Orm;
 use \Exception;
 
 use TempestTools\Common\Contracts\ArrayHelperContract;
+use TempestTools\Crud\Contracts\HasTTConfig;
 use TempestTools\Crud\Contracts\Orm\Wrapper\EntityManagerWrapperContract;
 use TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract;
 use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
@@ -19,7 +20,7 @@ use TempestTools\Crud\Contracts\Orm\Helper\QueryBuilderHelperContract;
 use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
 
 
-interface RepositoryContract
+interface RepositoryContract extends HasTTConfig
 {
 
     /** @noinspection MoreThanThreeArgumentsInspection */
@@ -99,8 +100,6 @@ interface RepositoryContract
      */
     public function findIn(string $fieldName, array $values): array;
 
-    public function getTTConfig(): array;
-
     /**
      * @return array|NULL
      */
@@ -132,56 +131,6 @@ interface RepositoryContract
      */
     public function setConfigArrayHelper(QueryBuilderHelperContract $configArrayHelper): void;
 
-    /**
-     * @param array $ttPath
-     */
-    public function setTTPath(array $ttPath): void;
-
-    /**
-     * @param array $ttFallBack
-     */
-    public function setTTFallBack(array $ttFallBack): void;
-
-    /**
-     * @return NULL|array
-     */
-    public function getTTPath(): ?array;
-
-    /**
-     * @return NULL|array
-     */
-    public function getTTFallBack(): ?array;
-
-    /** @noinspection MoreThanThreeArgumentsInspection */
-
-    /**
-     * Common logic for checking if the permissive settings allow something to be don
-     *
-     * @param array|\ArrayObject $high
-     * @param array $low
-     * @param string $canDo
-     * @param string $target
-     * @return bool
-     */
-    public function permissivePermissionCheck($high, array $low, string $canDo, string $target): bool;
-
-    /**
-     * @param array|\ArrayObject $high
-     * @param array $low
-     * @param string $setting
-     * @return bool|mixed|null
-     */
-    public function highLowSettingCheck($high, array $low = null, string $setting);
-
-    /** @noinspection MoreThanThreeArgumentsInspection */
-    /**
-     * Common logic for checking if the permissive settings allow something to be don
-     *
-     * @param array|\ArrayObject $high
-     * @param array $low
-     * @return bool
-     */
-    public function permissiveAllowedCheck($high, array $low): bool;
 
     /**
      * Passes it's self to the extractor
@@ -287,6 +236,10 @@ interface RepositoryContract
      */
     public function gatherPrePopulateEntityIds (array $params, array $gathered=[]):array;
 
+    /**
+     *
+     */
     public function clearPrePopulatedEntities ():void;
+
 
 }
