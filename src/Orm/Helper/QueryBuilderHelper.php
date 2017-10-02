@@ -318,7 +318,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $maxLimit = (int)$this->getRepository()->getArrayHelper()->parse($maxLimit, $extra);
 
         /** @noinspection NullPointerExceptionInspection */
-        $fixedLimit = (int)$this->getRepository()->getArrayHelper()->parse($fixedLimit, $extra);
+        $fixedLimit = $fixedLimit!==null?(int)$this->getRepository()->getArrayHelper()->parse($fixedLimit, $extra):null;
 
         if ($fixedLimit !== null && ($offset + $limit) % $fixedLimit !== 0) {
             throw QueryBuilderHelperException::fixedLimit($limit, $offset, $fixedLimit);
