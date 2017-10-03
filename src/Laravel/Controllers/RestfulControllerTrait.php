@@ -14,6 +14,7 @@ use Illuminate\Http\Response;
 use TempestTools\Common\Contracts\ArrayHelperContract;
 use TempestTools\Common\Contracts\Doctrine\Transformers\SimpleTransformerContract;
 use TempestTools\Common\Utility\TTConfigTrait;
+use TempestTools\Crud\Constants\ControllerEventsConstants;
 use TempestTools\Crud\Contracts\Controller\Helper\ControllerArrayHelperContract;
 use TempestTools\Crud\Contracts\Orm\RepositoryContract;
 use TempestTools\Crud\Controller\Helper\ControllerArrayHelper;
@@ -172,12 +173,12 @@ trait RestfulControllerTrait
     {
         try {
             $settings = $this->getConfigArrayHelper()->transformGetRequest($request->input(), $request->json(), $id);
-            event(new PreIndex($settings));
+            event(new PreShow($settings));
             $repo = $this->getRepo();
             $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
             $result = $repo->read($settings['query'], $settings['frontEndOptions'], $settings['overrides']);
             $settings['result'] = $result;
-            event(new PostIndex($settings));
+            event(new PostShow($settings));
         } catch (Exception $e) {
             $this->getConfigArrayHelper()->stop(true);
             throw $e;
@@ -266,54 +267,17 @@ trait RestfulControllerTrait
      */
     public function subscribe(DispatcherContract $events):void
     {
-        $events->listen(
-            Init::class,
-            static::class . '@onInit'
-        );
+        /** @noinspection CallableParameterUseCaseInTypeContextInspection */
+        $eventsInfo = ControllerEventsConstants::getAll();
 
-        $events->listen(
-            PreIndex::class,
-            static::class . '@onPreIndex'
-        );
-
-        $events->listen(
-            PostIndex::class,
-            static::class . '@onPostIndex'
-        );
-        $events->listen(
-            PreStore::class,
-            static::class . '@onPreStore'
-        );
-
-        $events->listen(
-            PostStore::class,
-            static::class . '@onPostStore'
-        );
-        $events->listen(
-            PreShow::class,
-            static::class . '@onPreShow'
-        );
-        $events->listen(
-            PostShow::class,
-            static::class . '@onPostShow'
-        );
-        $events->listen(
-            PreUpdate::class,
-            static::class . '@onPreUpdate'
-        );
-        $events->listen(
-            PostUpdate::class,
-            static::class . '@onPostUpdate'
-        );
-        $events->listen(
-            PreDestroy::class,
-            static::class . '@onPreDestroy'
-        );
-        $events->listen(
-            PostDestroy::class,
-            static::class . '@onPostDestroy'
-        );
-
+        foreach ($eventsInfo as $eventInfo) {
+            if (method_exists($this, $eventInfo['on'])) {
+                $events->listen(
+                    $eventInfo['class'],
+                    static::class . '@' . $eventInfo['on']
+                );
+            }
+        }
     }
 
 
