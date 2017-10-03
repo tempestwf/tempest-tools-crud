@@ -6,7 +6,7 @@
  * Time: 7:03 PM
  */
 
-namespace TempestTools\Crud\Controller\Helper;
+namespace TempestTools\Crud\Contracts\Controller\Helper;
 
 use ArrayObject;
 use TempestTools\Common\Contracts\ArrayHelperContract;

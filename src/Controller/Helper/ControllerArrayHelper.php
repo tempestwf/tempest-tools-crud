@@ -11,13 +11,20 @@ namespace TempestTools\Crud\Controller\Helper;
 use ArrayObject;
 use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Crud\Contracts\Controller\ControllerContract;
+use TempestTools\Crud\Contracts\Controller\Helper\ControllerArrayHelperContract;
 
 class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelperContract
 {
     /** @var ControllerContract  $controller*/
     protected $controller;
 
-    public function __construct($array = null, ControllerContract $controller)
+    /**
+     * ControllerArrayHelper constructor.
+     *
+     * @param ArrayObject|null $array |null $array
+     * @param ControllerContract $controller
+     */
+    public function __construct(ArrayObject $array = null, ControllerContract $controller)
     {
         $this->setController($controller);
         parent::__construct($array);
