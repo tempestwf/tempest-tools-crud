@@ -118,7 +118,7 @@ trait RepositoryCoreTrait
     /**
      * @return EntityManagerWrapperContract
      */
-    public function getEm(): EntityManagerWrapperContract
+    public function getEm(): ?EntityManagerWrapperContract
     {
         return $this->em;
     }

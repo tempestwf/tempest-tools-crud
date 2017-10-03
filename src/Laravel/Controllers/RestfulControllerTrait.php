@@ -9,8 +9,8 @@
 namespace TempestTools\Crud\Laravel\Controllers;
 use ArrayObject;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use TempestTools\Common\Contracts\ArrayHelperContract;
 use TempestTools\Common\Contracts\Doctrine\Transformers\SimpleTransformerContract;
 use TempestTools\Common\Utility\TTConfigTrait;
@@ -84,7 +84,7 @@ trait RestfulControllerTrait
      * Display a listing of the resource.
      *
      * @param Request $request
-     * @return Response
+     * @return JsonResponse
      * @throws \Exception
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\DBAL\ConnectionException
@@ -92,15 +92,15 @@ trait RestfulControllerTrait
      * @throws \Doctrine\ORM\ORMException
      * @throws \LogicException
      */
-    public function index(Request $request): Response
+    public function index(Request $request): JsonResponse
     {
 
         try {
-            $settings = $this->getConfigArrayHelper()->transformGetRequest($request->input(), $request->json());
-            event(new PreIndex($settings));
-            $this->getConfigArrayHelper()->start();
+            $settings = $this->getConfigArrayHelper()->transformGetRequest($request->input(), $request->json()->all());
             $repo = $this->getRepo();
-            $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
+            $repo->init($this->getArrayHelper(), $this->getTTPathNoMode(), $this->getTTFallBackNoMode());
+            $this->getConfigArrayHelper()->start();
+            event(new PreIndex($settings));
             $result = $repo->read($settings['query'], $settings['frontEndOptions'], $settings['overrides']);
             $settings['result'] = $result;
             event(new PostIndex($settings));
@@ -117,10 +117,10 @@ trait RestfulControllerTrait
     /**
      * Show the form for creating a new resource.
      *
-     * @return Response
+     * @return JsonResponse
      * @throws \TempestTools\Crud\Exceptions\Laravel\Controller\ControllerException
      */
-    public function create(): Response
+    public function create(): JsonResponse
     {
         throw ControllerException::prePersistValidatorFails('create');
     }
@@ -129,7 +129,7 @@ trait RestfulControllerTrait
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @return Response
+     * @return JsonResponse
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
      * @throws Exception
@@ -138,13 +138,14 @@ trait RestfulControllerTrait
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \LogicException
      */
-    public function store(Request $request): Response
+    public function store(Request $request): JsonResponse
     {
         try {
             $settings = $this->getConfigArrayHelper()->transformNoneGetRequest($request->input());
-            event(new PreStore($settings));
             $repo = $this->getRepo();
-            $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
+            $repo->init($this->getArrayHelper(), $this->getTTPathNoMode(), $this->getTTFallBackNoMode());
+            $this->getConfigArrayHelper()->start();
+            event(new PreStore($settings));
             $result = $repo->create($settings['params'], $settings['frontEndOptions'], $settings['overrides']);
             $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
             $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
@@ -161,7 +162,7 @@ trait RestfulControllerTrait
      *
      * @param Request $request
      * @param  int $id
-     * @return Response
+     * @return JsonResponse
      * @throws \Exception
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\DBAL\ConnectionException
@@ -169,13 +170,14 @@ trait RestfulControllerTrait
      * @throws \Doctrine\ORM\ORMException
      * @throws \LogicException
      */
-    public function show(Request $request, $id=null): Response
+    public function show(Request $request, $id=null): JsonResponse
     {
         try {
-            $settings = $this->getConfigArrayHelper()->transformGetRequest($request->input(), $request->json(), $id);
-            event(new PreShow($settings));
+            $settings = $this->getConfigArrayHelper()->transformGetRequest($request->input(), $request->json()->all(), $id);
             $repo = $this->getRepo();
-            $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
+            $repo->init($this->getArrayHelper(), $this->getTTPathNoMode(), $this->getTTFallBackNoMode());
+            $this->getConfigArrayHelper()->start();
+            event(new PreShow($settings));
             $result = $repo->read($settings['query'], $settings['frontEndOptions'], $settings['overrides']);
             $settings['result'] = $result;
             event(new PostShow($settings));
@@ -192,7 +194,7 @@ trait RestfulControllerTrait
      *
      * @throws \TempestTools\Crud\Exceptions\Laravel\Controller\ControllerException
      */
-    public function edit(): Response
+    public function edit(): JsonResponse
     {
         throw ControllerException::prePersistValidatorFails('edit');
     }
@@ -202,7 +204,7 @@ trait RestfulControllerTrait
      *
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
-     * @return Response
+     * @return JsonResponse
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
      * @throws Exception
@@ -211,13 +213,14 @@ trait RestfulControllerTrait
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \LogicException
      */
-    public function update(Request $request, $id=null): Response
+    public function update(Request $request, $id=null): JsonResponse
     {
         try {
             $settings = $this->getConfigArrayHelper()->transformNoneGetRequest($request->input(), $id);
-            event(new PreUpdate($settings));
             $repo = $this->getRepo();
-            $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
+            $repo->init($this->getArrayHelper(), $this->getTTPathNoMode(), $this->getTTFallBackNoMode());
+            $this->getConfigArrayHelper()->start();
+            event(new PreUpdate($settings));
             $result = $repo->update($settings['params'], $settings['frontEndOptions'], $settings['overrides']);
             $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
             $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
@@ -234,7 +237,7 @@ trait RestfulControllerTrait
      *
      * @param  int $id
      * @param Request $request
-     * @return Response
+     * @return JsonResponse
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
      * @throws Exception
@@ -242,13 +245,14 @@ trait RestfulControllerTrait
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\DBAL\ConnectionException
      */
-    public function destroy(Request $request, $id = null): Response
+    public function destroy(Request $request, $id = null): JsonResponse
     {
         try {
             $settings = $this->getConfigArrayHelper()->transformNoneGetRequest($request->input(), $id);
-            event(new PreDestroy($settings));
             $repo = $this->getRepo();
-            $repo->init($this->getArrayHelper(), $this->getTTPath(), $this->getTTFallBack());
+            $repo->init($this->getArrayHelper(), $this->getTTPathNoMode(), $this->getTTFallBackNoMode());
+            $this->getConfigArrayHelper()->start();
+            event(new PreDestroy($settings));
             $result = $repo->update($settings['params'], $settings['frontEndOptions'], $settings['overrides']);
             $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
             $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);

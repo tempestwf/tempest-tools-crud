@@ -175,7 +175,7 @@ interface RepositoryContract extends HasTTConfig
     /**
      * @return \TempestTools\Crud\Contracts\Orm\Wrapper\EntityManagerWrapperContract
      */
-    public function getEm(): EntityManagerWrapperContract;
+    public function getEm(): ?EntityManagerWrapperContract;
 
     /**
      * @param \TempestTools\Crud\Contracts\Orm\Wrapper\EntityManagerWrapperContract $em

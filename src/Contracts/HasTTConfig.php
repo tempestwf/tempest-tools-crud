@@ -8,9 +8,6 @@
 
 namespace TempestTools\Crud\Contracts;
 
-
-use TempestTools\Common\Contracts\ArrayHelperContract;
-
 interface HasTTConfig
 {
 
@@ -37,14 +34,19 @@ interface HasTTConfig
      */
     public function getTTFallBack(): ?array;
     /**
-     * @return NULL|ArrayHelperContract
+     * @return array
      */
-    //public function getConfigArrayHelper():?ArrayHelperContract;
+    public function getTTPathNoMode(): array;
 
     /**
-     * @param ArrayHelperContract $configArrayHelper
+     * @param array $ttPathNoMode
      */
-    //public function setConfigArrayHelper(ArrayHelperContract $configArrayHelper): void;
+    public function setTTPathNoMode(array $ttPathNoMode):void;
+
+    /**
+     * @return array
+     */
+    public function getTTFallBackNoMode(): array;
 
     /** @noinspection MoreThanThreeArgumentsInspection */
     /**

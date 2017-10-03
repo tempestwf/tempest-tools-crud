@@ -77,7 +77,7 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
             ];
         }
 
-        return new ArrayObject(['self'=>$this, 'query'=>$query, 'frontEntOptions'=>$options, 'controllerOptions'=>$controllerOptions, 'overrides'=>$overrides, 'controller'=>$controller]);
+        return new ArrayObject(['self'=>$this, 'query'=>$query, 'frontEndOptions'=>$options, 'controllerOptions'=>$controllerOptions, 'overrides'=>$overrides, 'controller'=>$controller]);
     }
 
     /**
@@ -100,7 +100,7 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
             }
 
         }
-        return new ArrayObject(['self'=>$this, 'params'=>$params, 'frontEntOptions'=>$options, 'overrides'=>$overrides, 'controllerOptions'=>$controllerOptions, 'controller'=>$controller]);
+        return new ArrayObject(['self'=>$this, 'params'=>$params, 'frontEndOptions'=>$options, 'overrides'=>$overrides, 'controllerOptions'=>$controllerOptions, 'controller'=>$controller]);
     }
 
 
@@ -140,25 +140,27 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
         $controller = $this->getController();
         $repo = $controller->getRepo();
         $em = $repo->getEm();
+        if ($em !== null) {
+            /** @noinspection NullPointerExceptionInspection */
+            $transaction = $this->findSetting([
+                $this->getArray(),
+                $controller->getOverrides(),
+            ], 'transaction');
 
-        /** @noinspection NullPointerExceptionInspection */
-        $transaction = $this->findSetting([
-            $this->getArray(),
-            $controller->getOverrides(),
-        ], 'transaction');
 
-
-        if (
-            $transaction !== false
-        ) {
-            if ($failure === true) {
-                /** @noinspection NullPointerExceptionInspection */
-                $em->rollBack();
-            } else {
-                /** @noinspection NullPointerExceptionInspection */
-                $em->commit();
+            if (
+                $transaction !== false
+            ) {
+                if ($failure === true) {
+                    /** @noinspection NullPointerExceptionInspection */
+                    $em->rollBack();
+                } else {
+                    /** @noinspection NullPointerExceptionInspection */
+                    $em->commit();
+                }
             }
         }
+
     }
 
     /**
