@@ -49,7 +49,7 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
                 $options = $params['options'];
                 break;
             case 'singleParam':
-                $params = $json;
+                $params = json_decode($input['query'], true);
                 $query = $params['query'];
                 $options = $params['options'];
                 break;
