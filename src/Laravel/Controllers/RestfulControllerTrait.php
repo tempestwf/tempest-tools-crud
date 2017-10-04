@@ -146,7 +146,7 @@ trait RestfulControllerTrait
             $repo->init($this->getArrayHelper(), $this->getTTPathNoMode(), $this->getTTFallBackNoMode());
             $this->getConfigArrayHelper()->start();
             event(new PreStore($settings));
-            $result = $repo->create($settings['params'], $settings['frontEndOptions'], $settings['overrides']);
+            $result = $repo->create($settings['params'], $settings['overrides'], $settings['frontEndOptions']);
             $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
             $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
             event(new PostStore($settings));
@@ -221,7 +221,7 @@ trait RestfulControllerTrait
             $repo->init($this->getArrayHelper(), $this->getTTPathNoMode(), $this->getTTFallBackNoMode());
             $this->getConfigArrayHelper()->start();
             event(new PreUpdate($settings));
-            $result = $repo->update($settings['params'], $settings['frontEndOptions'], $settings['overrides']);
+            $result = $repo->update($settings['params'], $settings['overrides'], $settings['frontEndOptions']);
             $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
             $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
             event(new PostUpdate($settings));
@@ -253,7 +253,7 @@ trait RestfulControllerTrait
             $repo->init($this->getArrayHelper(), $this->getTTPathNoMode(), $this->getTTFallBackNoMode());
             $this->getConfigArrayHelper()->start();
             event(new PreDestroy($settings));
-            $result = $repo->update($settings['params'], $settings['frontEndOptions'], $settings['overrides']);
+            $result = $repo->delete($settings['params'], $settings['overrides'], $settings['frontEndOptions']);
             $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
             $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
             event(new PostDestroy($settings));

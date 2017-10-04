@@ -39,6 +39,7 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
      */
     public function transformGetRequest (array $input, array $json, $id = null):ArrayObject
     {
+        $id = $id === 'batch'?null:$id;
         $queryLocation = $input['queryLocation'] ?? $id === null?'params':null;
         $query = [];
         $options = [];
@@ -61,7 +62,7 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
         }
         $controller = $this->getController();
         $controllerOptions = array_replace_recursive($this->getArray()->getArrayCopy(), $controller->getOverrides())??[];
-        $overrides = $options['overrides'] ?? [];
+        $overrides = $controllerOptions['overrides'] ?? [];
 
         if ($id !== null) {
             $alias = $controllerOptions['alias'] ?? $controller->getRepo()->getEntityAlias();
@@ -89,14 +90,16 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
      */
     public function transformNoneGetRequest (array $input, $id = null):ArrayObject
     {
+        $id = $id === 'batch'?null:$id;
         $params = $input['params'] ?? [];
         $options = $input['options'] ?? [];
         $controller = $this->getController();
         $controllerOptions = array_replace_recursive($this->getArray()->getArrayCopy(), $controller->getOverrides())??[];
-        $overrides = $options['overrides'] ?? [];
+        $overrides = $controllerOptions['overrides'] ?? [];
         if ($id !== null ) {
-            if ($options['simplifiedParams'] !== null && $options['simplifiedParams'] === true) {
+            if (isset($options['simplifiedParams']) === true && $options['simplifiedParams'] === true) {
                 $params['id'] = $id;
+                $params = [$params];
             } else {
                 $params = [$id=>$params];
             }
