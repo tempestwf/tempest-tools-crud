@@ -39,7 +39,7 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
      */
     public function transformGetRequest (array $input, array $json, $id = null):ArrayObject
     {
-        $queryLocation = $input['queryLocation'] ?? 'params';
+        $queryLocation = $input['queryLocation'] ?? $id === null?'params':null;
         $query = [];
         $options = [];
         switch ($queryLocation) {
@@ -66,13 +66,15 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
         if ($id !== null) {
             $alias = $controllerOptions['alias'] ?? $controller->getRepo()->getEntityAlias();
             $query = [
-                'where'=>[
-                    [
-                        'field'=>$alias . '.id',
-                        'type'=>'and',
-                        'operator'=>'eq',
-                        'arguments'=>[$id]
-                    ],
+                'query'=>[
+                    'where'=>[
+                        [
+                            'field'=>$alias . '.id',
+                            'type'=>'and',
+                            'operator'=>'eq',
+                            'arguments'=>[$id]
+                        ],
+                    ]
                 ]
             ];
         }
