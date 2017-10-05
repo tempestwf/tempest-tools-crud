@@ -29,6 +29,9 @@ trait RepositoryCoreTrait
      */
     protected $options;
 
+    /** @var array  */
+    protected /** @noinspection PropertyCanBeStaticInspection */ $availableModes = ['create', 'read', 'update', 'delete'];
+
 
     /** @noinspection MoreThanThreeArgumentsInspection */
 
@@ -330,6 +333,13 @@ trait RepositoryCoreTrait
         $this->getDataBindHelper()->clearPrePopulatedEntities();
     }
 
+    /**
+     * @return array
+     */
+    public function getAvailableModes(): array
+    {
+        return $this->availableModes;
+    }
 
 }
 

@@ -48,6 +48,9 @@ trait RestfulControllerTrait
      */
     protected $lastMode;
 
+    /** @var array  */
+    protected /** @noinspection PropertyCanBeStaticInspection */ $availableModes = ['GET', 'POST', 'PUT', 'DELETE'];
+
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
@@ -361,4 +364,12 @@ trait RestfulControllerTrait
      * @return array
      */
     abstract public function getTTConfig(): array;
+
+    /**
+     * @return array
+     */
+    public function getAvailableModes(): array
+    {
+        return $this->availableModes;
+    }
 }

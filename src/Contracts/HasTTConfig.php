@@ -75,4 +75,9 @@ interface HasTTConfig
      * @return bool
      */
     public function permissiveAllowedCheck ($high, array $low):bool;
+
+    /**
+     * @return array
+     */
+    public function getAvailableModes(): array;
 }

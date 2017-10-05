@@ -33,6 +33,9 @@ trait EntityCoreTrait
     /** @var  bool $prePopulated */
     protected $prePopulated = false;
 
+    /** @var array  */
+    protected /** @noinspection PropertyCanBeStaticInspection */ $availableModes = ['create', 'read', 'update', 'delete'];
+
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
@@ -307,6 +310,14 @@ trait EntityCoreTrait
      * @return array
      */
     abstract public function getTTConfig(): array;
+
+    /**
+     * @return array
+     */
+    public function getAvailableModes(): array
+    {
+        return $this->availableModes;
+    }
 
 }
 ?>
