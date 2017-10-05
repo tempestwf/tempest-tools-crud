@@ -459,6 +459,17 @@ $exampleFrontEndRequest = [
     ]
 ];
 
+$toArrayTransformerSettings = [ // Tested in testToArrayArrayStorage and as part of all transformation tests
+    'defaultMode'=>'<create, read, update, or delete>', // Defaults to 'read'. This is the mode that will be initiated on the entity if no mode is currently active on the entity
+    'defaultArrayHelper'=>'<array helper>',// If no array helper is set for the entity already this one will be used
+    'defaultPath'=>['<path>'],// If no path is set for the entity already this will be used
+    'defaultFallBack'=>['<fall back>'], // If no fall back is set for the entity already this will be used
+    'force'=>'<true or false>', // Defaults to false. If true then the entity will be force to use the path, mode, fall back and array helper that you are setting as defaults, regardless of if they have there own already.
+    'store'=>'<true or false>', //Defaults to true. Whether or not the toArray result should be stored to be used again if toArray is called again.
+    'recompute'=>'<true or false>', // Defaults to false. Whether or not to recompute toArray, even if one was previously stored
+    'useStored'=>'<true or false>', // Defaults to true. Whether or not to use a previously stored toArray result if one is found. If false then it will return a freshly generated result.
+    'frontEndOptions'=>['<options>'], // Options passed from the front end with the request
+];
 // Complex param versions, these execute more quickly but may be less like what you might expect them to look like.
 // Note: When a relation is set to null then an assignType of setNull is used internally which calls the set method with a null value
 $createSingleParams = [ // Tested in CudTest.php
