@@ -2,6 +2,7 @@
 namespace TempestTools\Crud\Orm\Helper;
 
 use TempestTools\AclMiddleware\Contracts\HasIdContract;
+use TempestTools\Common\Constants\CommonArrayObjectKeyConstants;
 use TempestTools\Crud\Constants\RepositoryEventsConstants;
 use TempestTools\Crud\Contracts\Orm\Helper\DataBindHelperContract;
 use TempestTools\Crud\Contracts\Orm\EntityContract;
@@ -120,7 +121,7 @@ class DataBindHelper implements DataBindHelperContract
     public function clearPrePopulatedEntities():void
     {
         /** @noinspection NullPointerExceptionInspection */
-        $this->getRepository()->getArrayHelper()->getArray()[static::PRE_POPULATED_ENTITIES_KEY] = null;
+        $this->getRepository()->getArrayHelper()->getArray()[CommonArrayObjectKeyConstants::ORM_KEY_NAME][static::PRE_POPULATED_ENTITIES_KEY] = null;
     }
     /**
      * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
@@ -309,7 +310,7 @@ class DataBindHelper implements DataBindHelperContract
 
         /** @noinspection NullPointerExceptionInspection */
         /** @noinspection CallableParameterUseCaseInTypeContextInspection */
-        $array = $repo->getArrayHelper()->getArray()[static::PRE_POPULATED_ENTITIES_KEY][$className] ?? null;
+        $array = $repo->getArrayHelper()->getArray()[CommonArrayObjectKeyConstants::ORM_KEY_NAME][static::PRE_POPULATED_ENTITIES_KEY][$className] ?? null;
 
         if ($array !== null) {
             $entities = [];
@@ -446,8 +447,8 @@ class DataBindHelper implements DataBindHelperContract
     protected function convertGatheredToPrePopulation (array $gathered, \ArrayObject $sharedArray):void
     {
         $em = $this->getRepository()->getEm();
-        if (!isset($sharedArray[static::PRE_POPULATED_ENTITIES_KEY])) {
-            $sharedArray[static::PRE_POPULATED_ENTITIES_KEY] = [];
+        if (!isset($sharedArray[CommonArrayObjectKeyConstants::ORM_KEY_NAME][static::PRE_POPULATED_ENTITIES_KEY])) {
+            $sharedArray[CommonArrayObjectKeyConstants::ORM_KEY_NAME][static::PRE_POPULATED_ENTITIES_KEY] = [];
         }
         $prePopulate = [];
 
@@ -462,12 +463,12 @@ class DataBindHelper implements DataBindHelperContract
                     $prePopulate[$key][$foundEntity->getId()] = $foundEntity;
                 }
 
-                if (!isset($sharedArray[static::PRE_POPULATED_ENTITIES_KEY][$key])) {
-                    $sharedArray[static::PRE_POPULATED_ENTITIES_KEY][$key] = [];
+                if (!isset($sharedArray[CommonArrayObjectKeyConstants::ORM_KEY_NAME][static::PRE_POPULATED_ENTITIES_KEY][$key])) {
+                    $sharedArray[CommonArrayObjectKeyConstants::ORM_KEY_NAME][static::PRE_POPULATED_ENTITIES_KEY][$key] = [];
                 }
 
                 /** @noinspection SlowArrayOperationsInLoopInspection */
-                $sharedArray[static::PRE_POPULATED_ENTITIES_KEY][$key] = array_replace($sharedArray[static::PRE_POPULATED_ENTITIES_KEY][$key], $prePopulate[$key]);
+                $sharedArray[CommonArrayObjectKeyConstants::ORM_KEY_NAME][static::PRE_POPULATED_ENTITIES_KEY][$key] = array_replace($sharedArray[CommonArrayObjectKeyConstants::ORM_KEY_NAME][static::PRE_POPULATED_ENTITIES_KEY][$key], $prePopulate[$key]);
             }
         }
     }

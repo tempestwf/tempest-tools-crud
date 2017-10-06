@@ -10,6 +10,7 @@ namespace TempestTools\Crud\Laravel\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use TempestTools\Common\ArrayObject\DefaultTTArrayObject;
 use TempestTools\Common\Exceptions\Laravel\Http\Middleware\CommonMiddlewareException;
 use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Crud\Contracts\Controller\ControllerContract;
@@ -35,7 +36,7 @@ class PrimeControllerMiddleware
         }
 
         /** @var  ControllerContract $controller */
-        $arrayHelper = $controller->getArrayHelper() ?? new ArrayHelper();
+        $arrayHelper = $controller->getArrayHelper() ?? new ArrayHelper(new DefaultTTArrayObject());
 
         $actions = $request->route()->getAction();
         $ttPath = $actions['ttPath'] ?? ['default'];
