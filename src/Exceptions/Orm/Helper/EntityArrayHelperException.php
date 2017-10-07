@@ -9,6 +9,8 @@
 namespace TempestTools\Crud\Exceptions\Orm\Helper;
 
 
+use TempestTools\Crud\Contracts\Orm\EntityContract;
+
 class EntityArrayHelperException extends \RunTimeException
 {
     /**
@@ -32,11 +34,12 @@ class EntityArrayHelperException extends \RunTimeException
     }
 
     /**
+     * @param EntityContract $entity
      * @return EntityArrayHelperException
      */
-    public static function actionNotAllow (): EntityArrayHelperException
+    public static function actionNotAllow (EntityContract $entity): EntityArrayHelperException
     {
-        return new self (sprintf('Error: the requested action is not allowed on this entity for this request.'));
+        return new self (sprintf('Error: the requested action is not allowed on this entity for this request. entity = %s', get_class($entity)));
     }
 
     /**

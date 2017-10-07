@@ -269,7 +269,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         /** @noinspection NullPointerExceptionInspection */
         $allowed = $entity->getArrayHelper()->parse($allowed, ['self'=>$entity]);
         if ($nosey === true && $allowed === false) {
-            throw EntityArrayHelperException::actionNotAllow();
+            throw EntityArrayHelperException::actionNotAllow($entity);
         }
         return $allowed;
     }
@@ -351,7 +351,9 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         if ($settings !== null) {
             $builder = $this->getPrePersistEntityBuilder();
             foreach($settings as $key => $fieldSetting) {
-                $builder->$key($entity, $fieldSetting);
+                if ($fieldSetting !== null) {
+                    $builder->$key($entity, $fieldSetting);
+                }
             }
         }
     }

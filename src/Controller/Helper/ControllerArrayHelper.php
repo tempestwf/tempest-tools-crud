@@ -123,7 +123,7 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
         $transaction = $this->findSetting([
             $this->getArray(),
             $controller->getOverrides(),
-        ], 'transaction');
+        ], 'transaction') ?? false;
 
         if ($transaction !== false) {
             /** @noinspection NullPointerExceptionInspection */
@@ -150,7 +150,7 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
             $transaction = $this->findSetting([
                 $this->getArray(),
                 $controller->getOverrides(),
-            ], 'transaction');
+            ], 'transaction') ?? false;
 
 
             if (
