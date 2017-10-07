@@ -462,4 +462,20 @@ abstract class CrudTestBaseAbstract extends \TestCase
         ];
     }
 
+    /**
+     * @return string
+     */
+    protected function getToken ():string {
+        $userRepo = $this->em->getRepository(User::class);
+
+        $testUser = $userRepo->findOneBy(['id'=>1]);
+
+        $response = $this->json('POST', '/auth/authenticate', ['email' => $testUser->getEmail(), 'password' => $testUser->getPassword()]);
+        $result = $response->decodeResponseJson();
+
+        /** @var string $token */
+        $token = $result['token'];
+        $this->refreshApplication();
+        return $token;
+    }
 }
