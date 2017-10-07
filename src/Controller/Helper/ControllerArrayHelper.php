@@ -125,7 +125,7 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
             $controller->getOverrides(),
         ], 'transaction') ?? false;
 
-        if ($transaction !== false) {
+        if ($transaction === true) {
             /** @noinspection NullPointerExceptionInspection */
             $repo->getEm()->beginTransaction();
         }
@@ -154,7 +154,7 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
 
 
             if (
-                $transaction !== false
+                $transaction === true
             ) {
                 if ($failure === true) {
                     /** @noinspection NullPointerExceptionInspection */

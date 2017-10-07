@@ -16,7 +16,7 @@ class DataBindHelper implements DataBindHelperContract
 {
     use RepositoryTrait;
 
-    const IGNORE_KEYS = ['assignType'];
+    const IGNORE_KEYS = ['assignType', 'chainType'];
 
     const PRE_POPULATED_ENTITIES_KEY = 'prePopulatedEntities';
 
@@ -52,7 +52,7 @@ class DataBindHelper implements DataBindHelperContract
             $optionOverrides,
         ], 'transaction');
 
-        if ($transaction !== false) {
+        if ($transaction === true) {
             /** @noinspection NullPointerExceptionInspection */
             $repo->getEm()->beginTransaction();
         }
@@ -106,7 +106,7 @@ class DataBindHelper implements DataBindHelperContract
         }
 
         if (
-            $transaction !== false
+            $transaction === true
         ) {
             if ($failure === true) {
                 /** @noinspection NullPointerExceptionInspection */
@@ -199,7 +199,7 @@ class DataBindHelper implements DataBindHelperContract
         $chainOverrides = ['transaction'=>false, 'flush'=>false, 'batchMax'=>null, 'prePopulateEntities'=>false];
         if ($params !== NULL) {
             foreach ($params as $chainType => $paramsForEntities) {
-                $paramsForEntities = $this->prepareAssociationParams($entity, $associationName, $paramsForEntities);
+                $paramsForEntities = $this->prepareAssociationParams($entity, $associationName, $paramsForEntities, $chainType);
                 $foundEntities = $this->processChaining($chainType, $paramsForEntities, $chainOverrides, $repo);
 
                 if ($foundEntities !== null) {
@@ -267,16 +267,20 @@ class DataBindHelper implements DataBindHelperContract
         }
         return $foundEntities;
     }
+    /** @noinspection MoreThanThreeArgumentsInspection */
+
     /**
      * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
      * @param string $associationName
      * @param array $paramsForEntities
+     * @param string|null $chainType
      * @return array
      * @throws \RuntimeException
      */
-    protected function prepareAssociationParams (EntityContract $entity, string $associationName, array $paramsForEntities):array {
+    protected function prepareAssociationParams (EntityContract $entity, string $associationName, array $paramsForEntities, string $chainType = null):array {
         /** @var array $paramsForEntities */
         foreach ($paramsForEntities as $key=>$paramsForEntity) {
+            $paramsForEntity['chainType'] = $chainType;
             $paramsForEntities[$key] = $entity->processAssociationParams($associationName, $paramsForEntity);
         }
         return $paramsForEntities;
