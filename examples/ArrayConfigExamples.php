@@ -80,6 +80,10 @@ $readInfo = [
             'fetchJoin'=>'<true or false>', // whether or not when paginating this query requires a fetch join // Tested in: testGeneralDataRetrieval
         ],
         'permissions'=>[
+            'settings'=>[
+                'closure'=>'<closure to test param, return false from closure to cancel execution>', // Tested in testMutateAndClosure
+                'mutate'=>'<closure to modify paramaters passed from front end before applying them>', // Tested in testMutateAndClosure
+            ],
             'allowed'=>'<true or false>', // Tested in testReadPermissions
             'maxLimit'=>'<max limit>', // Tested in testGeneralDataRetrieval
             'fixedLimit'=>'<a number that represents that all limits and offsets from the must be divisable by this number>', // Tested in testFixedLimit

@@ -219,14 +219,17 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
      */
     protected function readCore(QueryBuilderWrapperContract $qb, array $params, array $frontEndOptions, array $options, array $optionOverrides):array
     {
+        $repo = $this->getRepository();
+        $arrayHelper = $repo->getArrayHelper();
         $extra = [
-            'params'=>$params,
             'options'=>$options,
             'optionOverrides'=>$optionOverrides,
             'frontEndOptions'=>$frontEndOptions,
             'qb'=>$qb,
             'helper'=>$this
         ];
+        $config = $this->getArray()['read']['permissions'] ?? [];
+        $extra['params'] = $this->processSettings(null, $params, $arrayHelper, $config, $extra)[1];
         $this->verifyAllowed($extra);
         $this->buildBaseQuery($qb, $extra);
         $this->addPlaceholders($qb, $extra);
@@ -237,6 +240,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $this->addLimitAndOffset($qb, $extra);
         return $this->prepareResult($qb, $extra);
     }
+
 
     /**
      * @param array $extra
