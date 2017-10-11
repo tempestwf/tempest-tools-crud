@@ -380,7 +380,10 @@ $controllerConfig = [
     '<http request mode>'=> [ // GET, POST, PUT, DELETE. Corresponds to the method that was requested
         'transaction'=>'<true or false>', // whether or not an additional transactions should be started at the controller level. This is useful if you mean to call one more than 1 repo in the controller
         'overrides'=>['<override key and value pairs>'], // overrides passed to the repo
-        'transformerSettings'=>['<settings to be passed to the transformer, generally toArray settings>']
+        'transformerSettings'=>['<settings to be passed to the transformer, generally toArray settings>'],
+        'resourceIdConversion'=>[ // This lets you set up resource ids passed in the url that are automatically converted to placeholders in the filter from the front end
+            '<placeholder as it appearts in the url string>'=>'<query placeholders or null>'// If null then the placeholder will be automatically converted to: <name from url>ResourceId
+        ]
     ]
 ];
 

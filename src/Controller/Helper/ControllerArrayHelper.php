@@ -42,8 +42,60 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
     {
         $id = $id === 'batch'?null:$id;
         $queryLocation = $input['queryLocation'] ?? $id === null?'params':null;
+        [$query, $options] = $this->paramsToParamsAndOptions($input, $json, $queryLocation);
+        $controller = $this->getController();
+        $controllerOptions = array_replace_recursive($this->getArray()->getArrayCopy(), $controller->getOverrides())??[];
+        $overrides = $controllerOptions['overrides'] ?? [];
+        $options['resourceIds'] = $options['resourceIds'] ?? [];
+        $options['resourceIds'] = array_replace_recursive($resourceIds, $options['resourceIds']);
+        $query = $this->resourceIdsToPlaceholders($query, $options, $controllerOptions, $queryLocation);
+        if ($id !== null) {
+            $query = $this->injectId($query, $queryLocation, $id);
+        }
+
+        return new ArrayObject(['self'=>$this, 'query'=>$query, 'frontEndOptions'=>$options, 'controllerOptions'=>$controllerOptions, 'overrides'=>$overrides, 'controller'=>$controller]);
+    }
+
+    protected function injectId(array $query, string $queryLocation, $id):array
+    {
+        $alias = $controllerOptions['alias'] ?? $this->getController()->getRepo()->getEntityAlias();
+        // The only where clause from the front end filter should be this one based on the id
+        if ($queryLocation === 'params') {
+            /**
+             * @var array $query
+             */
+            foreach ($query as $key => $value) {
+                if (preg_match('/^(and|or)_where/', $key)) {
+                    unset($query[$key]);
+                }
+            }
+            $query['and_where_eq_' . $alias . '-id'] = $id;
+        } else {
+
+            $query['query'] = $query['query'] ?? [];
+            $query['query']['where'] = [];
+            $query['query']['where'][] = [
+                'field'=>$alias . '.id',
+                'type'=>'and',
+                'operator'=>'eq',
+                'arguments'=>[$id],
+            ];
+        }
+        return $query;
+    }
+
+    /**
+     * @param array $input
+     * @param array $json
+     * @param string $queryLocation
+     * @return array
+     * @internal param array $params
+     */
+    protected function paramsToParamsAndOptions(array $input, array $json, string $queryLocation):array
+    {
         $query = [];
         $options = [];
+
         switch ($queryLocation) {
             case 'body':
                 $params = $json;
@@ -61,25 +113,46 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
                 $options = ['useGetParams'=>true];
                 break;
         }
-        $controller = $this->getController();
-        $controllerOptions = array_replace_recursive($this->getArray()->getArrayCopy(), $controller->getOverrides())??[];
-        $overrides = $controllerOptions['overrides'] ?? [];
-        $options['resourceIds'] = $options['resourceIds'] ?? [];
-        $options['resourceIds'] = array_replace_recursive($resourceIds, $options['resourceIds']);
-        if ($id !== null) {
-            $alias = $controllerOptions['alias'] ?? $controller->getRepo()->getEntityAlias();
-            $query['query'] = $query['query'] ?? [];
-            $query['query']['where'] = $query['query']['where'] ?? [];
-            $query['query']['where'][] = [
-                'field'=>$alias . '.id',
-                'type'=>'and',
-                'operator'=>'eq',
-                'arguments'=>[$id]
-            ];
-        }
-
-        return new ArrayObject(['self'=>$this, 'query'=>$query, 'frontEndOptions'=>$options, 'controllerOptions'=>$controllerOptions, 'overrides'=>$overrides, 'controller'=>$controller]);
+        return [$query, $options];
     }
+
+    /** @noinspection MoreThanThreeArgumentsInspection
+     * @param array $query
+     * @param array $options
+     * @param array $controllerOptions
+     * @param string $queryLocation
+     * @return array
+     */
+    protected function resourceIdsToPlaceholders (array $query, array $options, array $controllerOptions, string $queryLocation):array
+    {
+        if (isset($controllerOptions['resourceIdConversion']) === true) {
+            if ($queryLocation !== 'params') {
+                $query['query']['placeholders'] = $query['query']['placeholders'] ?? [];
+            }
+            /**
+             * @var array $controllerOptions
+             * @var array $resourceIdConversion
+             */
+            $resourceIdConversion = $controllerOptions['resourceIdConversion'];
+            foreach ($resourceIdConversion as $key => $value) {
+                if ($queryLocation === 'params') {
+                    if ($value === null) {
+                        $query['placeholder_' . $key . 'ResourceId'] = $options['resourceIds'][$key];
+                    } else {
+                        $query['placeholder_' . $value] = $options['resourceIds'][$key];
+                    }
+                } else {
+                    if ($value === null) {
+                        $query['query']['placeholders'][$key . 'ResourceId'] = $options['resourceIds'][$key];
+                    } else {
+                        $query['query']['placeholders'][$value] = $options['resourceIds'][$key];
+                    }
+                }
+            }
+        }
+        return $query;
+    }
+
 
     /**
      * @param array $input
