@@ -66,17 +66,13 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
 
         if ($id !== null) {
             $alias = $controllerOptions['alias'] ?? $controller->getRepo()->getEntityAlias();
-            $query = [
-                'query'=>[
-                    'where'=>[
-                        [
-                            'field'=>$alias . '.id',
-                            'type'=>'and',
-                            'operator'=>'eq',
-                            'arguments'=>[$id]
-                        ],
-                    ]
-                ]
+            $query['query'] = $query['query'] ?? [];
+            $query['query']['where'] = $query['query']['where'] ?? [];
+            $query['query']['where'][] = [
+                'field'=>$alias . '.id',
+                'type'=>'and',
+                'operator'=>'eq',
+                'arguments'=>[$id]
             ];
         }
 
