@@ -457,6 +457,7 @@ $exampleFrontEndRequest = [
     'params'=>['<see param examples below>'],
     'options'=>[
         'simplifiedParams'=>'<true or false>', //Defaults to false, may also be set as a different default on the controller // whether or not to process the params as standard version of simplified version. Both param examples are below.
+        'testMode'=>'<true or false>', // Defaults to false, if set to true then data will be rolled back instead of committed. This lets you write test cases that use the api but not store anything to the db
         'toArray'=>[
             'completeness'=>'<full, limited, minimal, none>', // Defaults to full, if 'full' then all data will be shown so long as it wouldn't trigger an infinite loop, if 'limited' then all data will be shown but relations leading to already processed entities will not be shown, if 'minimal' the same entity will never be shown twice in the return and an empty array will be in it's place, if 'none' nothing is returned. Tested in: testToArrayBasicFunctionality
             'maxDepth'=>'<number or null>', // how deep should the to array go. Tested in: testToArrayBasicFunctionality

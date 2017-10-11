@@ -50,13 +50,13 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
         $options['resourceIds'] = array_replace_recursive($resourceIds, $options['resourceIds']);
         $query = $this->resourceIdsToPlaceholders($query, $options, $controllerOptions, $queryLocation);
         if ($id !== null) {
-            $query = $this->injectId($query, $queryLocation, $id);
+            $query = $this->injectIdOnGetRequest($query, $queryLocation, $id);
         }
 
         return new ArrayObject(['self'=>$this, 'query'=>$query, 'frontEndOptions'=>$options, 'controllerOptions'=>$controllerOptions, 'overrides'=>$overrides, 'controller'=>$controller]);
     }
 
-    protected function injectId(array $query, string $queryLocation, $id):array
+    protected function injectIdOnGetRequest(array $query, string $queryLocation, $id):array
     {
         $alias = $controllerOptions['alias'] ?? $this->getController()->getRepo()->getEntityAlias();
         // The only where clause from the front end filter should be this one based on the id
@@ -171,17 +171,28 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
         $controllerOptions = array_replace_recursive($this->getArray()->getArrayCopy(), $controller->getOverrides())??[];
         $overrides = $controllerOptions['overrides'] ?? [];
         if ($id !== null ) {
-            if (isset($options['simplifiedParams']) === true && $options['simplifiedParams'] === true) {
-                $params['id'] = $id;
-                $params = [$params];
-            } else {
-                $params = [$id=>$params];
-            }
+            $params = $this->injectIdOnNonGetRequest($options, $params, $id);
 
         }
         return new ArrayObject(['self'=>$this, 'params'=>$params, 'frontEndOptions'=>$options, 'overrides'=>$overrides, 'controllerOptions'=>$controllerOptions, 'controller'=>$controller]);
     }
 
+    /**
+     * @param array $options
+     * @param array $params
+     * @param $id
+     * @return array
+     */
+    protected function injectIdOnNonGetRequest(array $options, array $params, $id):array
+    {
+        if (isset($options['simplifiedParams']) === true && $options['simplifiedParams'] === true) {
+            $params['id'] = $id;
+            $params = [$params];
+        } else {
+            $params = [$id=>$params];
+        }
+        return $params;
+    }
 
     /**
      * Makes sure the repo is ready to run
@@ -225,7 +236,6 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
                 $this->getArray(),
                 $controller->getOverrides(),
             ], 'transaction') ?? false;
-
 
             if (
                 $transaction === true

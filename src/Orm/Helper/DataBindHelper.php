@@ -77,6 +77,7 @@ class DataBindHelper implements DataBindHelperContract
         $evm->dispatchEvent(RepositoryEventsConstants::PRE_STOP, $eventArgs);
         $options = $eventArgs->getArgs()['options'];
         $optionOverrides = $eventArgs->getArgs()['optionOverrides'];
+        $frontEndOptions = $eventArgs->getArgs()['frontEndOptions'];
 
         /** @noinspection NullPointerExceptionInspection */
         $transaction = $arrayHelper->findSetting([
@@ -96,6 +97,7 @@ class DataBindHelper implements DataBindHelperContract
             $optionOverrides,
         ], 'clearPrePopulatedEntitiesOnFlush');
 
+        $testMode = $frontEndOptions['testMode'] ?? false;
 
         if ($failure === false && $flush === true) {
             /** @noinspection NullPointerExceptionInspection */
@@ -108,7 +110,7 @@ class DataBindHelper implements DataBindHelperContract
         if (
             $transaction === true
         ) {
-            if ($failure === true) {
+            if ($failure === true || $testMode === true) {
                 /** @noinspection NullPointerExceptionInspection */
                 $em->rollBack();
             } else {

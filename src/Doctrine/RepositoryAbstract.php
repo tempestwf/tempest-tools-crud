@@ -66,6 +66,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
         return new GenericEventArgs(new \ArrayObject([
             'params'=>$params,
             'arrayHelper'=>$this->getArrayHelper(),
+            'configArrayHelper'=>$this->getConfigArrayHelper(),
             'results'=>[],
             'self'=>$this,
             'options'=>$options,
