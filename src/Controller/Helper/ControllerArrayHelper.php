@@ -135,15 +135,9 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
              */
             $resourceIdConversion = $controllerOptions['resourceIdConversion'];
             foreach ($resourceIdConversion as $key => $value) {
-                if ($queryLocation === 'params') {
-                    if ($value === null) {
-                        $query['placeholder_' . $key . 'ResourceId'] = $options['resourceIds'][$key];
-                    } else {
+                if ($value !== null) {
+                    if ($queryLocation === 'params') {
                         $query['placeholder_' . $value] = $options['resourceIds'][$key];
-                    }
-                } else {
-                    if ($value === null) {
-                        $query['query']['placeholders'][$key . 'ResourceId'] = $options['resourceIds'][$key];
                     } else {
                         $query['query']['placeholders'][$value] = $options['resourceIds'][$key];
                     }

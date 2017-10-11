@@ -382,7 +382,7 @@ $controllerConfig = [
         'overrides'=>['<override key and value pairs>'], // overrides passed to the repo
         'transformerSettings'=>['<settings to be passed to the transformer, generally toArray settings>'],
         'resourceIdConversion'=>[ // This lets you set up resource ids passed in the url that are automatically converted to placeholders in the filter from the front end
-            '<placeholder as it appearts in the url string>'=>'<query placeholders or null>'// If null then the placeholder will be automatically converted to: <name from url>ResourceId
+            '<placeholder as it appearts in the url string>'=>'<query placeholders or null>'// If null then the placeholder will not be generated, other wise it will be converted to a placeholder with the name of value
         ]
     ]
 ];
