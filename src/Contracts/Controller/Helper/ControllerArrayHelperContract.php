@@ -14,21 +14,24 @@ use TempestTools\Crud\Contracts\Controller\ControllerContract;
 
 interface ControllerArrayHelperContract extends ArrayHelperContract
 {
+    /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
      * @param array $input
      * @param array $json
+     * @param array $resourceIds
      * @param null $id
      * @return ArrayObject
      */
-    public function transformGetRequest(array $input, array $json, $id = null): ArrayObject;
+    public function transformGetRequest(array $input, array $json, array $resourceIds = [], $id = null): ArrayObject;
 
     /**
      * @param array $input
+     * @param array $resourceIds
      * @param $id
      * @return ArrayObject
      */
-    public function transformNoneGetRequest(array $input, $id = null): ArrayObject;
+    public function transformNoneGetRequest(array $input, array $resourceIds = [], $id = null): ArrayObject;
 
     /**
      * Makes sure the repo is ready to run

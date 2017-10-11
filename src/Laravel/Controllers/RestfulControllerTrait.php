@@ -99,7 +99,7 @@ trait RestfulControllerTrait
     {
 
         try {
-            $settings = $this->getConfigArrayHelper()->transformGetRequest($request->input(), $request->json()->all());
+            $settings = $this->getConfigArrayHelper()->transformGetRequest($request->input(), $request->json()->all(), $request->route()->parameters());
             $repo = $this->getRepo();
             $repo->init($this->getArrayHelper(), $this->getTTPathNoMode(), $this->getTTFallBackNoMode());
             $this->getConfigArrayHelper()->start();
@@ -176,7 +176,7 @@ trait RestfulControllerTrait
     public function show(Request $request, $id=null): JsonResponse
     {
         try {
-            $settings = $this->getConfigArrayHelper()->transformGetRequest($request->input(), $request->json()->all(), $id);
+            $settings = $this->getConfigArrayHelper()->transformGetRequest($request->input(), $request->json()->all(), $request->route()->parameters(), $request->$id);
             $repo = $this->getRepo();
             $repo->init($this->getArrayHelper(), $this->getTTPathNoMode(), $this->getTTFallBackNoMode());
             $this->getConfigArrayHelper()->start();

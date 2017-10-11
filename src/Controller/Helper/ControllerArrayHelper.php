@@ -34,10 +34,11 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
     /**
      * @param array $input
      * @param array $json
+     * @param array $resourceIds
      * @param null $id
      * @return ArrayObject
      */
-    public function transformGetRequest (array $input, array $json, $id = null):ArrayObject
+    public function transformGetRequest (array $input, array $json, array $resourceIds = [], $id = null):ArrayObject
     {
         $id = $id === 'batch'?null:$id;
         $queryLocation = $input['queryLocation'] ?? $id === null?'params':null;
@@ -63,7 +64,8 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
         $controller = $this->getController();
         $controllerOptions = array_replace_recursive($this->getArray()->getArrayCopy(), $controller->getOverrides())??[];
         $overrides = $controllerOptions['overrides'] ?? [];
-
+        $options['resourceIds'] = $options['resourceIds'] ?? [];
+        $options['resourceIds'] = array_replace_recursive($resourceIds, $options['resourceIds']);
         if ($id !== null) {
             $alias = $controllerOptions['alias'] ?? $controller->getRepo()->getEntityAlias();
             $query['query'] = $query['query'] ?? [];
@@ -81,14 +83,17 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
 
     /**
      * @param array $input
+     * @param array $resourceIds
      * @param $id
      * @return ArrayObject
      */
-    public function transformNoneGetRequest (array $input, $id = null):ArrayObject
+    public function transformNoneGetRequest (array $input, array $resourceIds = [], $id = null):ArrayObject
     {
         $id = $id === 'batch'?null:$id;
         $params = $input['params'] ?? [];
         $options = $input['options'] ?? [];
+        $options['resourceIds'] = $options['resourceIds'] ?? [];
+        $options['resourceIds'] = array_replace_recursive($resourceIds, $options['resourceIds']);
         $controller = $this->getController();
         $controllerOptions = array_replace_recursive($this->getArray()->getArrayCopy(), $controller->getOverrides())??[];
         $overrides = $controllerOptions['overrides'] ?? [];

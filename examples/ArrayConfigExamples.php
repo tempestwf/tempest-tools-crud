@@ -421,7 +421,8 @@ $frontEndQuery = [
         'returnCount'=>'<true or false>', // Tested in: testGeneralDataRetrieval
         'limit'=>'<limit>', //Tested in: testGeneralQueryBuilding
         'offset'=>'<offset>', //Tested in: testGeneralQueryBuilding
-        'useGetParams'=>'<true or false>'// whether or not to expect the params to be in get format as illustrated below. Tested in testGeneralQueryBuildingWithGetParams
+        'useGetParams'=>'<true or false>',// whether or not to expect the params to be in get format as illustrated below. Tested in testGeneralQueryBuildingWithGetParams
+        'resourceIds'=>['<an array of resource ids passed to the url>'] // This is automatically populated or appended to by the controller based on parameters passed through the url. This is included for custom logic so such as closures to enforce resource ids passed are appropriate for the given route
     ]
 ];
 
