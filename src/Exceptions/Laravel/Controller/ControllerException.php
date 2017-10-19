@@ -15,7 +15,7 @@ class ControllerException extends \RunTimeException
      * @param string $method
      * @return ControllerException
      */
-    public static function prePersistValidatorFails (string $method): ControllerException
+    public static function methodNotImplemented (string $method): ControllerException
     {
         return new self (sprintf('Error: Method not implemented on controller. method = %s', $method));
     }

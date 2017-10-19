@@ -125,7 +125,7 @@ trait RestfulControllerTrait
      */
     public function create(): JsonResponse
     {
-        throw ControllerException::prePersistValidatorFails('create');
+        throw ControllerException::methodNotImplemented('create');
     }
 
     /**
@@ -199,7 +199,7 @@ trait RestfulControllerTrait
      */
     public function edit(): JsonResponse
     {
-        throw ControllerException::prePersistValidatorFails('edit');
+        throw ControllerException::methodNotImplemented('edit');
     }
 
     /**
