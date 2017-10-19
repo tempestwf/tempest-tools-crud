@@ -144,7 +144,7 @@ trait RestfulControllerTrait
     public function store(Request $request): JsonResponse
     {
         try {
-            $settings = $this->getConfigArrayHelper()->transformNoneGetRequest($request->input());
+            $settings = $this->getConfigArrayHelper()->transformNoneGetRequest($request->input(), $request->route()->parameters());
             $repo = $this->getRepo();
             $repo->init($this->getArrayHelper(), $this->getTTPathNoMode(), $this->getTTFallBackNoMode());
             $this->getConfigArrayHelper()->start();
@@ -219,7 +219,7 @@ trait RestfulControllerTrait
     public function update(Request $request, $id=null): JsonResponse
     {
         try {
-            $settings = $this->getConfigArrayHelper()->transformNoneGetRequest($request->input(), $id);
+            $settings = $this->getConfigArrayHelper()->transformNoneGetRequest($request->input(), $request->route()->parameters(), $id);
             $repo = $this->getRepo();
             $repo->init($this->getArrayHelper(), $this->getTTPathNoMode(), $this->getTTFallBackNoMode());
             $this->getConfigArrayHelper()->start();
@@ -251,7 +251,7 @@ trait RestfulControllerTrait
     public function destroy(Request $request, $id = null): JsonResponse
     {
         try {
-            $settings = $this->getConfigArrayHelper()->transformNoneGetRequest($request->input(), $id);
+            $settings = $this->getConfigArrayHelper()->transformNoneGetRequest($request->input(), $request->route()->parameters(), $id);
             $repo = $this->getRepo();
             $repo->init($this->getArrayHelper(), $this->getTTPathNoMode(), $this->getTTFallBackNoMode());
             $this->getConfigArrayHelper()->start();

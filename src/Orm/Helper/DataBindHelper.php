@@ -497,7 +497,7 @@ class DataBindHelper implements DataBindHelperContract
         $repo = $this->getRepository();
         $evm = $repo->getEventManager();
         /** @noinspection NullPointerExceptionInspection */
-        $repo->getArrayHelper()->wrapArray($params);
+        $params = $repo->getArrayHelper()->wrapArray($params);
         $eventArgs = $repo->makeEventArgs($params, $optionOverrides, $frontEndOptions);
         $eventArgs->getArgs()['action'] = 'create';
 
@@ -570,6 +570,21 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
+     * @param array $array
+     * @return array
+     */
+    protected function wrapArray(array $array):array
+    {
+        $needsWrapping = false;
+        foreach ($array as $key => $value) {
+            if (!is_array($value)) {
+                $needsWrapping = true;
+                break;
+            }
+        }
+        return $needsWrapping === true?[$array]:$array;
+    }
+    /**
      * @param array $params
      * @param array $optionOverrides
      * @param array $frontEndOptions
@@ -586,7 +601,7 @@ class DataBindHelper implements DataBindHelperContract
         $repo = $this->getRepository();
         $evm = $repo->getEventManager();
         /** @noinspection NullPointerExceptionInspection */
-        $repo->getArrayHelper()->wrapArray($params);
+        $params = $this->wrapArray($params);
         $eventArgs = $repo->makeEventArgs($params, $optionOverrides, $frontEndOptions);
         $eventArgs->getArgs()['action'] = 'update';
 
@@ -663,7 +678,7 @@ class DataBindHelper implements DataBindHelperContract
     {
         $repo = $this->getRepository();
         /** @noinspection NullPointerExceptionInspection */
-        $repo->getArrayHelper()->wrapArray($params);
+        $params = $this->wrapArray($params);
         $eventArgs = $repo->makeEventArgs($params, $optionOverrides, $frontEndOptions);
         $eventArgs->getArgs()['action'] = 'delete';
         $evm = $repo->getEventManager();
