@@ -127,6 +127,7 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
     {
         if (isset($controllerOptions['resourceIdConversion']) === true) {
             if ($queryLocation !== 'params') {
+                $query['query'] = $query['query'] ??[];
                 $query['query']['placeholders'] = $query['query']['placeholders'] ?? [];
             }
             /**

@@ -226,7 +226,8 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
             'optionOverrides'=>$optionOverrides,
             'frontEndOptions'=>$frontEndOptions,
             'qb'=>$qb,
-            'helper'=>$this
+            'queryHelper'=>$this,
+            'arrayHelper'=>$arrayHelper
         ];
         $config = $this->getArray()['read']['permissions'] ?? [];
         $extra['params'] = $this->processSettings(null, $params, $arrayHelper, $config, $extra)[1];
