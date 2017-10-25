@@ -16,7 +16,7 @@ class DataBindHelper implements DataBindHelperContract
 {
     use RepositoryTrait;
 
-    const IGNORE_KEYS = ['assignType', 'chainType'];
+    const IGNORE_KEYS = ['assignType', 'chainType', 'id'];
 
     const PRE_POPULATED_ENTITIES_KEY = 'prePopulatedEntities';
 
@@ -283,6 +283,7 @@ class DataBindHelper implements DataBindHelperContract
         /** @var array $paramsForEntities */
         foreach ($paramsForEntities as $key=>$paramsForEntity) {
             $paramsForEntity['chainType'] = $chainType;
+            $paramsForEntity['id'] = $key;
             $paramsForEntities[$key] = $entity->processAssociationParams($associationName, $paramsForEntity);
         }
         return $paramsForEntities;

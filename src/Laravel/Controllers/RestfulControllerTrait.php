@@ -182,7 +182,7 @@ trait RestfulControllerTrait
             $this->getConfigArrayHelper()->start();
             event(new PreShow($settings));
             $result = $repo->read($settings['query'], $settings['frontEndOptions'], $settings['overrides']);
-            $settings['result'] = $result;
+            $settings['result'] = $result['result'];
             event(new PostShow($settings));
         } catch (Exception $e) {
             $this->getConfigArrayHelper()->stop(true);

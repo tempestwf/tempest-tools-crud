@@ -25,6 +25,7 @@ class ArrayToAssociationPropertyBuilder implements ArrayToAssociationPropertyBui
      * @param array $params
      * @param mixed $fieldSetting
      * @return mixed
+     * @throws \RuntimeException
      * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
      */
     public function enforce(ArrayHelperContract $arrayHelper, string $fieldName, array $values, array $params, $fieldSetting)
