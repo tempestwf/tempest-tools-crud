@@ -467,6 +467,89 @@ abstract class CrudTestBaseAbstract extends \TestCase
         ];
     }
 
+
+
+    /**
+     * @return array
+     */
+    protected function makeTestFrontEndQueryArtist3(): array
+    {
+        return [
+            'query'=>[
+                'where'=>[
+                    [
+                        'type'=>'and',
+                        'operator'=>'andX',
+                        'conditions'=>[
+                            [
+                                'field'=>'t.name',
+                                'operator'=>'neq',
+                                'arguments'=>['BEEFOVEN']
+                            ],
+                            [
+                                'field'=>'t.name',
+                                'operator'=>'neq',
+                                'arguments'=>['Bob Marley']
+                            ],
+                            [
+                                'field'=>'t.name',
+                                'operator'=>'eq',
+                                'arguments'=>['Brahms']
+                            ]
+                        ]
+                    ],
+                    [
+                        'type'=>'and',
+                        'operator'=>'andX',
+                        'conditions'=>[
+                            [
+                                'field'=>'t.name',
+                                'operator'=>'neq',
+                                'arguments'=>['Urethra Franklin']
+                            ],
+                            [
+                                'field'=>'t.name',
+                                'operator'=>'neq',
+                                'arguments'=>['Khaaan!!']
+                            ]
+                        ]
+                    ],
+                    [
+                        'field'=>'t.name',
+                        'type'=>'and',
+                        'operator'=>'neq',
+                        'arguments'=>['Gossepi the squid']
+                    ],
+                ],
+                'having'=>[
+                    [
+                        'field'=>'t.id',
+                        'type'=>'or',
+                        'operator'=>'neq',
+                        'arguments'=>[0]
+                    ],
+                    [
+                        'field'=>'t.id',
+                        'type'=>'or',
+                        'operator'=>'neq',
+                        'arguments'=>[0]
+                    ],
+                ],
+                'placeholders'=>[
+                    'frontEndTestPlaceholder'=>[
+                        'value'=>777,
+                        'type'=>'integer'
+                    ],
+                    'frontEndTestPlaceholder2'=>[
+                        'value'=>'stuff2',
+                        'type'=>'string'
+                    ]
+                ]
+            ]
+        ];
+    }
+
+
     /**
      * @return string
      */
