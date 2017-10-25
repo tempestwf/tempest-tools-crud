@@ -149,10 +149,11 @@ trait RestfulControllerTrait
             $repo->init($this->getArrayHelper(), $this->getTTPathNoMode(), $this->getTTFallBackNoMode());
             $this->getConfigArrayHelper()->start();
             event(new PreStore($settings));
+            $isNumeric = $this->getArrayHelper()->isNumeric($settings['params']);
             $result = $repo->create($settings['params'], $settings['overrides'], $settings['frontEndOptions']);
             $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
             $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
-            $settings['result'] = count($settings['result']) > 1?$settings['result']:$settings['result'][0];
+            $settings['result'] = $isNumeric?$settings['result']:$settings['result'][0];
             event(new PostStore($settings));
         } catch (Exception $e) {
             $this->getConfigArrayHelper()->stop(true);
