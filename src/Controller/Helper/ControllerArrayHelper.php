@@ -41,7 +41,7 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
     public function transformGetRequest (array $input, array $json, array $resourceIds = [], $id = null):ArrayObject
     {
         $id = $id === 'batch'?null:$id;
-        $queryLocation = $input['queryLocation'] ?? $id === null?'params':null;
+        $queryLocation = $input['queryLocation'] ?? 'params';
         [$query, $options] = $this->paramsToParamsAndOptions($input, $json, $queryLocation);
         $controller = $this->getController();
         $controllerOptions = array_replace_recursive($this->getArray()->getArrayCopy(), $controller->getOverrides())??[];
@@ -99,13 +99,15 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
         switch ($queryLocation) {
             case 'body':
                 $params = $json;
-                $query = $params['query'];
-                $options = $params['options'];
+                $query = $params['query'] ?? [];
+                $query = ['query'=>$query];
+                $options = $params['options'] ?? [];
                 break;
             case 'singleParam':
-                $params = json_decode($input['query'], true);
-                $query = $params['query'];
-                $options = $params['options'];
+                $params = json_decode($input['query'] ?? [], true);
+                $query = $params['query'] ?? [];
+                $query = ['query'=>$query];
+                $options = $params['options'] ?? [];
                 break;
             case 'params':
                 $query = $input;
