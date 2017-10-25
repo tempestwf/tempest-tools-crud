@@ -159,7 +159,7 @@ trait RestfulControllerTrait
             $this->getConfigArrayHelper()->stop(true);
             throw $e;
         }
-        return response()->json($settings['result']);
+        return response()->json($settings['result'],JsonResponse::HTTP_CREATED);
     }
 
     /**
