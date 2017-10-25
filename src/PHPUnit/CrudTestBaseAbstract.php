@@ -408,6 +408,11 @@ abstract class CrudTestBaseAbstract extends \TestCase
                                 'field'=>'t.name',
                                 'operator'=>'neq',
                                 'arguments'=>['Bob Marley']
+                            ],
+                            [
+                                'field'=>'t.name',
+                                'operator'=>'in',
+                                'arguments'=>[['Brahms', 'BEETHOVEN', 'BACH']]
                             ]
                         ]
                     ],
