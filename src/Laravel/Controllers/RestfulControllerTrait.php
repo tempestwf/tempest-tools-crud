@@ -152,6 +152,7 @@ trait RestfulControllerTrait
             $result = $repo->create($settings['params'], $settings['overrides'], $settings['frontEndOptions']);
             $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
             $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
+            $settings['result'] = count($settings['result']) > 1?$settings['result']:$settings['result'][0];
             event(new PostStore($settings));
         } catch (Exception $e) {
             $this->getConfigArrayHelper()->stop(true);
@@ -182,7 +183,7 @@ trait RestfulControllerTrait
             $this->getConfigArrayHelper()->start();
             event(new PreShow($settings));
             $result = $repo->read($settings['query'], $settings['frontEndOptions'], $settings['overrides']);
-            $settings['result'] = $result['result'];
+            $settings['result'] = $result['result'][0];
             event(new PostShow($settings));
         } catch (Exception $e) {
             $this->getConfigArrayHelper()->stop(true);
@@ -227,6 +228,7 @@ trait RestfulControllerTrait
             $result = $repo->update($settings['params'], $settings['overrides'], $settings['frontEndOptions']);
             $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
             $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
+            $settings['result'] = $id === 'batch'?$settings['result']:$settings['result'][0];
             event(new PostUpdate($settings));
         } catch (Exception $e) {
             $this->getConfigArrayHelper()->stop(true);
@@ -259,6 +261,7 @@ trait RestfulControllerTrait
             $result = $repo->delete($settings['params'], $settings['overrides'], $settings['frontEndOptions']);
             $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
             $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
+            $settings['result'] = $id === 'batch'?$settings['result']:$settings['result'][0];
             event(new PostDestroy($settings));
         } catch (Exception $e) {
             $this->getConfigArrayHelper()->stop(true);
