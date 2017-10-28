@@ -454,15 +454,17 @@ $exampleFrontEndNonGetRequest = [
 // Complex types of params execute more quickly but are less pretty to look at and write.
 // Note: Create requests are structures a little differently than update, or delete requests.
 // Note: When a relation is set to null then an assignType of setNull is used internally which calls the set method with a null value
-$createSingleParamForField = [ // You may have as many field names and values as you like in your request, one is shown in the example for illustration. Tested in CudTest.php
+$singleParamForField = [ // You may have as many field names and values as you like in your request, one is shown in the example for illustration. Tested in CudTest.php
     '<string>'=>'<mixed>', // If a field name is specified as a key then the value will be the value that the field will be set to. Tested in CudTest.php
 ];
 
-$createSingleParamForAssociation = [ //You may have as many field names and values as you like in your request, one is shown in the example for illustration. Tested in CudTest.php
+$singleParamForAssociation = [ //You may have as many field names and values as you like in your request, one is shown in the example for illustration. Tested in CudTest.php
     '<string>'=>[ // The key is the association name. A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association. // Tested in CudTest.php
-        '<create | update | delete | read>'=>[ // chainType can be: create, update, delete, read. This triggers another entity to be created, retrieved and manipulated to be added to this association. Tested in CudTest.php
-            '<string>'=>'<mixed>', // This is a reference to another field or association. Tested in CudTest.php
-            'assignType'=>'<set|add|remove|setSingle|addSingle|removeSingle|null(in quotes)|setNull>' // any time single is at the end of the assign type, then we strip the s off the end of the association name before calling the method. For instance if you have an association of users, but you have a method of addUser you need use an assignType of addSingle. // Tested in CudTest.php
+        '<create | read | update | delete>'=>[ // This key is the chainType. chainType can be: create, update, delete, read. This triggers another entity to be created, retrieved and manipulated to be added to this association. Tested in CudTest.php
+            '<string|int|null>'=>[ // If you are chaining with a create chain type, omit the key. For another other chain type the key references the id of the entity to be retrieved from the database and manipulated.
+                '<string>'=>'<mixed>', // This is a reference to another field or association. Tested in CudTest.php
+                'assignType'=>'<set|add|remove|setSingle|addSingle|removeSingle|null(in quotes)|setNull|null>' // This is the assignment type that the entity will assigned to the association using. It corresponds to the method on the entity that will be called (IE: set<string> where string is the field name to set, such as setName). If null set will be used. Any time single is at the end of the assign type, then we strip the s off the end of the association name before calling the method. For instance if you have an association of users, but you have a method of addUser you need use an assignType of addSingle. // Tested in CudTest.php
+            ]
         ]
     ]
 ];
@@ -474,32 +476,7 @@ $createBatchParams = [ // Tested in CudTest.php
     ]
 ];
 
-//
-$singleParams = [ // id will be passed as a separate argument // Tested in CudTest.php
-    '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
-    '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association. // Tested in CudTest.php
-        '<chainType>'=>[ // chainType can be: create, update, delete, read // Tested in CudTest.php
-            '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
-            'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle, null (in quotes), setNull>' // Tested in CudTest.php
-        ]
-    ]
-];
-
-$batchParams = [ // Tested in CudTest.php
-    [
-        [
-            '<id of entity>' => [ // Tested in CudTest.php
-                '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
-                '<associationName>'=>[ // A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association. // Tested in CudTest.php
-                    '<chainType>'=>[ // chainType can be: create, update, delete, read // Tested in CudTest.php
-                        '<fieldName>'=>'<fieldValue>', // Tested in CudTest.php
-                        'assignType'=>'<set, add, or remove, or setSingle, addSingle, removeSingle, null (in quotes), setNull>' // Tested in CudTest.php
-                    ]
-                ]
-            ]
-        ]
-    ]
-];
+//TODO: Put in examples
 
 // simplified Param Syntax for Create Update and Delete. To active pass a front end option of 'simplifiedParams'=>true
 // Top level examples:
@@ -562,9 +539,6 @@ $singleAssociationDelete = [
         ],
     ]
 ];
-
-
-
 
 $multipleAssociationCreate = [
     [
