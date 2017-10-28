@@ -111,8 +111,10 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
         $frontEndOptions = $settings['frontEndOptions'] ?? [];
         $completeness = $frontEndOptions['toArray']['completeness'] ?? 'full';
         $maxDepth  = $frontEndOptions['toArray']['maxDepth'] ?? null;
+        $maxDepth = (int)$maxDepth;
         $excludeKeys = $frontEndOptions['toArray']['excludeKeys'] ?? [];
         $allowOnlyRequestedParams = $frontEndOptions['toArray']['allowOnlyRequestedParams'] ?? true;
+        $allowOnlyRequestedParams = (bool)$allowOnlyRequestedParams;
         $forceIncludeKeys = $frontEndOptions['toArray']['forceIncludeKeys'] ?? ['id'];
         $boundParams = $entity->getBindParams() ?? [];
 

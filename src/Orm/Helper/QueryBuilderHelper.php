@@ -108,6 +108,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     protected function convertGetParams(array $params, array $frontEndOptions):array
     {
         $convert = $frontEndOptions['useGetParams']??false;
+        $convert = (bool)$convert;
         if ($convert === true) {
             return $this->doConvertGetParams($params, $frontEndOptions);
         }
@@ -275,6 +276,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
         $paginate = $this->findSetting([$options, $optionOverrides], 'paginate');
         $fetchJoin = $this->findSetting([$options, $optionOverrides], 'fetchJoin');
         $returnCount = $frontEndOptions['returnCount'] ?? static::DEFAULT_RETURN_COUNT;
+        $returnCount = (bool)$returnCount;
         $hydrate = $this->findSetting([$options, $optionOverrides], 'hydrate');
         /** @noinspection NullPointerExceptionInspection */
         $fetchJoin = $fetchJoin !== null ? $this->getRepository()->getArrayHelper()->parse($fetchJoin, $extra): static::DEFAULT_FETCH_JOIN;

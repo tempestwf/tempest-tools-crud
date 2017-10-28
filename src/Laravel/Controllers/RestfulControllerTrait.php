@@ -151,7 +151,7 @@ trait RestfulControllerTrait
             event(new PreStore($settings));
             $isNumeric = $this->getArrayHelper()->isNumeric($settings['params']);
             $result = $repo->create($settings['params'], $settings['overrides'], $settings['frontEndOptions']);
-            $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
+            $transformerSettings = $this->getTransformerSettings($settings);
             $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
             $settings['result'] = $isNumeric?$settings['result']:$settings['result'][0];
             event(new PostStore($settings));
@@ -161,6 +161,7 @@ trait RestfulControllerTrait
         }
         return response()->json($settings['result'],JsonResponse::HTTP_CREATED);
     }
+
 
     /**
      * Display the specified resource.
@@ -227,7 +228,7 @@ trait RestfulControllerTrait
             $this->getConfigArrayHelper()->start();
             event(new PreUpdate($settings));
             $result = $repo->update($settings['params'], $settings['overrides'], $settings['frontEndOptions']);
-            $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
+            $transformerSettings = $this->getTransformerSettings($settings);
             $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
             $settings['result'] = $id === 'batch'?$settings['result']:$settings['result'][0];
             event(new PostUpdate($settings));
@@ -260,7 +261,7 @@ trait RestfulControllerTrait
             $this->getConfigArrayHelper()->start();
             event(new PreDestroy($settings));
             $result = $repo->delete($settings['params'], $settings['overrides'], $settings['frontEndOptions']);
-            $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
+            $transformerSettings = $this->getTransformerSettings($settings);
             $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
             $settings['result'] = $id === 'batch'?$settings['result']:$settings['result'][0];
             event(new PostDestroy($settings));
@@ -291,6 +292,15 @@ trait RestfulControllerTrait
         }
     }
 
+    /**
+     * @param ArrayObject $settings
+     * @return array
+     */
+    protected function getTransformerSettings(ArrayObject $settings):array {
+        $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
+        $transformerSettings['frontEndOptions'] = array_replace_recursive($transformerSettings['frontEndOptions'], $settings['frontEndOptions']);
+        return $transformerSettings;
+    }
 
     /**
      * @return RepositoryContract

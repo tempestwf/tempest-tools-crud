@@ -98,6 +98,7 @@ class DataBindHelper implements DataBindHelperContract
         ], 'clearPrePopulatedEntitiesOnFlush');
 
         $testMode = $frontEndOptions['testMode'] ?? false;
+        $testMode = (bool)$testMode;
 
         if ($failure === false && $flush === true) {
             /** @noinspection NullPointerExceptionInspection */
@@ -815,6 +816,7 @@ class DataBindHelper implements DataBindHelperContract
     protected function convertSimpleParams(array $params, array $frontEndOptions):array
     {
         $convert = $frontEndOptions['simplifiedParams']??false;
+        $convert = (bool)$convert;
         if ($convert === true) {
             return $this->doConvertSimpleParams($params, true);
         }
