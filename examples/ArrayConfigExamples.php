@@ -256,9 +256,9 @@ $entityConfig = [
                         'set'=>'<boolean|null>', // Defaults to permissive setting. set<fieldname> method allowed or not. Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
                         'add'=>'<boolean|null>', // Defaults to permissive setting. add<fieldname> method allowed or not. Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
                         'remove'=>'<boolean|null>', // Defaults to permissive setting. remove<fieldname> method allowed or not. Tested in: testChainRemove
-                        'setSingle'=>'<boolean|null>', // Defaults to permissive setting. set<fieldname>. Works like set but changes pluralized field names to singular. method allowed or not. Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
-                        'addSingle'=>'<boolean|null>', // Defaults to permissive setting. add<fieldname>. Works like add but changes pluralized field names to singular.Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
-                        'removeSingle'=>'<boolean|null>', // Defaults to permissive setting. remove<fieldname>. Works like remove but changes pluralized field names to singular.Tested in: testChainRemove
+                        'setSingle'=>'<boolean|null>', // Defaults to permissive setting. set<fieldname> method allowed or not. Works like set but changes pluralized field names to singular. method allowed or not. Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
+                        'addSingle'=>'<boolean|null>', // Defaults to permissive setting. add<fieldname> method allowed or not. Works like add but changes pluralized field names to singular.Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
+                        'removeSingle'=>'<boolean|null>', // Defaults to permissive setting. remove<fieldname> method allowed or not. Works like remove but changes pluralized field names to singular.Tested in: testChainRemove
                         'null'=>'<boolean|null>', // Defaults to permissive setting. null assign types tell the system not to assign the entity that is manipulated. This is useful when an entity is already associated with another entity, but you want to interact with that entity any way. Tested in: testNullAssignType. Whether or not having no assign type is allowed.
                         'setNull'=>'<boolean|null>' // Defaults to permissive setting. This assign type sets a field to null.
                     ],
@@ -298,7 +298,7 @@ $controllerConfig = [
             'transaction'=>'<boolean|null>', // Whether or not an additional transactions should be started at the controller level. This is useful if you mean to call one more than 1 repo in the controller using events.
             'overrides'=>['<array|null>'], // Overrides passed to the repo that will override the default options set on the repo.
             'transformerSettings'=>[ // Can be null to disable the block. Settings to be passed to the transformer, generally toArray settings. Tested in testToArrayArrayStorage and as part of all transformation tests
-                'defaultMode'=>'<create | read | update | delete | null>', // Defaults to 'read'. This is the mode that will be initiated on the entity if no mode is currently active on the entity being transformed
+                'defaultMode'=>'<"create" | "read" | "update" | "delete" | null>', // Defaults to 'read'. This is the mode that will be initiated on the entity if no mode is currently active on the entity being transformed
                 'defaultArrayHelper'=>'<\TempestTools\Common\Contracts\ArrayHelperContract | null>',// If no array helper is set for the entity already this one will be used.
                 'defaultPath'=>['<array|null>'],// A contextual config path. If no path is set for the entity already this will be used
                 'defaultFallBack'=>['array|null>'], // A contextual config path. If no fall back is set for the entity already this will be used
@@ -478,10 +478,10 @@ $singleParamForField = [ // You may have as many field names and values as you l
 
 $singleParamForAssociation = [ //You may have as many field names and values as you like in your request, one is shown in the example for illustration. Tested in CudTest.php
     '<string>'=>[ // The key is the association name. A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association. // Tested in CudTest.php
-        '<"create" | "read" | "update" | "delete">'=>[ // This key is the chainType. chainType can be: create, update, delete, read. This triggers another entity to be created, retrieved and manipulated to be added to this association. Tested in CudTest.php
-            '<string|int|null>'=>[ // If you are chaining with a create chain type, omit the key. For another other chain type the key references the id of the entity to be retrieved from the database and manipulated.
-                '<string>'=>'<mixed>', // This is a reference to another field or association. Tested in CudTest.php
-                'assignType'=>'<"set"|"add"|"remove"|"setSingle"|"addSingle"|"removeSingle"|"null"|"setNull"|null>' // This is the assignment type that the entity will assigned to the association using. It corresponds to the method on the entity that will be called (IE: set<string> where string is the field name to set, such as setName). If null set will be used. Any time single is at the end of the assign type, then we strip the s off the end of the association name before calling the method. For instance if you have an association of users, but you have a method of addUser you need use an assignType of addSingle. // Tested in CudTest.php
+        '<"create" | "read" | "update" | "delete">'=>[ // Optional This key is the chainType. chainType can be: create, update, delete, read. This triggers another entity to be created, retrieved and manipulated to be added to this association. Tested in CudTest.php
+            '<string|int|null>'=>[ // If you are chaining with a create chain type, omit the key. For any other chain type the key references the id of the entity to be retrieved from the database and manipulated.
+                '<string>'=>'<mixed>', // Optional. This is a reference to another field or association. Tested in CudTest.php
+                'assignType'=>'<"set"|"add"|"remove"|"setSingle"|"addSingle"|"removeSingle"|"null"|"setNull"|null>' // Defaults to set. This is the assignment type that the entity will assigned to the association using. It corresponds to the method on the entity that will be called (IE: set<string> where string is the field name to set, such as setName). If null set will be used. Any time single is at the end of the assign type, then we strip the s off the end of the association name before calling the method. For instance if you have an association of users, but you have a method of addUser you need use an assignType of addSingle. // Tested in CudTest.php
             ]
         ]
     ]
@@ -494,76 +494,165 @@ $createBatchParams = [ // Tested in CudTest.php
     ]
 ];
 
-//TODO: Put in examples
-
-// simplified Param Syntax for Create Update and Delete. To active pass a front end option of 'simplifiedParams'=>true
-// Top level examples:
-$creates = [ // Note lack of id triggers create
-    [
-        '<fieldName>'=>'<fieldValue>',
+$nonCreateBatchParams = [ // Tested in CudTest.php
+    '<string|int|null>'=>[ // If you are chaining with a create chain type, omit the key. For any other chain type the key references the id of the entity to be retrieved from the database and manipulated.
+        '<string>'=>'<mixed>',
     ]
 ];
 
-$updates = [ // Id triggers an update when there is another field referenced
+// Note: All following examples use the following Entities:
+//  Album
+//      with a ManyToOne association to Artist
+//      with a ManyToMany association to User
+//  Artist
+//      with a oneToMany association to Album
+//  User
+//      with a ManyToMany association to Album
+
+
+// Example: Create an album in a batch request using POST, chain a new artist on to it, and assign an existing user to the album:
+/*{
+    "params": [{
+        "name": "BEETHOVEN: THE COMPLETE PIANO SONATAS",
+		"releaseDate": "2017-10-31 01:43:01",
+		"artist": {
+            "create": [{
+                "name": "BEETHOVEN",
+				"assignType": "set"
+			}]
+		},
+		"users": {
+            "read": {
+                "1": {
+                    "assignType": "addSingle"
+				}
+			}
+		}
+	}]
+}*/
+
+// Example: update artist with an id of 1, then update an album with an id of one to have a new name as well, using a PUT request.
+
+/*{
+    "params": {
+        "1": {
+            "name": "The artist formerly known as BEETHOVEN",
+			"albums": {
+                "update": {
+                    "1": {
+                        "name": "Kick Ass Piano Solos!"
+					}
+				}
+			}
+		}
+	}
+}*/
+
+// Example: Remove an album from an artist as part of an update request
+
+/*
+ {
+	"params": {
+		"1": {
+			"albums": {
+				"update": {
+					"1": {
+						"assignType": "removeSingle"
+					}
+				}
+			}
+		}
+	}
+}
+ */
+
+// Example: With a DELETE request remove a artist and an album related to it
+/*
+ {
+	"params": {
+		"1": {
+			"albums": {
+				"delete": {
+					"1": {
+						"assignType": "removeSingle"
+					}
+				}
+			}
+		}
+	}
+}
+ */
+
+// Simplified Param Syntax for Create Update and Delete. To active pass a front end option of 'simplifiedParams'=>true
+
+$creates = [ // Note lack of id triggers create
     [
-        'id'=>'<id of entiy>',
-        '<fieldName>'=>'<fieldValue>',
+        '<string>'=>'<mixed>', // Field name and value to set it to too. Can also be a association with an array of data relating to the association.
+    ]
+];
+
+$updates = [ // Including an id triggers an update when there is another field referenced
+    [
+        'id'=>'<string|int>', // The id of the entity being accessed.
+        '<string>'=>'<mixed>', // Field name and value to set it to too. Can also be a association with an array of data relating to the association.
     ]
 ];
 
 $deletes = [
     [
-        'id'=>'<id of entiy>',
+        'id'=>'<string|int>', // The id of the entity being accessed.
     ]
 ];
 
 
-// Chaining examples, not that these are all chains from inside a update action
+// Chaining Examples:
+// Note: these are all chains from inside a update action
 
 $singleAssociationCreate = [
     [
-        'id'=>'<id of entity>',
-        '<associationName>'=>[ // Note the lack of the id triggers the create
-            '<fieldName>'=>'<fieldValue>',
+        'id'=>'<string|int>', // The id of the entity being accessed.
+        '<string>'=>[ //Association name. Note the lack of the id triggers the create. This automatically triggers an assignType='set' (used with *ToOne type relationships). If you included an array of arrays it would trigger a assignType=addSingle (used with *ToMany relationships)
+            '<string>'=>'<mixed>', // Field name and value to set it to too. Can also be a association with an array of data relating to the association.
         ],
     ]
 ];
 
 $singleAssociationUpdate = [
     [
-        'id'=>'<id of entiy>',
-        '<associationName>'=>[ // Note the id and the field means it's an update
-            'id'=>'<id of entiy>',
-            '<fieldName>'=>'<fieldValue>',
+        'id'=>'<string|int>', // The id of the entity being accessed.
+        '<string>'=>[ //Association name. Note the id and the field means it's an update
+            'id'=>'<string|int>', // The id of the entity being accessed.
+            '<string>'=>'<mixed>', // Field name and value to set it to too. Can also be a association with an array of data relating to the association.
         ],
     ]
 ];
 
 $singleAssociationRead = [
     [
-        'id'=>'<id of entiy>',
-        '<associationName>'=>[ // Note the just using the id triggers a read and then assigns the entity to the association
-            'id'=>'<id of entiy>',
+        'id'=>'<string|int>', // The id of the entity being accessed.
+        '<string>'=>[ //Association name. Note  just using the id triggers a read and then assigns the entity to the association
+            'id'=>'<string|int>', // The id of the entity being accessed.
         ],
     ]
 ];
 
 $singleAssociationDelete = [
     [
-        'id'=>'<id of entiy>',
-        '<associationName>'=>[ // Note that specifying chain type delete triggers a delete
-            'id'=>'<id of entiy>',
-            'chainType'=>'delete'
+        'id'=>'<string|int>', // The id of the entity being accessed.
+        '<string>'=>[ //Association name. Note that specifying chainType=delete triggers a delete
+            'id'=>'<string|int>', // The id of the entity being accessed.
+            'chainType'=>'delete' // This instructs Scribe to delete the associated entity.
         ],
     ]
 ];
 
+// When you are chaining to a *ToMany relationship you use an array of arrays to trigger a addSingle assign type.
 $multipleAssociationCreate = [
     [
-        'id'=>'<id of entity>',
-        '<associationName>'=>[
-            [ // Note the lack of the id triggers the create. These will automatically be added to the association with the same assignment behaviour as assignType=>addSingle
-                '<fieldName>'=>'<fieldValue>',
+        'id'=>'<string|int>', // The id of the entity being accessed.
+        '<string>'=>[ //Association name. Note the lack of the id triggers the create. These will automatically be added to the association with the same assignment behaviour as assignType=>addSingle
+            [
+                '<string>'=>'<mixed>', // Field name and value to set it to too. Can also be a association with an array of data relating to the association.
             ],
         ]
     ]
@@ -571,11 +660,11 @@ $multipleAssociationCreate = [
 
 $multipleAssociationUpdate = [
     [
-        'id'=>'<id of entiy>',
-        '<associationName>'=>[
-            [ // Note the id and the field means it's an update. These will automatically be added to the association with the same assignment behaviour as assignType=>addSingle
-                'id'=>'<id of entiy>',
-                '<fieldName>'=>'<fieldValue>',
+        'id'=>'<string|int>', // The id of the entity being accessed.
+        '<string>'=>[ //Association name. Note the id and the field means it's an update. These will automatically be added to the association with the same assignment behaviour as assignType=>addSingle
+            [
+                'id'=>'<string|int>', // The id of the entity being accessed.
+                '<string>'=>'<mixed>', // Field name and value to set it to too. Can also be a association with an array of data relating to the association.
             ],
         ]
     ]
@@ -583,10 +672,10 @@ $multipleAssociationUpdate = [
 
 $singleAssociationRead = [
     [
-        'id'=>'<id of entiy>',
-        '<associationName>'=>[ // Note, just putting an id here, instead of an array will trigger the same behaviour and is simplier still thank this example
-            [ // Note the just using the id triggers a read and then assigns the entity to the association. These will automatically be added to the association with the same assignment behaviour as assignType=>addSingle
-                'id'=>'<id of entiy>',
+        'id'=>'<string|int>', // The id of the entity being accessed.
+        '<string>'=>[ //Association name. Note the just using the id triggers a read and then assigns the entity to the association. These will automatically be added to the association with the same assignment behaviour as assignType=>addSingle
+            [
+                'id'=>'<string|int>',
             ],
         ]
     ]
@@ -594,18 +683,18 @@ $singleAssociationRead = [
 
 $singleAssociationReadSimplierStill = [
     [
-        'id'=>'<id of entiy>',
-        '<associationName>'=>'<id of entity>' // simplified version of the above example
+        'id'=>'<string|int>', // The id of the entity being accessed.
+        '<string>'=>'<string|int>' // With the key as the association name and the value as an id it will automatically read the associated entity. This is simplified version of the above example
     ]
 ];
 
 $singleAssociationDelete = [
     [
-        'id'=>'<id of entiy>',
-        '<associationName>'=>[
-            [ // Note that specifying chain type delete triggers a delete. These will automatically be added to the association with the same assignment behaviour as assignType=>addSingle
-                'id'=>'<id of entiy>',
-                'chainType'=>'delete'
+        'id'=>'<string|int>', // The id of the entity being accessed.
+        '<string>'=>[ //Association name. Note that specifying chain type delete triggers a delete. These will automatically be added to the association with the same assignment behaviour as assignType=>addSingle
+            [
+                'id'=>'<string|int>', // The id of the entity being accessed.
+                'chainType'=>'delete' // This instructs Scribe to delete the associated entity.
             ],
         ]
     ]
@@ -614,12 +703,118 @@ $singleAssociationDelete = [
 // Any update, read or delete chain can cause the entity referenced to be removed instead of added to the association by using 'assignType'=>'removeSingle'. You can also use 'remove' if you have a plural in the name of your method on the entity -- IE: removeUser vs removeUsers
 $singleAssociationRead = [
     [
-        'id'=>'<id of entiy>',
-        '<associationName>'=>[ // Note, just putting an id here, instead of an array will trigger the same behaviour and is simplier still thank this example
-            [ // Note the just using the id triggers a read and then assigns the entity to the association. These will automatically be added to the association with the same assignment behaviour as assignType=>addSingle
-                'id'=>'<id of entiy>',
-                'assignType'=>'removeSingle'
+        'id'=>'<string|int>', // The id of the entity being accessed.
+        '<string>'=>[  //Association name. Note the just using the id triggers a read and then assigns the entity to the association. These will automatically be added to the association with the same assignment behaviour as assignType=>addSingle
+            [
+                'id'=>'<string|int>', // The id of the entity being accessed.
+                'assignType'=>'removeSingle' // This triggers script to remove the associated entity form it's parent.
             ],
         ]
     ]
 ];
+
+// Some times you want to update an entity through an association, but you don't want to trigger any assignType (because if you trigger an assignType you will be adding the same entity to an association it already exists in).
+$multipleAssociationUpdateWithOutAddingIt = [
+    [
+        'id'=>'<string|int>', // The id of the entity being accessed.
+        '<string>'=>[ //Association name. Note the id and the field means it's an update. These will automatically be added to the association with the same assignment behaviour as assignType=>addSingle
+            [
+                'id'=>'<string|int>', // The id of the entity being accessed.
+                '<string>'=>'<mixed>', // Field name and value to set it to too. Can also be a association with an array of data relating to the association.
+                'assignType'=>'null' // This causes the entity to be updated, but not assigned to the parent entity through the association.
+            ],
+        ]
+    ]
+];
+
+// Examples:
+
+// Example with a POST request create an artist, and album via chaining. Notice that whether or not you are doing a batch request is automatically detected when you use a POST. This example shows the end point will see this is not a batch request (since it only has 1 artist being created).
+// The url might look like: /artists
+/*
+{
+	"params": {
+		"name": "Test Artist",
+		"albums": [{
+			"name": "Test Album",
+			"releaseDate": "2017-10-31 01:43:01"
+		}]
+	},
+	"options": {
+		"simplifiedParams": true
+	}
+}
+ */
+
+// Example with PUT request. Update a album to have a new name, and then remove a user from it via chaining. This would be done via a batch request.
+// The url might look like: /albums/batch
+/*
+{
+	"params": [{
+		"id": 1,
+		"name": "Name Redacted",
+		"users": [{
+			"id": 1,
+			"assignType": "removeSingle"
+		}]
+	}],
+	"options": {
+		"simplifiedParams": true
+	}
+}
+ */
+
+// Example with PUT request. Update an album, and update it's user, with out triggering an assignType=addSingle that would try to add the user back onto the album a second time.
+// The url might look like: /albums/batch
+/*
+{
+	"params": [{
+		"id": 1,
+		"name": "Name Redacted",
+		"users": [{
+			"id": 1,
+            "name":"Your name is Dave now",
+			"assignType": "null"
+		}]
+	}],
+	"options": {
+		"simplifiedParams": true
+	}
+}
+
+// Example with PUT request. You can access a single resource by including it's id in the url and providing params for just 1 resource and not putting the id in the params. Here is another way to trigger the same behaviour demonstrated above.
+// The url might look like: /albums/1
+// Note that in the same manner you can batch PUT requests, or have them access a single resource you can do the same with DELETE requests.
+
+/*
+{
+	"params": {
+		"name": "Name Redacted",
+		"users": [{
+			"id": 1,
+			"assignType": "removeSingle"
+		}]
+	},
+	"options": {
+		"simplifiedParams": true
+	}
+}
+ */
+
+// Example with a DELETE request. Delete a album and the artist it is associate with
+// The url might look like: /albums/batch
+
+/*
+{
+	"params": [{
+		"id": 1,
+		"artist": {
+			"id": 1,
+			"chainType": "delete"
+		}
+	}],
+	"options": {
+		"simplifiedParams": true
+	}
+}
+ */
