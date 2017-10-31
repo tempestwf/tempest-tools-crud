@@ -4,69 +4,69 @@
 // This is returned in the getTTConfig method of a repository.
 $repoConfig = [
     '<string>'=>[ // Context keys may be layered as deep as you like. They are part of the contextual config nature of Scribe. See documentation for more details.
-        'extends'=>['<array|null>'], // An array of string paths to extend from else where in the array. The values from array at the paths specified will be used as defaults for for the config.
-        'read'=>[
-            'query'=>[
-                'select'=>[ //A list of arbitrary key names select strings to use in the query. with Tested in: testBasicRead
+        'extends'=>['<array|null>'], // Optional. An array of string paths to extend from else where in the array. The values from array at the paths specified will be used as defaults for for the config.
+        'read'=>[ // Optional.
+            'query'=>[ // Optional.
+                'select'=>[ // Optional. A list of arbitrary key names select strings to use in the query. with Tested in: testBasicRead
                     '<string>'=>'<string|null>' //Tested in: testBasicRead
                 ],
-                'from'=>[ // if not supplied it will be auto generated. A list of arbitrary key names and array keys and values to make a from part of the query. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
-                    '<string>'=>[ // Can be null to disable the block. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                'from'=>[ // Optional. if not supplied it will be auto generated. A list of arbitrary key names and array keys and values to make a from part of the query. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                    '<string>'=>[ // Optional. Can be null to disable the block. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
                         'className'=>'<string>', // Class name of the Entity associated with the base table from the query. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
                         'alias'=>'<string>', // The alias to use in the from. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
                         'indexBy'=>'<string|null>', // indexBy functionality of Doctrine. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
-                        'append'=>'<boolean|null>' // Whether or not to ad as an additional from, when you want more than 1 from in the query. Defaults to false // Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                        'append'=>'<boolean|null>' // Defaults to false. Whether or not to ad as an additional from, when you want more than 1 from in the query.  // Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
                     ]
                 ],
-                'where'=>[  // A list of arbitrary key names and strings, or arrays used to make where clauses. Tested in: testGeneralQueryBuilding
+                'where'=>[  // Optional. A list of arbitrary key names and strings, or arrays used to make where clauses. Tested in: testGeneralQueryBuilding
                     '<string>'=>[ // Can be null to disable the block.Tested in: testGeneralQueryBuilding
                         'type'=>'<null | and | or>', //If null then it's neither a 'and' or 'or' where clause, or wise it can be set to 'and' or 'or' Tested in: testGeneralQueryBuilding
                         'value'=>'<string|array>' // Either a string used in the where clause or an array.  If an array of: ['expr'=>'<xpr name>', 'arguments'=>['<arguments, could be another xpr array>']] is used, then all parts will be parsed by the array helper, and corresponding xpr methods will be called with the specified arguments. This is true for all parts of the query //Tested in: testGeneralQueryBuilding
                     ]
                 ],
-                'having'=>[ //Works the same as the where section but applied to a having clause. Tested in: testGeneralQueryBuilding
-                    '<string>'=>[ // Can be null to disable the block. Tested in: testGeneralQueryBuilding
+                'having'=>[ // Optional. Works the same as the where section but applied to a having clause. Tested in: testGeneralQueryBuilding
+                    '<string>'=>[ // Optional. Can be null to disable the block. Tested in: testGeneralQueryBuilding
                         'type'=>'<null | and | or>', //Tested in: testGeneralQueryBuilding
                         'value'=>'<string|array>' // can be an array expression like with the where. Tested in: testGeneralQueryBuilding
                     ]
                 ],
-                'leftJoin'=>[ // A list of arbitrary key names arrays with information about joins for the query to make. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
-                    '<string>'=>[ // Can be null to disable the block. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                'leftJoin'=>[ // Optional. A list of arbitrary key names arrays with information about joins for the query to make. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                    '<string>'=>[ // Optional. Can be null to disable the block. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
                         'join'=>'<string>', // A join part of the query, such as <table alias>.<relationship being joined to>. When using a queryType of sql use: <from alias>.<name of table to join too>. IE: t.Albums //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
                         'alias'=>'<string>', // The alias the table will be joined as. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
-                        'conditionType'=>'<ON | WITH | null>', // A condition type for the join such as: Expr\Join::WITH. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
-                        'condition'=>'<string | null>', //A condition to join on such as x =  x. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
-                        'indexBy'=>'<string | null>', //Doctrine indexBy functionality. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                        'conditionType'=>'<"ON" | "WITH" | null>', // A condition type for the join such as: Expr\Join::WITH. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                        'condition'=>'<string | null>', // A condition to join on such as x =  x. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                        'indexBy'=>'<string | null>', // Optional. Doctrine indexBy functionality. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
                     ]
                 ],
-                'innerJoin'=>[ // Works the same as the leftJoin block but goes into innerJoin now. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
-                    '<string>'=>[ // Can be null to disable the block. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
-                        'join'=>'<string>', // When using a queryType of sql use: <from alias>.<name of table to join too>. IE: t.Albums //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
-                        'alias'=>'<string>', //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
-                        'conditionType'=>'<ON | WITH | null>', //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
-                        'condition'=>'<string|null>', //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
-                        'indexBy'=>'<string|null>', //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                'innerJoin'=>[ // Optional. Works the same as the leftJoin block but goes into innerJoin now. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                    '<string>'=>[ // Optional. Can be null to disable the block. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                        'join'=>'<string>', // A join part of the query, such as <table alias>.<relationship being joined to>. When using a queryType of sql use: <from alias>.<name of table to join too>. IE: t.Albums //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                        'alias'=>'<string>', // The alias the table will be joined as. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                        'conditionType'=>'<"ON" | "WITH" | null>', // A condition type for the join such as: Expr\Join::WITH. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                        'condition'=>'<string | null>', // A condition to join on such as x =  x. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                        'indexBy'=>'<string | null>', // Optional. Doctrine indexBy functionality. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
                     ]
                 ],
-                'orderBy'=>[ // A list of arbitrary key names and array with information for building order bys. Tested in: testGeneralQueryBuilding
-                    '<string>'=>[ // Can be null to disable the block. Tested in: testGeneralQueryBuilding
+                'orderBy'=>[ // Optional. A list of arbitrary key names and array with information for building order bys. Tested in: testGeneralQueryBuilding
+                    '<string>'=>[ // Optional. Can be null to disable the block. Tested in: testGeneralQueryBuilding
                         'sort'=>'<string|null>', // The fields to be sorted by. Tested in: testGeneralQueryBuilding
-                        'order'=>'<ASC|DESC|null>' // The direction to order by. ASC or DESC. Tested in: testGeneralQueryBuilding
+                        'order'=>'<"ASC"|"DESC"|null>' // The direction to order by. ASC or DESC. Tested in: testGeneralQueryBuilding
                     ]
                 ],
-                'groupBy'=>[ // A list of arbitrary key names and a string to use to group by. Tested in: testGeneralQueryBuilding
-                    '<string>'=>'<string|null>' //The field to group by. Tested in: testGeneralQueryBuilding
+                'groupBy'=>[ // Optional. A list of arbitrary key names and a string to use to group by. Tested in: testGeneralQueryBuilding
+                    '<string>'=>'<string|null>' // Optional. The field to group by. Tested in: testGeneralQueryBuilding
                 ],
             ],
-            'settings'=>[ // Settings related to the query
+            'settings'=>[ // Optional. Settings related to the query
                 'queryType'=>'<dql | sql | null>', // Defaults to DQL, if SQL is used then Doctrine DBAL query is used instead of an ORM query. Design your syntax accordingly. sql tested in testSqlQueryFunctionality
-                'cache'=>[ //Settings related to cache. Tested in: testGeneralQueryBuilding
-                    'queryCacheProfile'=>'<\Doctrine\DBAL\Cache\QueryCacheProfile|null>',// See Doctrine docs for more information. Used only by SQL queries. Use a QueryCacheProfile object. Tested in testSqlQueryFunctionality
-                    'useQueryCache'=>'<boolean|null>', // Whether or not use query cache with the query. Can't be properly determined by a test case
-                    'useResultCache'=>'<boolean|null>', // Whether or not to use result cache with the query. Can't be properly determined by a test case
-                    'timeToLive'=>'<int|null>', // The time to live of the cache. Tested in: testGeneralQueryBuilding
-                    'cacheId'=>'<string|null>', // A cache id to use for the result cache. Tested in: testGeneralQueryBuilding
-                    'tagSet'=>[ // Can be null to disable the block. Future release will include this functionality. This will allow result cache to be tagged with provided tags.
+                'cache'=>[ // Optional. Settings related to cache. Tested in: testGeneralQueryBuilding
+                    'queryCacheProfile'=>'<\Doctrine\DBAL\Cache\QueryCacheProfile|null>',// Optional. See Doctrine docs for more information. Used only by SQL queries. Use a QueryCacheProfile object. Tested in testSqlQueryFunctionality
+                    'useQueryCache'=>'<boolean|null>', // Defaults to true. Whether or not use query cache with the query. Can't be properly determined by a test case
+                    'useResultCache'=>'<boolean|null>', // Defaults to false. Whether or not to use result cache with the query. Can't be properly determined by a test case
+                    'timeToLive'=>'<int|null>', // Optional. The time to live of the cache. Tested in: testGeneralQueryBuilding
+                    'cacheId'=>'<string|null>', // Optional. A cache id to use for the result cache. Tested in: testGeneralQueryBuilding
+                    'tagSet'=>[ // Optional. Can be null to disable the block. Future release will include this functionality. This will allow result cache to be tagged with provided tags.
                         '<string>'=>[
                             'disjunction'=>'<boolean|null>',
                             'templates'=>[
@@ -76,209 +76,210 @@ $repoConfig = [
 
                     ]
                 ],
-                'placeholders'=>[ // A list of arbitrary keys and place holders to inject into the query. Tested in: testGeneralQueryBuilding
-                    '<string>'=>[ // Can be null to disable the block. Tested in: testGeneralQueryBuilding
+                'placeholders'=>[ // Optional. A list of arbitrary keys and place holders to inject into the query. Tested in: testGeneralQueryBuilding
+                    '<string>'=>[ // Optional. Can be null to disable the block. Tested in: testGeneralQueryBuilding
                         'value'=>'<mixed>', //The value of the placeholder. Tested in: testGeneralQueryBuilding
-                        'type'=>'<PDO::PARAM_* | \Doctrine\DBAL\Types\Type::* constant | null>' // The type of the value. This is optional and while Doctrine supports it it doesn't seem necessaryy or valuable. Tested in: testGeneralQueryBuilding
+                        'type'=>'<PDO::PARAM_* | \Doctrine\DBAL\Types\Type::* constant | null>' // Optional. The type of the value. This is optional and while Doctrine supports it it doesn't seem necessaryy or valuable. Tested in: testGeneralQueryBuilding
                     ]
                 ],
-                'fetchJoin'=>'<boolean|null>', // whether or not when paginating this query requires a fetch join // Tested in: testGeneralDataRetrieval
+                'fetchJoin'=>'<boolean|null>', // Defaults to true. Whether or not when paginating this query requires a fetch join // Tested in: testGeneralDataRetrieval
             ],
-            'permissions'=>[ // Permissions information related to the query.
-                'settings'=>[ // Can be null to disable the block.
-                    'closure'=>'<closure|null>', // A closure to test if the current query can be allowed to proceed. Tested in testMutateAndClosure
-                    'mutate'=>'<closure|null>', // A closure to mutate information about the current query before running it. Tested in testMutateAndClosure
+            'permissions'=>[ // Optional. Permissions information related to the query.
+                'settings'=>[ // Optional. Can be null to disable the block.
+                    'closure'=>'<closure|null>', // Optional. A closure to test if the current query can be allowed to proceed. Tested in testMutateAndClosure
+                    'mutate'=>'<closure|null>', // Optional. A closure to mutate information about the current query before running it. Tested in testMutateAndClosure
                 ],
-                'allowed'=>'<boolean|null>', // Whether or not queries are allowed. Tested in testReadPermissions
-                'maxLimit'=>'<int|null>', // The maximum number of rows that can be returned at once. Tested in testGeneralDataRetrieval
-                'fixedLimit'=>'<int|null>', // This can be used to force all returns to have the same number of rows. This is useful when it comes to caching to make sure the same types pagination are requested every time.  Tested in testFixedLimit
-                'where'=>[ // Can be null to disable the block. Permissions related to the where part of the query passed from the front end. Tested in testReadPermissions
-                    'permissive'=>'<boolean|null>', // Whether or not to use "permissive" permissions. Permissive true means that we assume that everything is allowed unless specified other wise, and false works in the opposite manner. Tested in testReadPermissions
-                    'fields'=>[ // Can be null to disable the block. Permissive related to individual fields. Tested in testReadPermissions
-                        '<string>'=>[ // The field name the permissions are related to. Tested in testReadPermissions
-                            'permissive'=>'<boolean|null>', // Whether or not to use "permissive" permissions. Permissive true means that we assume that everything is allowed unless specified other wise, and false works in the opposite manner.. Tested in testReadPermissions
-                            'settings'=>[
-                                'closure'=>'<closure|null>', // A closure that tests whether or not the query should be allowed to go forward. Tested in testMutateAndClosure
-                                'mutate'=>'<closure|null>', // A closure to mutate information related to the field before it is used in the query. Tested in testMutateAndClosure
+                'allowed'=>'<boolean|null>', // Default to true. Whether or not queries are allowed. Tested in testReadPermissions
+                'maxLimit'=>'<int|null>', // Defaults to 100. The maximum number of rows that can be returned at once. Tested in testGeneralDataRetrieval
+                'fixedLimit'=>'<int|null>', // Defaults to false. This can be used to force all returns to have the same number of rows. This is useful when it comes to caching to make sure the same types pagination are requested every time.  Tested in testFixedLimit
+                'where'=>[ // Optional. Can be null to disable the block. Permissions related to the where part of the query passed from the front end. Tested in testReadPermissions
+                    'permissive'=>'<boolean|null>', // Defaults to true. Whether or not to use "permissive" permissions. Permissive true means that we assume that everything is allowed unless specified other wise, and false works in the opposite manner. Tested in testReadPermissions
+                    'fields'=>[ // Optional. Can be null to disable the block. Permissive related to individual fields. Tested in testReadPermissions
+                        '<string>'=>[ // Optional. Can be null to disable the block. The field name the permissions are related to. Tested in testReadPermissions
+                            'permissive'=>'<boolean|null>', //Defaults to true. Whether or not to use "permissive" permissions. Permissive true means that we assume that everything is allowed unless specified other wise, and false works in the opposite manner.. Tested in testReadPermissions
+                            'settings'=>[ // Optional.
+                                'closure'=>'<closure|null>', // Optional. A closure that tests whether or not the query should be allowed to go forward. Tested in testMutateAndClosure
+                                'mutate'=>'<closure|null>', // Optional. A closure to mutate information related to the field before it is used in the query. Tested in testMutateAndClosure
                             ],
-                            'operators'=>[ // Can be null to disable the block. A list of operators that are allowed or disallowed to be used in a query from the front end.  Tested in testReadPermissions
-                                '<string>'=>'<boolean|null>' // An operator name and whether or not it's allowed. Tested in testReadPermissions
+                            'operators'=>[ // Optional. Can be null to disable the block. A list of operators that are allowed or disallowed to be used in a query from the front end.  Tested in testReadPermissions
+                                '<string>'=>'<boolean|null>' // Defaults to permissive setting. An operator name and whether or not it's allowed. Tested in testReadPermissions
                             ]
                         ]
                     ]
                 ],
-                'having'=>[ // Can be null to disable the block. Works the same as where permissions
-                    'permissive'=>'<boolean|null>', // Tested in testReadPermissions2 and testReadPermissions3
-                    'fields'=>[ // Can be null to disable the block. Tested in testReadPermissions2 and testReadPermissions3
-                        '<string>'=>[ // Can be null to disable the block. Tested in testReadPermissions2 and testReadPermissions3
-                            'permissive'=>'<boolean|null>', // Tested in testReadPermissions2 and testReadPermissions3
-                            'settings'=>[
-                                'closure'=>'<closure|null>', // Tested in testMutateAndClosure
-                                'mutate'=>'<closure|null>', // Tested in testMutateAndClosure and testMutateUsed
+                'having'=>[ // Optional. Can be null to disable the block. Works the same as where permissions
+                    'permissive'=>'<boolean|null>', // Defaults to true. Whether or not to use "permissive" permissions. Permissive true means that we assume that everything is allowed unless specified other wise, and false works in the opposite manner. Tested in testReadPermissions
+                    'fields'=>[ // Optional. Can be null to disable the block. Permissive related to individual fields. Tested in testReadPermissions
+                        '<string>'=>[ // Optional. Can be null to disable the block. The field name the permissions are related to. Tested in testReadPermissions
+                            'permissive'=>'<boolean|null>', // Defaults to true. Whether or not to use "permissive" permissions. Permissive true means that we assume that everything is allowed unless specified other wise, and false works in the opposite manner.. Tested in testReadPermissions
+                            'settings'=>[ // Optional.
+                                'closure'=>'<closure|null>', // Optional. A closure that tests whether or not the query should be allowed to go forward. Tested in testMutateAndClosure
+                                'mutate'=>'<closure|null>', // Optional. A closure to mutate information related to the field before it is used in the query. Tested in testMutateAndClosure
                             ],
-                            'operators'=>[ // Can be null to disable the block. Tested in testReadPermissions2 and testReadPermissions3
-                                '<string>'=>'<boolean|null>' // Tested in testReadPermissions2 and testReadPermissions3
+                            'operators'=>[ // Optional. Can be null to disable the block. A list of operators that are allowed or disallowed to be used in a query from the front end.  Tested in testReadPermissions
+                                '<string>'=>'<boolean|null>' // Defaults to permissive setting. An operator name and whether or not it's allowed. Tested in testReadPermissions
                             ]
                         ]
                     ]
                 ],
-                'orderBy'=>[ // Can be null to disable the block. Permissions for order by requests from front end.
-                    'permissive'=>'<boolean|null>', // Whether or not to use "permissive" permissions. Permissive true means that we assume that everything is allowed unless specified other wise, and false works in the opposite manner. Tested in testReadPermissions2 and testReadPermissions3
-                    'fields'=>[ // Can be null to disable the block.
-                        '<string>'=>[ // Can be null to disable the block. The field name the permissions relate to. Tested in testReadPermissions2 and testReadPermissions3
-                            'permissive'=>'<boolean|null>', // Whether or not to use "permissive" permissions. Permissive true means that we assume that everything is allowed unless specified other wise, and false works in the opposite manner. Tested in testReadPermissions2 and testReadPermissions3
-                            'settings'=>[
-                                'closure'=>'<closure|null>', // A closure that tests whether or not the query should be allowed to go forward. Tested in testMutateAndClosure
-                                'mutate'=>'<closure|null>', // A closure to mutate information related to the field before it is used in the query. Tested in testMutateAndClosure and testMutateUsed
+                'orderBy'=>[ // Optional. Can be null to disable the block. Permissions for order by requests from front end.
+                    'permissive'=>'<boolean|null>', // Defaults to true. Whether or not to use "permissive" permissions. Permissive true means that we assume that everything is allowed unless specified other wise, and false works in the opposite manner. Tested in testReadPermissions2 and testReadPermissions3
+                    'fields'=>[ // Optional. Can be null to disable the block.
+                        '<string>'=>[ // Optional. Can be null to disable the block. The field name the permissions relate to. Tested in testReadPermissions2 and testReadPermissions3
+                            'permissive'=>'<boolean|null>', // Defaults to true. Whether or not to use "permissive" permissions. Permissive true means that we assume that everything is allowed unless specified other wise, and false works in the opposite manner. Tested in testReadPermissions2 and testReadPermissions3
+                            'settings'=>[ // Optional.
+                                'closure'=>'<closure|null>', // Optional. A closure that tests whether or not the query should be allowed to go forward. Tested in testMutateAndClosure
+                                'mutate'=>'<closure|null>', // Optional. A closure to mutate information related to the field before it is used in the query. Tested in testMutateAndClosure and testMutateUsed
                             ],
-                            'directions'=>[ // A list of directions that are allowed or not allowed. Tested in testReadPermissions2 and testReadPermissions3
-                                '<ASC | DESC>'=>'<boolean|null>' // Whether or not the direction is allowed. Tested in testReadPermissions2 and testReadPermissions3
+                            'directions'=>[ // Optional. A list of directions that are allowed or not allowed. Tested in testReadPermissions2 and testReadPermissions3
+                                '<"ASC" | "DESC">'=>'<boolean|null>' // Defaults to permissive setting. Whether or not the direction is allowed. Tested in testReadPermissions2 and testReadPermissions3
                             ]
                         ]
                     ]
                 ],
-                'groupBy'=>[ // Can be null to disable the block. Permissions for group by requests from front end. Tested in testReadPermissions2 and testReadPermissions3
-                    'permissive'=>'<boolean|null>', // Whether or not to use "permissive" permissions. Permissive true means that we assume that everything is allowed unless specified other wise, and false works in the opposite manner. Tested in testReadPermissions2 and testReadPermissions3
-                    'fields'=>[ // Can be null to disable the block. Tested in testReadPermissions2 and testReadPermissions3
-                        '<string>'=>[ // Can be null to disable the block. The field name the permissions relate to. Tested in testReadPermissions2 and testReadPermissions3
-                            'allowed'=>'<boolean|null>', // Whether or group by for this field is allowed. Tested in testReadPermissions2 and testReadPermissions3
-                            'settings'=>[
-                                'closure'=>'<closure|null>', // A closure that tests whether or not the query should be allowed to go forward. Tested in testMutateAndClosure
-                                'mutate'=>'<closure|null>', // A closure to mutate information related to the field before it is used in the query. Tested in testMutateAndClosure and testMutateUsed
+                'groupBy'=>[ // Optional. Can be null to disable the block. Permissions for group by requests from front end. Tested in testReadPermissions2 and testReadPermissions3
+                    'permissive'=>'<boolean|null>', // Defaults to true. Whether or not to use "permissive" permissions. Permissive true means that we assume that everything is allowed unless specified other wise, and false works in the opposite manner. Tested in testReadPermissions2 and testReadPermissions3
+                    'fields'=>[ // Optional. Can be null to disable the block. Tested in testReadPermissions2 and testReadPermissions3
+                        '<string>'=>[ // Optional. Can be null to disable the block. The field name the permissions relate to. Tested in testReadPermissions2 and testReadPermissions3
+                            'allowed'=>'<boolean|null>', // Defaults to permissive setting. Whether or group by for this field is allowed. Tested in testReadPermissions2 and testReadPermissions3
+                            'settings'=>[ // Optional.
+                                'closure'=>'<closure|null>', // Optional. A closure that tests whether or not the query should be allowed to go forward. Tested in testMutateAndClosure
+                                'mutate'=>'<closure|null>', // Optional. A closure to mutate information related to the field before it is used in the query. Tested in testMutateAndClosure and testMutateUsed
                             ]
                         ]
                     ]
                 ],
-                'placeholders'=>[ // Can be null to disable the block. Permissions for placeholders requests from front end.
-                    'permissive'=>'<boolean|null>', // Whether or not to use "permissive" permissions. Permissive true means that we assume that everything is allowed unless specified other wise, and false works in the opposite manner. Tested in testReadPermissions2 and testReadPermissions3
-                    'placeholderNames'=>[ // Can be null to disable the block. Tested in testReadPermissions2 and testReadPermissions3
-                        '<string>'=>[ // The name of the placeholder passed from the front end that permission relates too. Tested in testReadPermissions2 and testReadPermissions3
-                            'allowed'=>'<boolean|null>', // Whether or not use of this placeholder by the front end is allowed. Tested in testReadPermissions2 and testReadPermissions3
-                            'settings'=>[
-                                'closure'=>'<closure|null>', // A closure that tests whether or not the query should be allowed to go forward. Tested in testMutateAndClosure
-                                'mutate'=>'<closure|null>', // A closure to mutate information related to the placeholder before it is used in the query. Tested in testMutateAndClosure and testMutateUsed
+                'placeholders'=>[ // Optional. Can be null to disable the block. Permissions for placeholders requests from front end.
+                    'permissive'=>'<boolean|null>', // Defaults to true. Whether or not to use "permissive" permissions. Permissive true means that we assume that everything is allowed unless specified other wise, and false works in the opposite manner. Tested in testReadPermissions2 and testReadPermissions3
+                    'placeholderNames'=>[ // Optional. Tested in testReadPermissions2 and testReadPermissions3
+                        '<string>'=>[ // Optional. Can be null to disable the block. The name of the placeholder passed from the front end that permission relates too. Tested in testReadPermissions2 and testReadPermissions3
+                            'allowed'=>'<boolean|null>', // Defaults to permissive setting. Whether or not use of this placeholder by the front end is allowed. Tested in testReadPermissions2 and testReadPermissions3
+                            'settings'=>[ // Optional.
+                                'closure'=>'<closure|null>', // Optional. A closure that tests whether or not the query should be allowed to go forward. Tested in testMutateAndClosure
+                                'mutate'=>'<closure|null>', // Optional. A closure to mutate information related to the placeholder before it is used in the query. Tested in testMutateAndClosure and testMutateUsed
                             ]
                         ]
                     ]
                 ],
             ]
         ],
-        'create'=>[ // Can be null to disable the block.
-            'prePopulateEntities'=>'<boolean|null>' // defaults to true, if true entities referenced in the params passed to CUD methods will be pre fetched using the minimum number of queries. // Tested in testPrePopulate
+        'create'=>[ // Optional. Can be null to disable the block.
+            'prePopulateEntities'=>'<boolean|null>' // Defaults to true, if true entities referenced in the params passed to CUD methods will be pre fetched using the minimum number of queries. // Tested in testPrePopulate
         ],
-        'update'=>[ // Can be null to disable the block.
-            'prePopulateEntities'=>'<boolean|null>' // defaults to true, if true entities referenced in the params passed to CUD methods will be pre fetched using the minimum number of queries. // Tested in testPrePopulate
+        'update'=>[ // Optional. Can be null to disable the block.
+            'prePopulateEntities'=>'<boolean|null>' // Defaults to true, if true entities referenced in the params passed to CUD methods will be pre fetched using the minimum number of queries. // Tested in testPrePopulate
         ],
-        'delete'=>[ // Can be null to disable the block.
-            'prePopulateEntities'=>'<boolean|null>' // defaults to true, if true entities referenced in the params passed to CUD methods will be pre fetched using the minimum number of queries. // Tested in testPrePopulate
+        'delete'=>[ // Optional. Can be null to disable the block.
+            'prePopulateEntities'=>'<boolean|null>' // Defaults to true, if true entities referenced in the params passed to CUD methods will be pre fetched using the minimum number of queries. // Tested in testPrePopulate
         ]
     ]
 ];
 
 // Back end options are passed to a repository when create, read, update, delete methods.
-$backendOptionsForRepo = [ // note all options override query level options
+// Note: all options override query level options
+$backendOptionsForRepo = [
     'options'=>[
         'paginate'=>'<boolean|null>', // Defaults to true. Whether or not paginate the results of a query. Tested in: testGeneralDataRetrieval
-        'fetchJoin'=>'<boolean|null>', // Whether or not to use a fetch join on a paginated query result. Optional // Tested in: testGeneralDataRetrieval
+        'fetchJoin'=>'<boolean|null>', // Defaults to true. Whether or not to use a fetch join on a paginated query result. Tested in: testGeneralDataRetrieval
         'hydrate'=>'<boolean|null>', // Defaults to true. Whether or not to hydrate the results of a query. If false then the query object is returned instead. Tested in: testGeneralDataRetrieval
         'hydrationType'=>'<Doctrine\ORM\Query::* constant|null>', // Defaults to: Query::HYDRATE_ARRAY. The hydration type for result sets. Tested in: testGeneralDataRetrieval
-        '<string>'=>[  // Can be null to disable the block. Keys of placeholders to inject into queries. Optional // Tested in: testGeneralDataRetrieval
+        '<string>'=>[  // Optional. Can be null to disable the block. Keys of placeholders to inject into queries. Tested in: testGeneralDataRetrieval
             'value'=>'<mixed>', // The value of the placeholder
-            'type'=>'<PDO::PARAM_* | \Doctrine\DBAL\Types\Type::* constant | null>' // Optional type of the placeholders.
+            'type'=>'<PDO::PARAM_* | \Doctrine\DBAL\Types\Type::* constant | null>' // Optional. type of the placeholders.
         ],
-        'queryCacheProfile'=>'<\Doctrine\DBAL\Cache\QueryCacheProfile|null>', // See Doctrine docs for more details. Optional // Used only by SQL queries. Use a QueryCacheProfile object
-        'queryCacheDrive'=>'<\Doctrine\Common\Cache\Cache|null>', // Query cache driver, see Doctrine docs for more details. Optional //Tested in: testGeneralQueryBuilding
-        'resultCacheDrive'=>'<\Doctrine\Common\Cache\Cache|null>', // Result cache driver, see Doctrine docs for more details. Optional //Tested in: testGeneralQueryBuilding
-        'allowCache'=>'<boolean|null>', // Whether or not to allow cache. Optional //Tested in: testGeneralQueryBuilding
-        'cacheId' => '<string|null>', // An optional cache id to use for the result cache. Optional //Tested in: testGeneralQueryBuilding
-        'useQueryCache' => '<boolean|null>', // Whether ot not to use query cache. Optional //Tested in: testGeneralQueryBuilding
-        'useResultCache' => '<boolean|null>', // Whether or not to use result cache. Optional //Tested in: testGeneralQueryBuilding
-        'timeToLive' => '<int|null>',// Optional  // Time to live of the cache. Tested in: testGeneralQueryBuilding
-        'tagSet' => '<array|null>', // In a future version you can pass in cache tags to assign to the result cache. Not yet implemented
+        'queryCacheProfile'=>'<\Doctrine\DBAL\Cache\QueryCacheProfile|null>', // Optional. See Doctrine docs for more details.  Used only by SQL queries. Use a QueryCacheProfile object
+        'queryCacheDrive'=>'<\Doctrine\Common\Cache\Cache|null>', // Optional. Query cache driver, see Doctrine docs for more details. Tested in: testGeneralQueryBuilding
+        'resultCacheDrive'=>'<\Doctrine\Common\Cache\Cache|null>', // Optional. Result cache driver, see Doctrine docs for more details. Tested in: testGeneralQueryBuilding
+        'allowCache'=>'<boolean|null>', // Optional. Whether or not to allow cache. Tested in: testGeneralQueryBuilding
+        'cacheId' => '<string|null>', // Optional. An optional cache id to use for the result cache. Tested in: testGeneralQueryBuilding
+        'useQueryCache' => '<boolean|null>', // Defaults to true. Whether ot not to use query cache. Tested in: testGeneralQueryBuilding
+        'useResultCache' => '<boolean|null>', // Defaults to false. Whether or not to use result cache. Tested in: testGeneralQueryBuilding
+        'timeToLive' => '<int|null>',// Optional. Time to live of the cache. Tested in: testGeneralQueryBuilding
+        'tagSet' => '<array|null>', // Optional. In a future version you can pass in cache tags to assign to the result cache. Not yet implemented
         'transaction'=>'<boolean|null>', // Defaults to true. Whether ot not to process the database interactions as part of a transaction that will roll back on failure. Tested in testMultiAddAndChain
-        'entitiesShareConfigs'=>'<boolean|null>', // If turned on like entities will share configs, mildly speeding up execution times. Tested in testMultiAddAndChain
-        'flush' => '<boolean|null>', // Whether or not to flush to the db at the end of call to Create, Read, Update, or Delete. Tested in testMultiAddAndChain
-        'batchMax' => '<int|null>', // The maximum number of arrays that can be passed to a Create, Update or Delete method. Used for stopping requests that are to large. Optional // Tested in testMaxBatch
-        'queryMaxParams' => '<int|null>', // The maximum number of query params that can be passed to a Read method. Used for stopping requests that are to large. Optional // Tested in testGeneralDataRetrieval
-        'maxLimit' => '<int|null>', // The maximum number of rows that can be returned at a time. Optional // Tested in testGeneralDataRetrieval
-        'prePopulateEntities'=>'<boolean|null>', // Optional  // defaults to true, if true entities referenced in the params passed to CUD methods will be pre fetched using the minimum number of queries. // Tested in testPrePopulate
-        'clearPrePopulatedEntitiesOnFlush'=>'<boolean|null>', // whether or not when a flush occurred the pre populated entities should be cleared // Tested in testPrePopulate
-        'fixedLimit'=>'<boolean|null>'  // This can be used to force all returns to have the same number of rows. This is useful when it comes to caching to make sure the same types pagination are requested every time. Tested in testFixedLimit
+        'entitiesShareConfigs'=>'<boolean|null>', // Defaults to true. If turned on like entities will share configs, mildly speeding up execution times. Tested in testMultiAddAndChain
+        'flush' => '<boolean|null>', // Defaults to true. Whether or not to flush to the db at the end of call to Create, Read, Update, or Delete. Tested in testMultiAddAndChain
+        'batchMax' => '<int|null>', // Optional. The maximum number of arrays that can be passed to a Create, Update or Delete method. Used for stopping requests that are to large. Tested in testMaxBatch
+        'queryMaxParams' => '<int|null>', // Optional. The maximum number of query params that can be passed to a Read method. Used for stopping requests that are to large. Tested in testGeneralDataRetrieval
+        'maxLimit' => '<int|null>', // Defaults to 100. The maximum number of rows that can be returned at a time. Tested in testGeneralDataRetrieval
+        'prePopulateEntities'=>'<boolean|null>', // Defaults to true, if true entities referenced in the params passed to CUD methods will be pre fetched using the minimum number of queries. // Tested in testPrePopulate
+        'clearPrePopulatedEntitiesOnFlush'=>'<boolean|null>', // Defaults to true. whether or not when a flush occurred the pre populated entities should be cleared // Tested in testPrePopulate
+        'fixedLimit'=>'<boolean|null>'  // Defaults to false. This can be used to force all returns to have the same number of rows. This is useful when it comes to caching to make sure the same types pagination are requested every time. Tested in testFixedLimit
     ]
 ];
 
 // This is returned in the getTTConfig method of a entity.
 $entityConfig = [
     '<string>'=>[ // Context keys may be layered as deep as you like. They are part of the contextual config nature of Scribe. See documentation for more details.
-        '<create | update | delete>'=>[ // Can be null to disable the block. Configs work the same for create, update and delete
-            'extends'=>['<array|null>'], // An array of string paths to extend from else where in the array. The values from array at the paths specified will be used as defaults for for the config.
-            'allowed'=>'<boolean|null>', // Whether ot not this type of operation is permitted. Tested in: testAllowedWorks
-            'permissive'=>'<boolean|null>', // Whether or not to use "permissive" permissions. Permissive true means that we assume that everything is allowed unless specified other wise, and false works in the opposite manner.Tested in: testPermissiveWorks1
-            'settings'=>[ // Can be null to disable the block. Settings related to the type of operation.
-                'setTo'=>'<array|null>', // array of field names with values to set them to, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist. Tested In: testTopLevelSetToAndMutate
-                'enforce'=>'<array|null>', // array of field names with values to make sure they match, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist. Tested in: testEnforceTopLevelWorks
-                'closure'=>'<closure|null>', // A closure to test if the operation should go ahead. Tested in: testTopLevelClosure
-                'mutate'=>'<closure|null>', // A closure to mutate the entity of prepersist. Tested In: testTopLevelSetToAndMutate
-                'validate'=>[ // Can be null to disable the block. Validation settings passed a validator used on the class. Tested in: testValidatorWorks
-                    'fields'=>[ // Can be null to disable the block.
+        '<"create" | "update" | "delete">'=>[ // Optional. Can be null to disable the block. Configs work the same for create, update and delete
+            'extends'=>['<array|null>'], // Optional. An array of string paths to extend from else where in the array. The values from array at the paths specified will be used as defaults for for the config.
+            'allowed'=>'<boolean|null>', // Defaults to true. Whether ot not this type of operation is permitted. Tested in: testAllowedWorks
+            'permissive'=>'<boolean|null>', // Defaults to true. Whether or not to use "permissive" permissions. Permissive true means that we assume that everything is allowed unless specified other wise, and false works in the opposite manner.Tested in: testPermissiveWorks1
+            'settings'=>[ // Optional. Can be null to disable the block. Settings related to the type of operation.
+                'setTo'=>'<array|null>', // Optional. array of field names with values to set them to, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist. Tested In: testTopLevelSetToAndMutate
+                'enforce'=>'<array|null>', // Optional. array of field names with values to make sure they match, if a field name is an association then an array should be given which will be run on the entity that is associated. Runs on prepersist. Tested in: testEnforceTopLevelWorks
+                'closure'=>'<closure|null>', // Optional. A closure to test if the operation should go ahead. Tested in: testTopLevelClosure
+                'mutate'=>'<closure|null>', // Optional. A closure to mutate the entity of prepersist. Tested In: testTopLevelSetToAndMutate
+                'validate'=>[ // Optional. Can be null to disable the block. Validation settings passed a validator used on the class. Tested in: testValidatorWorks
+                    'fields'=>[ // Optional. Can be null to disable the block.
                         '<string>'
                     ], // if not set the keys from rules will be used instead. By default this works like the fields passed to a Laravel validator.
                     'rules'=>[
                         '<string>'=>'<string|null>' // Validator rules. By default these are rules that are used by laravel validator. The keys are the field names the rules apply to.
                     ], // Tested in: testValidatorWorks
-                    'messages'=>[ // Can be null to disable the block.
+                    'messages'=>[ // Optional. Can be null to disable the block.
                         '<string>'=>'<string|null>'
                     ], // Custom validator messages to return on value. By default works with Laravel validator functionality.
-                    'customAttributes'=>[ // Can be null to disable the block.
+                    'customAttributes'=>[ // Optional. Can be null to disable the block.
                         '<string>'=>'<string|null>'
                     ], // Custom attributes to pass to the validator. By default works with Laravel validator functionality.
                 ],
             ],
-            'toArray'=>[ // Can be null to disable the block. Settings that dictate how an entity is converted to array.
+            'toArray'=>[ // Optional. Can be null to disable the block. Settings that dictate how an entity is converted to array.
                 '<string>'=>[ // Can be null to disable the block. Putting in an empty array will just assume get type. Key names that will be returned in the resulting array. If type is get this key equates to a field name on the entity.
-                    'type'=>'<get | literal | null>',// Defaults to get. if 'get' then the key is a property but we get it by calling get<Property name>. If 'literal' then a value property must be included, the value property may be a closure that returns a value.  Tested in: testToArrayBasicFunctionality
-                    'value'=>'<mixed|null>', // The value to set the key to if it's a literal, a closure or array expression closure may be used.  Tested in: testToArrayBasicFunctionality
-                    'format'=>'<string|null>', // format used if this is a date time field. By default sql date format is used.  Tested in: testToArrayBasicFunctionality
+                    'type'=>'<"get" | "literal" | null>',// Defaults to "get". if "get" then the key is a property but we get it by calling get<Property name>. If 'literal' then a value property must be included, the value property may be a closure that returns a value.  Tested in: testToArrayBasicFunctionality
+                    'value'=>'<mixed|null>', // Optional. The value to set the key to if it's a literal, a closure or array expression closure may be used.  Tested in: testToArrayBasicFunctionality
+                    'format'=>'<string|null>', // Optional. format used if this is a date time field. By default sql date format is used.  Tested in: testToArrayBasicFunctionality
                     'allowLazyLoad'=>'<boolean|null>', // Defaults to false, if true then when a collection is encountered that isn't loaded, during the course of calling a get method, it will be lazy loaded from the db. Be careful because this can cause huge amounts of load if used with out caution.  Tested in: testToArrayBasicFunctionality
                 ]
             ],
-            'fields'=>[ // Can be null to disable the block.
-                '<string>'=>[ // Can be null to disable the block. Field name that the permissions here relate to.
-                    'permissive'=>'<boolean|null>', // Whether or not to use "permissive" permissions. Permissive true means that we assume that everything is allowed unless specified other wise, and false works in the opposite manner. Tested in: testPermissiveWorks1 / testPermissiveWorks2
-                    'settings'=>[ // Can be null to disable the block.
-                        'setTo'=>'<mixed|null>', // A value to set the field to. Tested in: testFastMode2AndLowLevelSetTo
-                        'enforce'=>'<mixed|null>', // On a field then we test to make sure the field value matches. On an association then this value should be an array that compares the values to the properties being set on the association. Tested in: testLowLevelEnforce and testLowLevelEnforceOnRelation
-                        'closure'=>'<closure|null>', // A closure that tests if the operation should be able to continue. Tested in testLowLevelClosure
-                        'mutate'=>'<closure|null>', // A closure that mutates the values of the field before being committed to the DB. Tested in testLowLevelMutate
+            'fields'=>[ // Optional. Can be null to disable the block.
+                '<string>'=>[ // Optional. Can be null to disable the block. Field name that the permissions here relate to.
+                    'permissive'=>'<boolean|null>', // Defaults to true. Whether or not to use "permissive" permissions. Permissive true means that we assume that everything is allowed unless specified other wise, and false works in the opposite manner. Tested in: testPermissiveWorks1 / testPermissiveWorks2
+                    'settings'=>[ // Optional. Can be null to disable the block.
+                        'setTo'=>'<mixed|null>', // Optional. A value to set the field to. Tested in: testFastMode2AndLowLevelSetTo
+                        'enforce'=>'<mixed|null>', // Optional. On a field then we test to make sure the field value matches. On an association then this value should be an array that compares the values to the properties being set on the association. Tested in: testLowLevelEnforce and testLowLevelEnforceOnRelation
+                        'closure'=>'<closure|null>', // Optional. A closure that tests if the operation should be able to continue. Tested in testLowLevelClosure
+                        'mutate'=>'<closure|null>', // Optional. A closure that mutates the values of the field before being committed to the DB. Tested in testLowLevelMutate
                     ],
-                    'assign'=>[ // Types of assignment operations that allowed or disallowed. Note: all combinations of assign type as not tested, but there component parts are tested and shown to work.
-                        'set'=>'<boolean|null>', // set<fieldname> method allowed or not. Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
-                        'add'=>'<boolean|null>', // add<fieldname> method allowed or not. Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
-                        'remove'=>'<boolean|null>', // remove<fieldname> method allowed or not. Tested in: testChainRemove
-                        'setSingle'=>'<boolean|null>', // set<fieldname>. Works like set but changes pluralized field names to singular. method allowed or not. Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
-                        'addSingle'=>'<boolean|null>', // add<fieldname>. Works like add but changes pluralized field names to singular.Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
-                        'removeSingle'=>'<boolean|null>', // remove<fieldname>. Works like remove but changes pluralized field names to singular.Tested in: testChainRemove
-                        'null'=>'<boolean|null>', // null assign types tell the system not to assign the entity that is manipulated. This is useful when an entity is already associated with another entity, but you want to interact with that entity any way. Tested in: testNullAssignType. Whether or not having no assign type is allowed.
-                        'setNull'=>'<boolean|null>' // This assign type sets a field to null.
+                    'assign'=>[ // Optional. Types of assignment operations that allowed or disallowed. Note: all combinations of assign type as not tested, but there component parts are tested and shown to work.
+                        'set'=>'<boolean|null>', // Defaults to permissive setting. set<fieldname> method allowed or not. Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
+                        'add'=>'<boolean|null>', // Defaults to permissive setting. add<fieldname> method allowed or not. Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
+                        'remove'=>'<boolean|null>', // Defaults to permissive setting. remove<fieldname> method allowed or not. Tested in: testChainRemove
+                        'setSingle'=>'<boolean|null>', // Defaults to permissive setting. set<fieldname>. Works like set but changes pluralized field names to singular. method allowed or not. Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
+                        'addSingle'=>'<boolean|null>', // Defaults to permissive setting. add<fieldname>. Works like add but changes pluralized field names to singular.Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
+                        'removeSingle'=>'<boolean|null>', // Defaults to permissive setting. remove<fieldname>. Works like remove but changes pluralized field names to singular.Tested in: testChainRemove
+                        'null'=>'<boolean|null>', // Defaults to permissive setting. null assign types tell the system not to assign the entity that is manipulated. This is useful when an entity is already associated with another entity, but you want to interact with that entity any way. Tested in: testNullAssignType. Whether or not having no assign type is allowed.
+                        'setNull'=>'<boolean|null>' // Defaults to permissive setting. This assign type sets a field to null.
                     ],
-                    'chain'=>[ // Types of chaining that are allow or not
-                        'create'=>'<boolean|null>', // Create type chaining allowed or not. Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
-                        'update'=>'<boolean|null>', // Update type chaining allowed or not. Tested in: testUpdateWithChainAndEvents
-                        'delete'=>'<boolean|null>', // Delete type chaining allowed or not. Tested in: testMultiDeleteAndEvents
-                        'read'=>'<boolean|null>' // Read type chaining allowed or not. Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
+                    'chain'=>[ // Optional. Types of chaining that are allow or not
+                        'create'=>'<boolean|null>', // Defaults to permissive setting. Create type chaining allowed or not. Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
+                        'update'=>'<boolean|null>', // Defaults to permissive setting. Update type chaining allowed or not. Tested in: testUpdateWithChainAndEvents
+                        'delete'=>'<boolean|null>', // Defaults to permissive setting. Delete type chaining allowed or not. Tested in: testMultiDeleteAndEvents
+                        'read'=>'<boolean|null>' // Defaults to permissive setting. Read type chaining allowed or not. Tested in: testCreateAlbumAndArtistAndAddUserToAlbum
                     ]
                 ]
             ],
-            'options'=>[ // Can be null to disable the block.
+            'options'=>[ // Optional. Can be null to disable the block.
                 '<string>'=>'<mixed|null>', // reserved for custom use cases
             ]
         ],
         'read'=>[
-            'toArray'=>[ // Can be null to disable the block. Settings that dictate how an entity is converted to array.
-                '<string>'=>[ // Can be null to disable the block. Key names that will be returned in the resulting array. If type is get this key equates to a field name on the entity.
-                    'type'=>'<get | literal | null>',// Defaults to get. if 'get' then the key is a property but we get it by calling get<Property name>. If 'literal' then a value property must be included, the value property may be a closure that returns a value.  Tested in: testToArrayBasicFunctionality
-                    'value'=>'<mixed|null>', // The value to set the key to if it's a literal, a closure or array expression closure may be used.  Tested in: testToArrayBasicFunctionality
-                    'format'=>'<string|null>', // format used if this is a date time field. By default sql date format is used.  Tested in: testToArrayBasicFunctionality
+            'toArray'=>[ // Optional. Can be null to disable the block. Settings that dictate how an entity is converted to array.
+                '<string>'=>[ // Can be null to disable the block. Putting in an empty array will just assume get type. Key names that will be returned in the resulting array. If type is get this key equates to a field name on the entity.
+                    'type'=>'<"get" | "literal" | null>',// Defaults to "get". if "get" then the key is a property but we get it by calling get<Property name>. If 'literal' then a value property must be included, the value property may be a closure that returns a value.  Tested in: testToArrayBasicFunctionality
+                    'value'=>'<mixed|null>', // Optional. The value to set the key to if it's a literal, a closure or array expression closure may be used.  Tested in: testToArrayBasicFunctionality
+                    'format'=>'<string|null>', // Optional. format used if this is a date time field. By default sql date format is used.  Tested in: testToArrayBasicFunctionality
                     'allowLazyLoad'=>'<boolean|null>', // Defaults to false, if true then when a collection is encountered that isn't loaded, during the course of calling a get method, it will be lazy loaded from the db. Be careful because this can cause huge amounts of load if used with out caution.  Tested in: testToArrayBasicFunctionality
                 ]
             ],
@@ -292,7 +293,7 @@ $entityConfig = [
 
 $controllerConfig = [
     '<string>'=>[ // Context keys may be layered as deep as you like. They are part of the contextual config nature of Scribe. See documentation for more details.
-        '<GET | POST | PUT | DELETE | null>'=> [ // GET, POST, PUT, DELETE. Corresponds to the method that was requested
+        '<"GET" | "POST" | "PUT" | "DELETE" | null>'=> [ // GET, POST, PUT, DELETE. Corresponds to the method that was requested
             'extends'=>['<array|null>'], // An array of string paths to extend from else where in the array. The values from array at the paths specified will be used as defaults for for the config.
             'transaction'=>'<boolean|null>', // Whether or not an additional transactions should be started at the controller level. This is useful if you mean to call one more than 1 repo in the controller using events.
             'overrides'=>['<array|null>'], // Overrides passed to the repo that will override the default options set on the repo.
@@ -326,7 +327,7 @@ $frontEndQueryToGet = [
         'where'=>[ // Optional block. In this block filters can be set that will be applied to the where clause of the query. Tested in: testGeneralQueryBuilding
             [
                 'field'=>'<string>', //Field name with the alias of the table the field is on, such as t.id. Tested in: testGeneralQueryBuilding
-                'type'=>'<and|or>', // Is it a an 'and' or an 'or' criteria. Tested in: testGeneralQueryBuilding
+                'type'=>'<"and"|"or">', // Is it a an 'and' or an 'or' criteria. Tested in: testGeneralQueryBuilding
                 'operator'=>'<string>', // An expression name that will be used to generate the operator in the make sure here that only the safe ones are even used. If operator is 'andX' or 'orX' then conditions with a nested list of conditions is used instead. By default the following operators are allowed: 'andX', 'orX', 'eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'in', 'notIn', 'isNull', 'isNotNull', 'like', 'notLike', 'between'. Tested in: testGeneralQueryBuilding
                 'arguments'=>['<mixed>'],  // Arguments to pass to the expression. If operator is 'andX' or 'orX' this is omitted. Conditions are used in instead. Generally just 1 argument is needed, for between operators use 2 arguments, and for in and notIn operators use a nested array of values -- 'arguments'=>[['<string>', '<string>']]. //Tested in: testGeneralQueryBuilding
                 'conditions'=>['<array>'] // Contains an array of additional criteria. This nested array has the exact same structure as the block above it in this example. If operator is not 'andX' or 'orX' this is omitted. This allows condition nesting. //Tested in: testGeneralQueryBuilding
@@ -335,14 +336,14 @@ $frontEndQueryToGet = [
         'having'=>[ // Optional block. Works the same as the where block but applied to criteria to the having clause of the query. Tested in: testGeneralQueryBuilding
             [
                 'field'=>'<string>', //Field name with the alias of the table the field is on, such as t.id. Tested in: testGeneralQueryBuilding
-                'type'=>'<and|or>', // Is it a an 'and' or an 'or' criteria. Tested in: testGeneralQueryBuilding
+                'type'=>'<"and"|"or">', // Is it a an 'and' or an 'or' criteria. Tested in: testGeneralQueryBuilding
                 'operator'=>'<string>', // An expression name that will be used to generate the operator in the make sure here that only the safe ones are even used. If operator is 'andX' or 'orX' then conditions with a nested list of conditions is used instead. By default the following operators are allowed: 'andX', 'orX', 'eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'in', 'notIn', 'isNull', 'isNotNull', 'like', 'notLike', 'between'. Tested in: testGeneralQueryBuilding
                 'arguments'=>['<mixed>'],  // Arguments to pass to the expression. If operator is 'andX' or 'orX' this is omitted. Conditions are used in instead. Generally just 1 argument is needed, for between operators use 2 arguments, and for in and notIn operators use a nested array of values -- 'arguments'=>[['<string>', '<string>']]. //Tested in: testGeneralQueryBuilding
                 'conditions'=>['<array>'] // Contains an array of additional criteria. This nested array has the exact same structure as the block above it in this example. If operator is not 'andX' or 'orX' this is omitted. This allows condition nesting. //Tested in: testGeneralQueryBuilding
             ]
         ],
         'orderBy'=>[ // Optional block. This block will add criteria to the order by clause of the query. Tested in: testGeneralQueryBuilding
-            '<string>'=>'<ASC | DESC>' // The key is the field name (including the table alias -- such as t.id) and the value is the direction of the order by. Tested in: testGeneralQueryBuilding
+            '<string>'=>'<"ASC" | "DESC">' // The key is the field name (including the table alias -- such as t.id) and the value is the direction of the order by. Tested in: testGeneralQueryBuilding
         ],
         'groupBy'=>[ // Optional block. Tested in: testGeneralQueryBuilding
             '<string>' // Each value is the a field name including the table alias -- such as t.id) to group by. Should only be used in queries that inherently have an aggregate in the select. Tested in: testGeneralQueryBuilding
@@ -368,18 +369,35 @@ $frontEndQueryToGet = [
 // Example json:
 
 /*{
-    "query": {
-        "where": [
-            {
-                "field": "t.name",
-                "type": "and",
-                "operator": "eq",
-                "arguments": ["BEETHOVEN7"]
-            }
-        ]
+	"query": {
+		"where": [{
+			"field": "t.name",
+			"type": "and",
+			"operator": "eq",
+			"arguments": ["BEETHOVEN"]
+		}],
+		"having": [{
+			"field": "t.name",
+			"type": "and",
+			"operator": "eq",
+			"arguments": ["BEETHOVEN"]
+		}],
+		"orderBy": {
+			"t.name": "ASC",
+			"t.id": "DESC"
+		},
+		"groupBy": [
+			"t.name",
+			"t.id"
+		],
+		"placeholders": {
+			"test": {
+				"value": 42,
+			}
+		}
 	},
 	"options": {
-        "returnCount": true,
+		"returnCount": true,
 		"limit": 1,
 		"offset": 1
 	}
@@ -436,13 +454,13 @@ $frontEndQueryToGet = [
 // All none get requests will include params (described below) and may include an options block. The structure will look like this.
 $exampleFrontEndNonGetRequest = [
     'params'=>['<array>'], // See below for examples for different types of param sets that can be passed
-    'options'=>[ // Optional block. This block relates to the options for the request.
+    'options'=>[ // Optional. This block relates to the options for the request.
         'simplifiedParams'=>'<boolean|null>', //Defaults to false, may also be set as a different default on the controller. This value is whether or not to process the params as standard params or simplified params. Both param examples are below.
         'testMode'=>'<boolean|null>', // Defaults to false, if set to true then data will be rolled back instead of committed. This lets you write test cases that use the api but not store anything to the db
-        'toArray'=>[ // Optional block. This blocks relates to the data that should be returned -- specifying how the entities will be transformed to an array.
-            'completeness'=>'<full | limited | minimal | none | null>', // Defaults to full, if 'full' then all data will be shown so long as it wouldn't trigger an infinite loop (relations between entities are omitted as soon as they loop back on them selves), if 'limited' then all data will be shown but relations leading to already processed entities will not be shown, if 'minimal' the same entity will never be shown twice in the return and an empty array will be in it's place, if 'none' nothing is returned. Tested in: testToArrayBasicFunctionality
-            'maxDepth'=>'<int|null>', // How deep should the to array go. You can use this option to prevent unnecessary levels of depth in your return. Tested in: testToArrayBasicFunctionality
-            'excludeKeys'=> ['<string>'], // Each string is the name of a field or association that should be returned in the resulting array from the back end. Use this to prevent certain keys from being converted to array to trim the return. Tested in: testToArrayBasicFunctionality
+        'toArray'=>[ // Optional. This blocks relates to the data that should be returned -- specifying how the entities will be transformed to an array.
+            'completeness'=>'<"full" | "limited" | "minimal" | "none" | null>', // Defaults to full, if 'full' then all data will be shown so long as it wouldn't trigger an infinite loop (relations between entities are omitted as soon as they loop back on them selves), if 'limited' then all data will be shown but relations leading to already processed entities will not be shown, if 'minimal' the same entity will never be shown twice in the return and an empty array will be in it's place, if 'none' nothing is returned. Tested in: testToArrayBasicFunctionality
+            'maxDepth'=>'<int|null>', // Optional. How deep should the to array go. You can use this option to prevent unnecessary levels of depth in your return. Tested in: testToArrayBasicFunctionality
+            'excludeKeys'=> ['<string>'], // Optional. Each string is the name of a field or association that should be returned in the resulting array from the back end. Use this to prevent certain keys from being converted to array to trim the return. Tested in: testToArrayBasicFunctionality
             'allowOnlyRequestedParams'=>'<boolean|null>',// Defaults to true, if true only the params that you requested to be changed on the effect entities will be shown in the return. This filters out any fields or associations that you did not request to be changed directly with this request. Tested in: testToArrayBasicFunctionality
             'forceIncludeKeys'=>['<string>'] // Defaults to: ['id'], these are keys to include in the result even if you didn't request to change them. Tested in: testToArrayBasicFunctionality
         ]
@@ -460,10 +478,10 @@ $singleParamForField = [ // You may have as many field names and values as you l
 
 $singleParamForAssociation = [ //You may have as many field names and values as you like in your request, one is shown in the example for illustration. Tested in CudTest.php
     '<string>'=>[ // The key is the association name. A null can be put here instead to null the field, or a an id can be put here to automatically read and assign an entity with that id to the association. // Tested in CudTest.php
-        '<create | read | update | delete>'=>[ // This key is the chainType. chainType can be: create, update, delete, read. This triggers another entity to be created, retrieved and manipulated to be added to this association. Tested in CudTest.php
+        '<"create" | "read" | "update" | "delete">'=>[ // This key is the chainType. chainType can be: create, update, delete, read. This triggers another entity to be created, retrieved and manipulated to be added to this association. Tested in CudTest.php
             '<string|int|null>'=>[ // If you are chaining with a create chain type, omit the key. For another other chain type the key references the id of the entity to be retrieved from the database and manipulated.
                 '<string>'=>'<mixed>', // This is a reference to another field or association. Tested in CudTest.php
-                'assignType'=>'<set|add|remove|setSingle|addSingle|removeSingle|null(in quotes)|setNull|null>' // This is the assignment type that the entity will assigned to the association using. It corresponds to the method on the entity that will be called (IE: set<string> where string is the field name to set, such as setName). If null set will be used. Any time single is at the end of the assign type, then we strip the s off the end of the association name before calling the method. For instance if you have an association of users, but you have a method of addUser you need use an assignType of addSingle. // Tested in CudTest.php
+                'assignType'=>'<"set"|"add"|"remove"|"setSingle"|"addSingle"|"removeSingle"|"null"|"setNull"|null>' // This is the assignment type that the entity will assigned to the association using. It corresponds to the method on the entity that will be called (IE: set<string> where string is the field name to set, such as setName). If null set will be used. Any time single is at the end of the assign type, then we strip the s off the end of the association name before calling the method. For instance if you have an association of users, but you have a method of addUser you need use an assignType of addSingle. // Tested in CudTest.php
             ]
         ]
     ]
