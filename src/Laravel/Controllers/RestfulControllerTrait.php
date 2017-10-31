@@ -298,6 +298,7 @@ trait RestfulControllerTrait
      */
     protected function getTransformerSettings(ArrayObject $settings):array {
         $transformerSettings = $settings['controllerOptions']['transformerSettings'] ?? [];
+        $transformerSettings['frontEndOptions'] = $transformerSettings['frontEndOptions'] ?? [];
         $transformerSettings['frontEndOptions'] = array_replace_recursive($transformerSettings['frontEndOptions'], $settings['frontEndOptions']);
         return $transformerSettings;
     }
