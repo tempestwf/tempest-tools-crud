@@ -14,7 +14,7 @@ use TempestTools\Crud\Orm\EntityCoreTrait;
 
 
 /**
- * An abstract class for Doctrine Entities that other entities must extend to use the functionality of this package.
+ * An abstract class for that Doctrine entities must extend to use the functionality of this package.
  * @link    https://github.com/tempestwf
  * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
  */

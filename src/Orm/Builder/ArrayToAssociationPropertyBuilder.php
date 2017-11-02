@@ -15,7 +15,7 @@ use TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException;
 use TempestTools\Crud\Orm\Utility\BadBuilderCallTrait;
 
 /**
- * A builder that takes data store on an array, verifies it and modifies it as needed. This is used when processing data that will be used in regards to an entity association.
+ * A builder that takes data stored on an array, verifies it and modifies it as needed. This is used when processing data that will be used in regards to an entity association.
  * @link    https://github.com/tempestwf
  * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
  */

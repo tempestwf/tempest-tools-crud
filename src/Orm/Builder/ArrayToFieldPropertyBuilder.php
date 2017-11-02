@@ -66,7 +66,6 @@ class ArrayToFieldPropertyBuilder implements ArrayToFieldPropertyBuilderContract
 
     /** @noinspection MoreThanThreeArgumentsInspection
      * Changes a value that is about to be set on a field to match with the value stored in the config.
-     *
      * @param ArrayHelperContract $arrayHelper
      * @param string $fieldName
      * @param $params

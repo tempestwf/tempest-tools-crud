@@ -335,7 +335,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     }
 
     /**
-     * Processes the params for a passed for a specific association
+     * Processes the params passed for a specific association
      * @param EntityContract $entity
      * @param array $params
      * @return array
@@ -366,7 +366,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     }
 
     /**
-     * Runs on pre persist to validate and mutate the entity
+     * Runs on pre-persist to validate and mutate the entity
      * @param EntityContract $entity
      * @throws \RuntimeException
      */
@@ -481,7 +481,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     }
 
     /**
-     * Gets the values for specified fields on teh current entity
+     * Gets the values for specified fields on the current entity
      * @param EntityContract $entity
      * @param array $fields
      * @return array

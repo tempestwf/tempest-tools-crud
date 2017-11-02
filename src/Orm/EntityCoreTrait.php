@@ -43,7 +43,7 @@ trait EntityCoreTrait
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
-     * Initialization the entity with the helpers and anc config context.
+     * Initialization the entity with helpers and and config context.
      * @param string $mode
      * @param ArrayHelperContract|null $arrayHelper
      * @param array|null $path
@@ -62,7 +62,7 @@ trait EntityCoreTrait
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
-     * Converts the entity an array representation of it's fields values
+     * Converts the entity into an array representation of it's fields values
      * @param array $settings
      * @param mixed $slatedToTransform
      * @return array
@@ -215,7 +215,7 @@ trait EntityCoreTrait
 
 
     /**
-     * Gets the values for specified fields on teh current entity
+     * Gets the values for specified fields on the current entity
      * @param array $fields
      * @return array
      */

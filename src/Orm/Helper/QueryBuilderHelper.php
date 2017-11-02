@@ -217,7 +217,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
-     * Handles the nitty gritty of a ready operation, calling all the other required methods
+     * Handles the nitty gritty of a read operation, calling all the other required methods
      * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $params
      * @param array $frontEndOptions
@@ -272,7 +272,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     }
 
     /**
-     * Gets the result to the query from the DB while making sure all the options passed to the get result method are appropriate and match the requests from the front end and the config
+     * Gets the result to the query from the DB while making sure all the options passed to the get result method are appropriate
      * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @return array
@@ -529,7 +529,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     }
 
     /**
-     * Takes arguments requested and converts them to query placeholders so no data requested is every directly inserted into the query
+     * Takes arguments requested and converts them to query placeholders so no data requested is ever directly inserted into the query (stops injection)
      * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $arguments
      * @return array
@@ -547,7 +547,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     }
 
     /**
-     * Makes a unique placeholder name based on the requested data
+     * Makes a unique placeholder name based on the requested data. Unique but repeatable names are important for setting up test cases where the resulting DQL can be compared.
      * @param $value
      * @return string
      */

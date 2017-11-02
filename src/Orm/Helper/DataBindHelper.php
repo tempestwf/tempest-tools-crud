@@ -13,7 +13,7 @@ use TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException;
 use TempestTools\Crud\Orm\Utility\RepositoryTrait;
 
 /**
- * A helper used to bind data that was passed from the front end to an entity. This helper is used by a repository for common functionality related to create, update and delete requests.
+ * A helper used to bind data that was passed to an entity. This helper is used by a repository for common functionality related to create, update and delete requests.
  * @link    https://github.com/tempestwf
  * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
  */
@@ -27,7 +27,7 @@ class DataBindHelper implements DataBindHelperContract
     const IGNORE_KEYS = ['assignType', 'chainType', 'id'];
 
     /**
-     * The key that shared array object uses to store entities that were prepopulated
+     * The key that shared array object uses to store entities that were pre-populated
      */
     const PRE_POPULATED_ENTITIES_KEY = 'prePopulatedEntities';
 
@@ -43,7 +43,7 @@ class DataBindHelper implements DataBindHelperContract
 
 
     /**
-     * Makes sure the repo is ready to run
+     * Makes sure the repo is ready to run and pre prepare a transaction as needed
      *
      * @param GenericEventArgsContract $eventArgs
      * @internal param array $optionOverrides
@@ -181,7 +181,7 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
-     * Facilitates params that are passed from the front end only having the id of entity, instead of an array with an id key in it. This will trigger a read from the database and a set on the association where the id was specified.
+     * Facilitates params that are passed only having the id of entity, instead of an array with an id key in it. This will trigger a read from the database and a set on the association where the id was specified.
      * @param mixed $value
      * @return array
      */
@@ -311,7 +311,7 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
-     * Finds entities in the database from keys in the array passed to the method. This method also the value of the array keys on the entity retrieved, for easy access later on.
+     * Finds entities in the database from keys in the array passed to the method. This method also stores the value of the array keys on the entity retrieved, for easy access later on.
      * @param array $array
      * @return array
      */
@@ -381,7 +381,7 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
-     * Locates all the ids and class names of entities that could be pre populated for use with the current request.
+     * Locates all the ids and class names of entities that could be pre-populated for use with the current operation.
      * @param array $params
      * @param array $gathered
      * @return array
@@ -435,7 +435,7 @@ class DataBindHelper implements DataBindHelperContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
-     * Locates all the ids and class names of entities that could be pre populated for use with the current request, retrieves them from the database and stores them in the shared array space.
+     * Locates all the ids and class names of entities that could be pre populated for use with the current operation, retrieves them from the database and stores them in the shared array space.
      * @param array $params
      * @param array $options
      * @param array $optionOverrides
@@ -845,7 +845,7 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
-     * Takes params written in the simple param syntax convert it to the verbose param syntax
+     * Takes params written in the simple param syntax and converts them to the verbose param syntax
      * @param array $params
      * @param array $frontEndOptions
      * @return array

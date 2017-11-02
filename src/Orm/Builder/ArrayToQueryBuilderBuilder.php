@@ -24,7 +24,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
     use BadBuilderCallTrait;
 
     /** @noinspection MoreThanThreeArgumentsInspection
-     * Verifies that the parameters passed to this method to be used as part of a front end specified filter are valid by passing them through a closure stored in the config
+     * Verifies that the parameters passed to this method to be used as part of a requested filter are valid by passing them through a closure stored in the config
      * @param string $key
      * @param array $settings
      * @param ArrayHelperContract $arrayHelper
@@ -48,7 +48,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
 
 
     /** @noinspection MoreThanThreeArgumentsInspection
-     * Modifies the parameters passed to this method to be used as part of a front end specified filter using a closure stored in the config
+     * Modifies the parameters passed to this method to be used as part of a requested filter using a closure stored in the config
      * @param string $key
      * @param array $settings
      * @param ArrayHelperContract $arrayHelper

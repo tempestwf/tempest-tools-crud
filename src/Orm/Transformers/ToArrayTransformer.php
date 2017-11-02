@@ -20,6 +20,7 @@ use TempestTools\Crud\Contracts\Orm\EntityContract;
 class ToArrayTransformer extends SimpleTransformerAbstract {
 
     /**
+     * Converts an entity to array
      * @param EntityContract $entity
      * @return array
      */

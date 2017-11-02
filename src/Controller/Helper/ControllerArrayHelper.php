@@ -38,7 +38,7 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
 
     /** @noinspection MoreThanThreeArgumentsInspection */
     /**
-     * Normalizes a get request into all the information needed for repository and controller to respond to it
+     * Normalizes a get request into all the information needed for the repository and controller to respond to it
      * @param array $input
      * @param array $json
      * @param array $resourceIds
@@ -99,7 +99,7 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
     }
 
     /**
-     * Divides params passed to it into a params array and an options array and returns it. This method also figures out where to pull the query data from and extracts from there
+     * Divides params passed to it into a params array and an options array and returns it. This method also figures out where to pull the query data from and extracts it from there
      * @param array $input
      * @param array $json
      * @param string $queryLocation

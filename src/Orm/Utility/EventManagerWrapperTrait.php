@@ -38,6 +38,7 @@ trait EventManagerWrapperTrait
     }
 
     /**
+     * Initializes the event manager
      * @param bool $force
      * @throws \RuntimeException
      */

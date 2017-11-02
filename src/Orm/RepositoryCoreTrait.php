@@ -15,7 +15,7 @@ use TempestTools\Common\Contracts\ArrayHelperContract;
 use TempestTools\Crud\Orm\Utility\EventManagerWrapperTrait;
 
 /**
- * A trait that provides the packages repository related functionality to a class
+ * A trait that provides the repository related functionality to a class
  * @link    https://github.com/tempestwf
  * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
  */
@@ -332,7 +332,7 @@ trait RepositoryCoreTrait
     abstract public function createEntityManagerWrapper():EntityManagerWrapperContract;
 
     /**
-     * Locates all the ids and class names of entities that could be pre populated for use with the current request.
+     * Locates all the ids and class names of entities that could be pre-populated for use with the current request.
      * @param array $params
      * @param array $gathered
      * @return array

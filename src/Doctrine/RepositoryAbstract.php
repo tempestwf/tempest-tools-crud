@@ -17,7 +17,7 @@ use TempestTools\Crud\Exceptions\Orm\RepositoryException;
 use TempestTools\Crud\Orm\RepositoryCoreTrait;
 
 /**
- * An abstract class for Doctrine Repositories that other Repositories must extend to use the functionality of this package.
+ * An abstract class for Repositories that Doctrine Repositories must extend to use the functionality of this package.
  * @link    https://github.com/tempestwf
  * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
  */

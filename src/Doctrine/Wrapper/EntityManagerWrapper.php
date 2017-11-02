@@ -93,7 +93,7 @@ class EntityManagerWrapper implements EntityManagerWrapperContract
     }
 
     /**
-     * Flushes the db
+     * Flushes to the db
      * @param EntityContract $entity
      * @throws \Doctrine\ORM\OptimisticLockException
      */
