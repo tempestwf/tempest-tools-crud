@@ -8,7 +8,11 @@
 
 namespace TempestTools\Crud\Exceptions\Laravel\Controller;
 
-
+/**
+ * Exception for errors that can happen on a controller.
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 class ControllerException extends \RunTimeException
 {
     /**

@@ -10,6 +10,10 @@ namespace TempestTools\Crud\Contracts\Events;
 
 use ArrayObject;
 
+/**
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 interface SimpleEventContract
 {
     /**

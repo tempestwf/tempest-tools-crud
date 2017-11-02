@@ -8,7 +8,11 @@
 
 namespace TempestTools\Crud\Exceptions\Orm\Helper;
 
-
+/**
+ * Exception for errors that can happen on the data bind helper.
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 class DataBindHelperException extends \RunTimeException
 {
     /**

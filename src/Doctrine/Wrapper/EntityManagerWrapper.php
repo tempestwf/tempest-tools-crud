@@ -14,10 +14,20 @@ use TempestTools\Crud\Contracts\Orm\EntityContract;
 use TempestTools\Crud\Contracts\Orm\Wrapper\EntityManagerWrapperContract;
 use TempestTools\Crud\Contracts\Orm\RepositoryContract;
 
+/**
+ * A wrapper class to provide a universal interface for accessing Doctrine Entity Manager functionality.
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 class EntityManagerWrapper implements EntityManagerWrapperContract
 {
     use EmTrait;
 
+    /**
+     * EntityManagerWrapper constructor.
+     *
+     * @param EntityManager $entityManager
+     */
     public function __construct(EntityManager $entityManager)
     {
         $this->setEm($entityManager);
@@ -25,6 +35,7 @@ class EntityManagerWrapper implements EntityManagerWrapperContract
 
 
     /**
+     * Gets the associations for a specific entity class
      * @param string $entityName
      * @return array
      */
@@ -36,6 +47,7 @@ class EntityManagerWrapper implements EntityManagerWrapperContract
     }
 
     /**
+     * Gets the field names for a specific entity class
      * @param string $entityName
      * @return array
      */
@@ -47,6 +59,7 @@ class EntityManagerWrapper implements EntityManagerWrapperContract
     }
 
     /**
+     * Gets a class name for a specific association for a specific entity class
      * @param string $entityName
      * @param string $fieldName
      * @return string
@@ -60,6 +73,7 @@ class EntityManagerWrapper implements EntityManagerWrapperContract
     }
 
     /**
+     * Gets a repository for a specific class
      * @param string $targetClass
      * @return \Doctrine\ORM\EntityRepository|RepositoryContract
      */
@@ -70,7 +84,7 @@ class EntityManagerWrapper implements EntityManagerWrapperContract
     }
 
     /**
-     *
+     * Begins a transaction
      */
     public function beginTransaction ():void
     {
@@ -79,6 +93,7 @@ class EntityManagerWrapper implements EntityManagerWrapperContract
     }
 
     /**
+     * Flushes the db
      * @param EntityContract $entity
      * @throws \Doctrine\ORM\OptimisticLockException
      */
@@ -89,7 +104,7 @@ class EntityManagerWrapper implements EntityManagerWrapperContract
     }
 
     /**
-     *
+     * Rolls back a transaction
      * @throws \Doctrine\DBAL\ConnectionException
      */
     public function rollBack ():void
@@ -99,7 +114,7 @@ class EntityManagerWrapper implements EntityManagerWrapperContract
     }
 
     /**
-     *
+     * Commits a transaction
      * @throws \Doctrine\DBAL\ConnectionException
      */
     public function commit ():void
@@ -109,6 +124,7 @@ class EntityManagerWrapper implements EntityManagerWrapperContract
     }
 
     /**
+     * Persists an entity
      * @param EntityContract $entity
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      */
@@ -119,6 +135,7 @@ class EntityManagerWrapper implements EntityManagerWrapperContract
     }
 
     /**
+     * Removes an entity
      * @param EntityContract $entity
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      */

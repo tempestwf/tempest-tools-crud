@@ -16,11 +16,17 @@ use TempestTools\Crud\Doctrine\Wrapper\QueryBuilderSqlWrapper;
 use TempestTools\Crud\Exceptions\Orm\RepositoryException;
 use TempestTools\Crud\Orm\RepositoryCoreTrait;
 
+/**
+ * An abstract class for Doctrine Repositories that other Repositories must extend to use the functionality of this package.
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 abstract class RepositoryAbstract extends EntityRepository implements EventSubscriber, RepositoryContract
 {
     use RepositoryCoreTrait, CreateEventManagerWrapperTrait;
 
     /**
+     * Default options for a repository
      * @var array|NULL $options;
      */
     protected $options = [
@@ -34,6 +40,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     ];
 
     /**
+     * Creates an entity manager wrapper.
      * @return EntityManagerWrapperContract
      */
     public function createEntityManagerWrapper():EntityManagerWrapperContract
@@ -77,6 +84,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     }
 
     /**
+     * Creates a query builder wrapper
      * @param string $entityAlias
      * @return QueryBuilderWrapperContract
      * @throws \TempestTools\Crud\Exceptions\Orm\RepositoryException
@@ -100,6 +108,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     }
 
     /**
+     * Gets the class name for entities that use this repo
      * @return string
      * @throws \RuntimeException
      */
@@ -109,6 +118,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     }
 
     /**
+     * Gets the class name for entities that use this repo
      * @return string
      */
     public function getEntityNameBase(): string
@@ -117,6 +127,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
     }
 
     /**
+     * Convenience method for find in functionality
      * @param string $fieldName
      * @param array $values
      * @return mixed

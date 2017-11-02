@@ -12,11 +12,21 @@ namespace TempestTools\Crud\Laravel\Events;
 use ArrayObject;
 use \TempestTools\Crud\Contracts\Events\SimpleEventContract;
 
+/**
+ * An abstract class to be extended by events. This allows the event to have an array object of "arguments" assigned to it.
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 abstract class SimpleEventAbstract implements SimpleEventContract
 {
     /** @var  ArrayObject  $eventArgs*/
     protected $eventArgs;
 
+    /**
+     * SimpleEventAbstract constructor.
+     *
+     * @param ArrayObject $eventArgs
+     */
     public function __construct(ArrayObject $eventArgs)
     {
         $this->setEventArgs($eventArgs);

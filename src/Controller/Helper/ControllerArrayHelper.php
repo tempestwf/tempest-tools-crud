@@ -13,6 +13,12 @@ use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Crud\Contracts\Controller\ControllerContract;
 use TempestTools\Crud\Contracts\Controller\Helper\ControllerArrayHelperContract;
 
+/**
+ * A helper used for controllers
+ *
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelperContract
 {
     /** @var ControllerContract  $controller*/
@@ -32,6 +38,7 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
 
     /** @noinspection MoreThanThreeArgumentsInspection */
     /**
+     * Normalizes a get request into all the information needed for repository and controller to respond to it
      * @param array $input
      * @param array $json
      * @param array $resourceIds
@@ -56,6 +63,13 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
         return new ArrayObject(['self'=>$this, 'query'=>$query, 'frontEndOptions'=>$options, 'controllerOptions'=>$controllerOptions, 'overrides'=>$overrides, 'controller'=>$controller]);
     }
 
+    /**
+     * Injects the id that was passed to the route as a where filter that will be passed to the repository.
+     * @param array $query
+     * @param string $queryLocation
+     * @param $id
+     * @return array
+     */
     protected function injectIdOnGetRequest(array $query, string $queryLocation, $id):array
     {
         $alias = $controllerOptions['alias'] ?? $this->getController()->getRepo()->getEntityAlias();
@@ -85,11 +99,11 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
     }
 
     /**
+     * Divides params passed to it into a params array and an options array and returns it. This method also figures out where to pull the query data from and extracts from there
      * @param array $input
      * @param array $json
      * @param string $queryLocation
      * @return array
-     * @internal param array $params
      */
     protected function paramsToParamsAndOptions(array $input, array $json, string $queryLocation):array
     {
@@ -119,6 +133,7 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection
+     * Takes resource ids that were passed to the route and converts them into placeholder filters to pass to the repository. This facilitates easy adding placeholders to to index queries to filter results based on the resource ids that were passed to the route.
      * @param array $query
      * @param array $options
      * @param array $controllerOptions
@@ -152,6 +167,7 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
 
 
     /**
+     * Normalizes a non get request into all the information needed for repository and controller to respond to it
      * @param array $input
      * @param array $resourceIds
      * @param $id
@@ -175,6 +191,7 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
     }
 
     /**
+     * On a non get request this takes the id that was passed to the route and stores it in the params we pass to the repository.
      * @param array $options
      * @param array $params
      * @param $id
@@ -192,7 +209,7 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
     }
 
     /**
-     * Makes sure the repo is ready to run
+     * Before interacting with the repo the controller can make preparations (such as wrapping all actions in an additional transaction -- a useful feature if additional interactions with the database are going to happen via event listeners).
      *
      * @throws \RuntimeException
      */
@@ -214,7 +231,7 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
     }
 
     /**
-     * Makes sure every wraps up
+     * Makes sure every thing wraps up
      *
      * @param bool $failure
      * @internal param array $optionOverrides

@@ -10,6 +10,10 @@ namespace TempestTools\Crud\Contracts\Orm\Builder;
 
 use TempestTools\Common\Contracts\ArrayHelperContract;
 
+/**
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 interface ArrayToFieldPropertyBuilderContract
 {
     /** @noinspection MoreThanThreeArgumentsInspection

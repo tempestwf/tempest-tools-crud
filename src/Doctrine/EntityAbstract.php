@@ -13,13 +13,18 @@ use TempestTools\Crud\Doctrine\Utility\CreateEventManagerWrapperTrait;
 use TempestTools\Crud\Orm\EntityCoreTrait;
 
 
-/** @noinspection PhpSuperClassIncompatibleWithInterfaceInspection
- * Note: PHP Storm is mistaken, this does match with the contract
+/**
+ * An abstract class for Doctrine Entities that other entities must extend to use the functionality of this package.
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
  */
 abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityContract
 {
     use EntityCoreTrait, CreateEventManagerWrapperTrait;
 
+    /**
+     * The default format for date times
+     */
     const DEFAULT_DATE_TIME_FORMAT = 'Y-m-d H:i:s';
     /**
      * Makes event args to use
@@ -33,6 +38,7 @@ abstract class EntityAbstract implements EventSubscriber, HasIdContract, EntityC
     }/** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Utilized by toArray functionality to convert a property of the entity to an array representation.
      * @param $propertyValue
      * @param array $settings
      * @param array $requestedSettings

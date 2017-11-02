@@ -31,7 +31,11 @@ use TempestTools\Crud\Laravel\Events\Controller\PreShow;
 use TempestTools\Crud\Laravel\Events\Controller\PreStore;
 use TempestTools\Crud\Laravel\Events\Controller\PreUpdate;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
-
+/**
+ * A trait that can be applied to a controller to facilitate the packages functionality.
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 trait RestfulControllerTrait
 {
     use TTConfigTrait;
@@ -54,6 +58,7 @@ trait RestfulControllerTrait
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Initializes the controller setting up it's array helpers and relevant data based on it's config context.
      * @param string $mode
      * @param ArrayHelperContract|null $arrayHelper
      * @param array|null $path
@@ -71,6 +76,7 @@ trait RestfulControllerTrait
     }
 
     /**
+     * Initializes the controller array helper
      * @param bool $force
      * @param string $mode
      * @throws \RuntimeException
@@ -293,6 +299,7 @@ trait RestfulControllerTrait
     }
 
     /**
+     * Gets the settings to pass to the simple transformer
      * @param ArrayObject $settings
      * @return array
      */

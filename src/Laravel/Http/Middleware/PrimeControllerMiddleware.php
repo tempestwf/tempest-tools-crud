@@ -16,7 +16,11 @@ use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Crud\Contracts\Controller\ControllerContract;
 
 
-
+/**
+ * This middleware takes the path and override data assigned to the route and initializes the controller using it. This sets the config context for the controller automatically.
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 class PrimeControllerMiddleware
 {
     /**

@@ -13,6 +13,10 @@ namespace TempestTools\Crud\Contracts\Orm\Wrapper;
 use TempestTools\Crud\Contracts\Orm\EntityContract;
 use TempestTools\Crud\Contracts\Orm\RepositoryContract;
 
+/**
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 interface EntityManagerWrapperContract
 {
     /**

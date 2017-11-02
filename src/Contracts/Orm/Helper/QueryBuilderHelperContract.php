@@ -6,6 +6,10 @@ use TempestTools\Crud\Contracts\Orm\Builder\ArrayToQueryBuilderBuilderContract;
 use TempestTools\Crud\Contracts\Orm\RepositoryContract;
 use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
 
+/**
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 interface QueryBuilderHelperContract extends ArrayHelperContract
 {
 
@@ -74,6 +78,10 @@ interface QueryBuilderHelperContract extends ArrayHelperContract
      */
     public function addPlaceholders(QueryBuilderWrapperContract $qb, array $extra): void;
 
+    /**
+     * @param array $extra
+     * @return array
+     */
     public function buildCacheSettings (array $extra):array;
 
     /**

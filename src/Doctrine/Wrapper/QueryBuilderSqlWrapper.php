@@ -11,7 +11,11 @@ namespace TempestTools\Crud\Doctrine\Wrapper;
 use Doctrine\DBAL\Query\QueryBuilder;
 
 use TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException;
-
+/**
+ * A wrapper class to provide a universal interface for accessing Doctrine Sql Query Builder functionality.
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
 {
     /** @var QueryBuilder $queryBuilder*/
@@ -52,6 +56,7 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Gets the result for the query form the db
      * @param bool $paginate
      * @param bool $returnCount
      * @param int|null $hydrationType
@@ -98,6 +103,7 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Adds a from to the query
      * @param string $className
      * @param string $alias
      * @param string|null $indexBy
@@ -122,6 +128,7 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection
+     * Adds a left join to the query
      * @param string $join
      * @param string $alias
      * @param string|null $conditionType
@@ -139,6 +146,7 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection
+     * Adds an inner join to the query
      * @param string $join
      * @param string $alias
      * @param string|null $conditionType
@@ -157,6 +165,7 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
 
 
     /**
+     * Verifies that the operator for a front end filter is one of the allowed types.
      * @param string $operator
      * @throws QueryBuilderWrapperException
      */

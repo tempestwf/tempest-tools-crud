@@ -8,7 +8,10 @@
 
 namespace TempestTools\Crud\Contracts\Orm\Events;
 
-
+/**
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 interface GenericEventArgsContract
 {
     /**

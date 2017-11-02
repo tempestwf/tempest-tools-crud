@@ -13,18 +13,25 @@ use TempestTools\Common\Utility\ValidationFactoryTrait;
 use \Illuminate\Contracts\Validation\Factory;
 use TempestTools\Crud\Doctrine\EntityAbstract as EntityAbstractBase;
 use TempestTools\Crud\Exceptions\Orm\EntityException;
-
+/**
+ * An abstract class which Doctrine entities must extend to use the functionality of this package
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 abstract class EntityAbstract extends EntityAbstractBase
 {
     use ValidationFactoryTrait;
 
+    /**
+     * EntityAbstract constructor.
+     */
     public function __construct()
     {
         $this->setValidationFactoryHelper(new ValidationFactoryHelper());
     }
 
     /**
-     * Needs extending in a child class to get a validation factory to use
+     * Gets the validator factory to be used in validation
      *
      * @throws \RuntimeException
      */
@@ -37,7 +44,7 @@ abstract class EntityAbstract extends EntityAbstractBase
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
-     *
+     * Uses the validation factory to validate the data passed to the method.
      * @param array $values
      * @param array $rules
      * @param array $messages

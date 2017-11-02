@@ -14,7 +14,11 @@ use TempestTools\Common\Utility\EvmTrait;
 use TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract;
 use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
 
-
+/**
+ * A wrapper class to provide a universal interface for accessing Doctrine Event Manager functionality.
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 class EventManagerWrapper implements EventManagerWrapperContract
 {
     use EvmTrait;
@@ -31,6 +35,7 @@ class EventManagerWrapper implements EventManagerWrapperContract
     }
 
     /**
+     * Adds an event subscriber
      * @param EventSubscriber $target
      */
     public function addEventSubscriber (EventSubscriber $target):void
@@ -40,6 +45,7 @@ class EventManagerWrapper implements EventManagerWrapperContract
     }
 
     /**
+     * Dispatches an event
      * @param string $event
      * @param GenericEventArgsContract $args
      */

@@ -12,6 +12,10 @@ use ArrayObject;
 use TempestTools\Common\Contracts\ArrayHelperContract;
 use TempestTools\Crud\Contracts\Controller\ControllerContract;
 
+/**
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 interface ControllerArrayHelperContract extends ArrayHelperContract
 {
     /** @noinspection MoreThanThreeArgumentsInspection */

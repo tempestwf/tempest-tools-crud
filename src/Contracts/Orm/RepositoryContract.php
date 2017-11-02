@@ -19,7 +19,10 @@ use TempestTools\Crud\Contracts\Orm\Helper\DataBindHelperContract;
 use TempestTools\Crud\Contracts\Orm\Helper\QueryBuilderHelperContract;
 use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
 
-
+/**
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 interface RepositoryContract extends HasTTConfig
 {
 

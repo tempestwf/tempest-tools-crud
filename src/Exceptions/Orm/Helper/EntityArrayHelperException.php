@@ -11,6 +11,11 @@ namespace TempestTools\Crud\Exceptions\Orm\Helper;
 
 use TempestTools\Crud\Contracts\Orm\EntityContract;
 
+/**
+ * Exception for errors that can happen on the entity array helper
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 class EntityArrayHelperException extends \RunTimeException
 {
     /**

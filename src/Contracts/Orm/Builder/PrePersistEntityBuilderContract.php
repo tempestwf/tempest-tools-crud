@@ -10,6 +10,10 @@ namespace TempestTools\Crud\Contracts\Orm\Builder;
 
 use TempestTools\Crud\Contracts\Orm\EntityContract;
 
+/**
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 interface PrePersistEntityBuilderContract
 {
     /** @noinspection MoreThanThreeArgumentsInspection

@@ -10,6 +10,10 @@ use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
 use TempestTools\Crud\Contracts\Orm\Helper\EntityArrayHelperContract;
 use TempestTools\Crud\Contracts\HasTTConfig;
 
+/**
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 interface EntityContract extends HasTTConfig
 {
 

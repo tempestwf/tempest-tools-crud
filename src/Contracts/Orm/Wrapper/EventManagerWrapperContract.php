@@ -11,6 +11,10 @@ namespace TempestTools\Crud\Contracts\Orm\Wrapper;
 use Doctrine\Common\EventSubscriber;
 use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
 
+/**
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 interface EventManagerWrapperContract
 {
     /**

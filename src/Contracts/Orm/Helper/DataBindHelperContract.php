@@ -6,6 +6,10 @@ use TempestTools\Crud\Contracts\Orm\EntityContract;
 use TempestTools\Crud\Contracts\Orm\RepositoryContract;
 use TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException;
 
+/**
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 interface DataBindHelperContract
 {
 
@@ -131,6 +135,9 @@ interface DataBindHelperContract
      */
     public function prePopulateEntities(array $params, array $options, array $optionOverrides, string $action):void;
 
+    /**
+     *
+     */
     public function clearPrePopulatedEntities():void;
 }
 ?>

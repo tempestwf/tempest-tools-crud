@@ -11,6 +11,10 @@ namespace TempestTools\Crud\Contracts\Orm\Builder;
 use TempestTools\Common\Contracts\ArrayHelperContract;
 use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
 
+/**
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 interface ArrayToQueryBuilderBuilderContract
 {
     /** @noinspection MoreThanThreeArgumentsInspection

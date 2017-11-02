@@ -19,14 +19,14 @@ $repoConfig = [
                     ]
                 ],
                 'where'=>[  // Optional. A list of arbitrary key names and strings, or arrays used to make where clauses. Tested in: testGeneralQueryBuilding
-                    '<string>'=>[ // Can be null to disable the block.Tested in: testGeneralQueryBuilding
-                        'type'=>'<null | and | or>', //If null then it's neither a 'and' or 'or' where clause, or wise it can be set to 'and' or 'or' Tested in: testGeneralQueryBuilding
+                    '<string>'=>[ // Can be null to disable the block. Tested in: testGeneralQueryBuilding
+                        'type'=>'<"and" | "or" | null>', // If null then it's neither a 'and' or 'or' where clause, or wise it can be set to 'and' or 'or' Tested in: testGeneralQueryBuilding
                         'value'=>'<string|array>' // Either a string used in the where clause or an array.  If an array of: ['expr'=>'<xpr name>', 'arguments'=>['<arguments, could be another xpr array>']] is used, then all parts will be parsed by the array helper, and corresponding xpr methods will be called with the specified arguments. This is true for all parts of the query //Tested in: testGeneralQueryBuilding
                     ]
                 ],
                 'having'=>[ // Optional. Works the same as the where section but applied to a having clause. Tested in: testGeneralQueryBuilding
                     '<string>'=>[ // Optional. Can be null to disable the block. Tested in: testGeneralQueryBuilding
-                        'type'=>'<null | and | or>', //Tested in: testGeneralQueryBuilding
+                        'type'=>'<"and" | "or" | null>', //Tested in: testGeneralQueryBuilding
                         'value'=>'<string|array>' // can be an array expression like with the where. Tested in: testGeneralQueryBuilding
                     ]
                 ],
@@ -356,7 +356,7 @@ $frontEndQueryToGet = [
         ],
     ],
     'options'=>[ // Optional block. This block lets you pass in options related to the query. You may add your own keys and values for your own implementations as well. These options will be passed to the repository actions that are called and may be referenced by your custom event listeners and closures.
-        'returnCount'=>'<boolean|null>', // Whether or not the count should be returned from and index action. Defaults to true. Tested in: testGeneralDataRetrieval
+        'returnCount'=>'<boolean|null>', // Defaults to true. Whether or not the count should be returned from and index action. Defaults to true. Tested in: testGeneralDataRetrieval
         'limit'=>'<int|null>', // The limit to apply to the query (max number of rows that will be returned). Defaults to 100. Tested in: testGeneralQueryBuilding
         'offset'=>'<int|null>', // The offset for the query. If omitted index actions will return data starting at the first available row. Tested in: testGeneralQueryBuilding
         'useGetParams'=>'<boolean|null>',// Whether or not to expect the params to be in discrete get params format as illustrated below. Defaults to true. You would not pass this option directly from the front end -- it will instead be detected from if you called the url like so: <url>?queryLocation=params, or if you omitted the queryLocation all together.  Tested in testGeneralQueryBuildingWithGetParams
@@ -455,7 +455,7 @@ $frontEndQueryToGet = [
 $exampleFrontEndNonGetRequest = [
     'params'=>['<array>'], // See below for examples for different types of param sets that can be passed
     'options'=>[ // Optional. This block relates to the options for the request.
-        'simplifiedParams'=>'<boolean|null>', //Defaults to false, may also be set as a different default on the controller. This value is whether or not to process the params as standard params or simplified params. Both param examples are below.
+        'simplifiedParams'=>'<boolean|null>', // Defaults to false, may also be set as a different default on the controller. This value is whether or not to process the params as standard params or simplified params. Both param examples are below.
         'testMode'=>'<boolean|null>', // Defaults to false, if set to true then data will be rolled back instead of committed. This lets you write test cases that use the api but not store anything to the db
         'toArray'=>[ // Optional. This blocks relates to the data that should be returned -- specifying how the entities will be transformed to an array.
             'completeness'=>'<"full" | "limited" | "minimal" | "none" | null>', // Defaults to full, if 'full' then all data will be shown so long as it wouldn't trigger an infinite loop (relations between entities are omitted as soon as they loop back on them selves), if 'limited' then all data will be shown but relations leading to already processed entities will not be shown, if 'minimal' the same entity will never be shown twice in the return and an empty array will be in it's place, if 'none' nothing is returned. Tested in: testToArrayBasicFunctionality

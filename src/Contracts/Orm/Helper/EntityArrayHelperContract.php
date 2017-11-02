@@ -10,6 +10,10 @@ use TempestTools\Crud\Contracts\Orm\Builder\ArrayToFieldPropertyBuilderContract;
 use TempestTools\Crud\Contracts\Orm\Builder\PrePersistEntityBuilderContract;
 use TempestTools\Crud\Contracts\Orm\EntityContract;
 
+/**
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 interface EntityArrayHelperContract extends ArrayHelperContract
 {
 

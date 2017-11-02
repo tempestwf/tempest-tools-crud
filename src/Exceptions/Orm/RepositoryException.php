@@ -8,7 +8,11 @@
 
 namespace TempestTools\Crud\Exceptions\Orm;
 
-
+/**
+ * Exception for errors that can happen on a repository.
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 class RepositoryException extends \RunTimeException
 {
     /**

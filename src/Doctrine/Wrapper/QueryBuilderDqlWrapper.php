@@ -17,6 +17,11 @@ use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
 use TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException;
 use Doctrine\ORM\Query;
 
+/**
+ * A wrapper class to provide a universal interface for accessing Doctrine Dql Query Builder functionality.
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
 {
     /**
@@ -50,6 +55,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Gets the result for the query form the db
      * @param bool $paginate
      * @param bool $returnCount
      * @param int|null $hydrationType
@@ -101,6 +107,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
     }
 
     /**
+     * Adds a group by to the query
      * @param string $string
      * @param bool $add
      */
@@ -114,6 +121,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
     }
 
     /**
+     * Adds an order by to the query
      * @param string $sort
      * @param string $order
      * @param bool $add
@@ -129,6 +137,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
     }
 
     /**
+     * Adds a where to the query
      * @param string $type
      * @param string $string
      * @param bool $add
@@ -145,6 +154,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
     }
 
     /**
+     * Adds a having to the query
      * @param string $type
      * @param string $string
      * @param bool $add
@@ -160,6 +170,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
     }
 
     /**
+     * Calls an expression on the expression builder and passes it in the required arguments for the expression.
      * @param string $expr
      * @param array $arguments
      * @return string
@@ -172,6 +183,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
     }
 
     /**
+     * Sets a parameter in a query
      * @param string $placeholderName
      * @param $argument
      * @param null $type
@@ -188,6 +200,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
 
 
     /**
+     * Sets the cache settings of the query
      * @param Query $query
      * @param bool $useQueryCache
      * @param bool $useResultCache
@@ -210,6 +223,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
     }
 
     /**
+     * Adds a select to the query
      * @param string $string
      * @param bool $add
      */
@@ -224,6 +238,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Adds a from to the query
      * @param string $className
      * @param string $alias
      * @param string|null $indexBy
@@ -240,6 +255,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection
+     * Adds a left joint to the query
      * @param string $join
      * @param string $alias
      * @param string|null $conditionType
@@ -252,6 +268,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection
+     * Adds an inner join to the query
      * @param string $join
      * @param string $alias
      * @param string|null $conditionType
@@ -264,6 +281,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
     }
 
     /**
+     * Adds a limit and offset to the query
      * @param int $limit
      * @param int $offset
      */
@@ -276,6 +294,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
     }
 
     /**
+     * Verifies that the field format for a field passed from the front end is formed correctly
      * @param string $field
      * @param bool $noisy
      * @return bool
@@ -294,6 +313,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
     }
 
     /**
+     * Verifies that a direction for an order by from the front end is one of the allowable options.
      * @param string $direction
      * @param bool $noisy
      * @return bool
@@ -312,6 +332,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
     }
 
     /**
+     * Verifies that the operator for a front end filter is one of the allowed types.
      * @param string $operator
      * @throws \TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
      */

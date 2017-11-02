@@ -12,6 +12,11 @@ namespace TempestTools\Crud\Doctrine\Events;
 use Doctrine\Common\EventArgs;
 use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
 
+/**
+ * A class for a simple object that stores arguments for events.
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 class GenericEventArgs extends EventArgs implements GenericEventArgsContract
 {
     /** @var \ArrayObject */

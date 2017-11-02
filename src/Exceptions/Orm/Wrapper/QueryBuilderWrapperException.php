@@ -8,7 +8,11 @@
 
 namespace TempestTools\Crud\Exceptions\Orm\Wrapper;
 
-
+/**
+ * Exception for errors that can happen on the query builder wrappers.
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 class QueryBuilderWrapperException extends \RunTimeException
 {
     /**

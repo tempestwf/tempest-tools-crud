@@ -9,6 +9,10 @@
 namespace TempestTools\Crud\Contracts\Orm\Wrapper;
 
 
+/**
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 interface QueryBuilderWrapperContract
 {
 
