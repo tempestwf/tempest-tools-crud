@@ -14,12 +14,18 @@ use TempestTools\Crud\Contracts\Orm\EntityContract;
 use TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException;
 use TempestTools\Crud\Orm\Utility\BadBuilderCallTrait;
 
+/**
+ * A builder that takes data store on an array, verifies it and modifies it as needed. This is used when processing data from an entity during the pre-persist event.
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 class PrePersistEntityBuilder implements PrePersistEntityBuilderContract
 {
 
     use BadBuilderCallTrait, AccessorMethodNameTrait;
 
     /** @noinspection MoreThanThreeArgumentsInspection
+     * Enforces the fields of the entity match with the values specified in the config
      * @param EntityContract $entity
      * @param array $fieldSetting
      * @return mixed
@@ -53,6 +59,7 @@ class PrePersistEntityBuilder implements PrePersistEntityBuilderContract
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection
+     * Uses a closure to verify that the entity is valid
      * @param EntityContract $entity
      * @param \Closure $fieldSetting
      * @return mixed
@@ -67,6 +74,7 @@ class PrePersistEntityBuilder implements PrePersistEntityBuilderContract
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection
+     * Sets fields of the entity to match with values stored in the config
      * @param EntityContract $entity
      * @param mixed $fieldSetting
      * @return mixed
@@ -86,6 +94,7 @@ class PrePersistEntityBuilder implements PrePersistEntityBuilderContract
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection
+     * Modifies the entity using a closure stored in the config
      * @param EntityContract $entity
      * @param mixed $fieldSetting
      * @return mixed
@@ -97,6 +106,7 @@ class PrePersistEntityBuilder implements PrePersistEntityBuilderContract
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection
+     * Validates the entity based on the validation data stored in the config. It does this by leveraging a validation factory.
      * @param EntityContract $entity
      * @param mixed $fieldSetting
      * @return mixed

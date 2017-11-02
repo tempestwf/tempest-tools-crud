@@ -14,11 +14,17 @@ use TempestTools\Crud\Contracts\Orm\Builder\ArrayToAssociationPropertyBuilderCon
 use TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException;
 use TempestTools\Crud\Orm\Utility\BadBuilderCallTrait;
 
+/**
+ * A builder that takes data store on an array, verifies it and modifies it as needed. This is used when processing data that will be used in regards to an entity association.
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 class ArrayToAssociationPropertyBuilder implements ArrayToAssociationPropertyBuilderContract
 {
     use BadBuilderCallTrait;
 
     /** @noinspection MoreThanThreeArgumentsInspection
+     * Makes sure that the values for the association match with the values that are set to be enforced in the entity config
      * @param ArrayHelperContract $arrayHelper
      * @param string $fieldName
      * @param array $values
@@ -40,14 +46,16 @@ class ArrayToAssociationPropertyBuilder implements ArrayToAssociationPropertyBui
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection
+     * Runs a closure to validate the values being set for the association
+     *
      * @param ArrayHelperContract $arrayHelper
      * @param string $fieldName
      * @param array $values
      * @param array $params
      * @param mixed $fieldSetting
      * @return mixed
+     * @throws \RuntimeException
      * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
-     * @internal param EntityContract $entity
      */
     public function closure(ArrayHelperContract $arrayHelper, string $fieldName, array $values, array $params, $fieldSetting)
     {
@@ -58,13 +66,15 @@ class ArrayToAssociationPropertyBuilder implements ArrayToAssociationPropertyBui
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection
+     * Sets values being set on an association to make the values stored in a setTo array in the config.
+     *
      * @param ArrayHelperContract $arrayHelper
      * @param string $fieldName
      * @param $params
      * @param array $values
      * @param mixed $fieldSetting
      * @return mixed
-     * @internal param EntityContract $entity
+     * @throws \RuntimeException
      */
     public function setTo (ArrayHelperContract $arrayHelper, string $fieldName, array $values, array $params, $fieldSetting)
     {
@@ -74,13 +84,14 @@ class ArrayToAssociationPropertyBuilder implements ArrayToAssociationPropertyBui
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection
+     * Mutates the values being set on an association using a closure.
      * @param ArrayHelperContract $arrayHelper
      * @param string $fieldName
      * @param array $values
      * @param array $params
      * @param mixed $fieldSetting
      * @return mixed
-     * @internal param EntityContract $entity
+     * @throws \RuntimeException
      */
     public function mutate (ArrayHelperContract $arrayHelper, string $fieldName, array $values, array $params, $fieldSetting) {
         return $arrayHelper->parse($fieldSetting, $params);

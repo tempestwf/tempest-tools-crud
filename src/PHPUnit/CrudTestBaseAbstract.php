@@ -8,6 +8,11 @@ use TempestTools\Common\Helper\ArrayHelper;
 
 
 /** @noinspection LongInheritanceChainInspection */
+/**
+ * A base class with data on it to make building tests for the package easier
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 abstract class CrudTestBaseAbstract extends \TestCase
 {
     use MakeEmTrait;

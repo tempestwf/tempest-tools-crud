@@ -12,6 +12,11 @@ use TempestTools\Crud\Contracts\Orm\EntityContract;
  * Time: 3:52 PM
  */
 
+/**
+ * Transforms entities to an array representation of their fields values
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 class ToArrayTransformer extends SimpleTransformerAbstract {
 
     /**

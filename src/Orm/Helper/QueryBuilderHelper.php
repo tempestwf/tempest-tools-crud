@@ -14,6 +14,11 @@ use TempestTools\Crud\Exceptions\Orm\Helper\QueryBuilderHelperException;
 use TempestTools\Crud\Orm\Builder\ArrayToQueryBuilderBuilder;
 use TempestTools\Crud\Orm\Utility\RepositoryTrait;
 
+/**
+ * A array helper class with functionality for building queries
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContract
 {
     use RepositoryTrait;
@@ -64,6 +69,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
 
 
     /**
+     * Handles a read operation
      * @param array $params
      * @param array $frontEndOptions
      * @param array $optionOverrides
@@ -101,6 +107,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     }
 
     /**
+     * Converts get params to filter and options in the standard format
      * @param array $params
      * @param array $frontEndOptions
      * @return array
@@ -117,6 +124,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     }
 
     /**
+     * Handles the nitty gritty for conversion of get params
      * @param array $params
      * @param array $frontEndOptions
      * @return array
@@ -171,6 +179,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
 
 
     /**
+     * Handles the conversion of filter params when converting get params to the standard format
      * @param array $parts
      * @param $value
      * @return array
@@ -208,6 +217,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Handles the nitty gritty of a ready operation, calling all the other required methods
      * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $params
      * @param array $frontEndOptions
@@ -245,6 +255,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
 
 
     /**
+     * Verifies the current operation is allowed in the config
      * @param array $extra
      * @throws \RuntimeException
      * @throws \TempestTools\Crud\Exceptions\Orm\Helper\QueryBuilderHelperException
@@ -261,6 +272,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     }
 
     /**
+     * Gets the result to the query from the DB while making sure all the options passed to the get result method are appropriate and match the requests from the front end and the config
      * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @return array
@@ -288,6 +300,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     }
 
     /**
+     * Adds a limit and offset to the query
      * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws \RuntimeException
@@ -305,6 +318,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
 
 
     /**
+     * Verifies that the limit and offset requested as appropriate based on the config
      * @param int $limit
      * @param int $offset
      * @param array $extra
@@ -337,6 +351,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     }
 
     /**
+     * Adds group bys requested
      * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws \RuntimeException
@@ -358,6 +373,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
 
 
     /**
+     * Verifies that the group bys requested are appropriate based on the config
      * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param string $key
      * @param array $permissions
@@ -389,6 +405,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
 
 
     /**
+     * Adds order bys that were requested
      * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws \RuntimeException
@@ -407,6 +424,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Verifies the that the requested order bys are appropriate based on the config
      * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param string $key
      * @param string $value
@@ -438,6 +456,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     }
 
     /**
+     * Adds a requested where filter
      * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws \RuntimeException
@@ -457,6 +476,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
 
 
     /**
+     * Adds a requested having filter
      * @param QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws \RuntimeException
@@ -476,6 +496,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Builds the filters based on the request for where or having query parts
      * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $condition
      * @param array $permissions
@@ -508,6 +529,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     }
 
     /**
+     * Takes arguments requested and converts them to query placeholders so no data requested is every directly inserted into the query
      * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $arguments
      * @return array
@@ -525,6 +547,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     }
 
     /**
+     * Makes a unique placeholder name based on the requested data
      * @param $value
      * @return string
      */
@@ -537,6 +560,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Verifies that the where and having filters requested are appropriate based on the config
      * @param QueryBuilderWrapperContract $qb
      * @param array $condition
      * @param array $permissions
@@ -567,6 +591,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
 
 
     /**
+     * Adds placeholders to the query
      * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $extra
      * @throws \RuntimeException
@@ -602,6 +627,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Verifies that the requested placeholders are appropriate based on the config
      * @param string $key
      * @param array $value
      * @param ArrayHelperContract $arrayHelper
@@ -627,6 +653,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     }
 
     /**
+     * Builds cache related settings for the query
      * @param array $extra
      * @throws RuntimeException
      * @throws \Doctrine\ORM\ORMException
@@ -657,13 +684,13 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
             $timeToLive = $arrayHelper->parse($timeToLive, $extra);
             /** @noinspection NullPointerExceptionInspection */
             $cacheId = $arrayHelper->parse($cacheId, $extra);
-            return ['useQueryCache'=>$useQueryCache, 'useResultCache'=>$useResultCache, 'timeToLive'=>$timeToLive, 'cacheId'=>$cacheId, 'queryCacheDriver'=>$queryCacheDriver, 'resultCacheDriver'=>$resultCacheDriver, 'queryCacheProfile'=>$queryCacheProfile];
-            //$qb->setCacheSettings($useQueryCache, $useResultCache, $timeToLive, $cacheId, $queryCacheDriver, $resultCacheDriver);
+            return compact('useQueryCache', 'useResultCache', 'timeToLive', 'cacheId', 'queryCacheDriver', 'resultCacheDriver', 'queryCacheProfile');
         }
         return [];
     }
 
     /**
+     * Builds the base query via the config
      * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $extra
      */
@@ -679,6 +706,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     }
 
     /**
+     * Checks that more query params have not been requested than are allowed in the options
      * @param array $values
      * @param array $options
      * @param array $optionOverrides
@@ -705,6 +733,7 @@ class QueryBuilderHelper extends ArrayHelper implements QueryBuilderHelperContra
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Processes settings blocks stored in the config to call the builder in order to process the requested data
      * @param string $key
      * @param $value
      * @param ArrayHelperContract $arrayHelper

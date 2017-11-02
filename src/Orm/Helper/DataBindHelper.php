@@ -12,12 +12,23 @@ use TempestTools\Crud\Doctrine\EntityAbstract;
 use TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException;
 use TempestTools\Crud\Orm\Utility\RepositoryTrait;
 
+/**
+ * A helper used to bind data that was passed from the front end to an entity. This helper is used by a repository for common functionality related to create, update and delete requests.
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 class DataBindHelper implements DataBindHelperContract
 {
     use RepositoryTrait;
 
+    /**
+     * Keys to ignore when they are encountered in an array of params
+     */
     const IGNORE_KEYS = ['assignType', 'chainType', 'id'];
 
+    /**
+     * The key that shared array object uses to store entities that were prepopulated
+     */
     const PRE_POPULATED_ENTITIES_KEY = 'prePopulatedEntities';
 
     /**
@@ -121,12 +132,16 @@ class DataBindHelper implements DataBindHelperContract
         }
     }
 
+    /**
+     * Clears the pre-populated entities for the shared array object at the end of a transaction.
+     */
     public function clearPrePopulatedEntities():void
     {
         /** @noinspection NullPointerExceptionInspection */
         $this->getRepository()->getArrayHelper()->getArray()[CommonArrayObjectKeyConstants::ORM_KEY_NAME][static::PRE_POPULATED_ENTITIES_KEY] = null;
     }
     /**
+     * Binds data based on the params passed to the method to fields and associations on an entity.
      * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
      * @param array $params
      * @return \TempestTools\Crud\Contracts\Orm\EntityContract
@@ -166,6 +181,7 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
+     * Facilitates params that are passed from the front end only having the id of entity, instead of an array with an id key in it. This will trigger a read from the database and a set on the association where the id was specified.
      * @param mixed $value
      * @return array
      */
@@ -184,6 +200,7 @@ class DataBindHelper implements DataBindHelperContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Binds data to an association on an entity
      * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
      * @param string $associationName
      * @param array $params
@@ -215,6 +232,7 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
+     * Binds multiple entities to an association on another entity.
      * @param array $entities
      * @param \TempestTools\Crud\Contracts\Orm\EntityContract $targetEntity
      * @param string $associationName
@@ -237,6 +255,7 @@ class DataBindHelper implements DataBindHelperContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Facilitates chaining, so when the params passed reference an association of the current entity, those params can be used to create, read, update or delete data for the associated entities.
      * @param string $chainType
      * @param array $params
      * @param array $chainOverrides
@@ -273,6 +292,7 @@ class DataBindHelper implements DataBindHelperContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Prepares and verifies data that relates to an association of the current entity.
      * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
      * @param string $associationName
      * @param array $paramsForEntities
@@ -291,6 +311,7 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
+     * Finds entities in the database from keys in the array passed to the method. This method also the value of the array keys on the entity retrieved, for easy access later on.
      * @param array $array
      * @return array
      */
@@ -307,6 +328,7 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
+     * Gets and returns entities that were already pre-populated from the shared array object, and reports that entities it was not able to retrieve in this manner.
      * @param array $array
      * @return array
      */
@@ -339,6 +361,7 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
+     * Gets a repository class for a specific association of an entity.
      * @param string $targetClass
      * @throws DataBindHelperException
      * @return RepositoryContract
@@ -358,6 +381,7 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
+     * Locates all the ids and class names of entities that could be pre populated for use with the current request.
      * @param array $params
      * @param array $gathered
      * @return array
@@ -411,6 +435,7 @@ class DataBindHelper implements DataBindHelperContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Locates all the ids and class names of entities that could be pre populated for use with the current request, retrieves them from the database and stores them in the shared array space.
      * @param array $params
      * @param array $options
      * @param array $optionOverrides
@@ -449,6 +474,7 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
+     * Takes the ids and class names of the entities that need to be pre-populated, retrieves them from the database and stores them in the shared array object
      * @param array $gathered
      * @param \ArrayObject $sharedArray
      */
@@ -482,6 +508,7 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
+     * Handles a create operation
      * @param array $params
      * @param array $optionOverrides
      * @param array $frontEndOptions
@@ -532,6 +559,7 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
+     * Handles the integration between events listeners/subscribers and the create logic for a single entity
      * @param GenericEventArgsContract $eventArgs
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
@@ -554,6 +582,7 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
+     * Creates a single entity
      * @param \TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract $eventArgs
      * @return \TempestTools\Crud\Contracts\Orm\EntityContract
      * @throws \TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException
@@ -572,6 +601,7 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
+     * Detects if the array passed to the method is already wrapped in another array, if not it wraps it and returns it
      * @param array $array
      * @return array
      */
@@ -587,6 +617,7 @@ class DataBindHelper implements DataBindHelperContract
         return $needsWrapping === true?[$array]:$array;
     }
     /**
+     * Handles an update operation
      * @param array $params
      * @param array $optionOverrides
      * @param array $frontEndOptions
@@ -641,6 +672,7 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
+     * Handles the integration between events listeners/subscribers and the update logic for a single entity
      * @param \TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract $eventArgs
      * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
      * @throws \InvalidArgumentException
@@ -665,6 +697,7 @@ class DataBindHelper implements DataBindHelperContract
 
 
     /**
+     * Handles a delete operation
      * @param array $params
      * @param array $optionOverrides
      * @param array $frontEndOptions
@@ -719,6 +752,7 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
+     * Handles the integration between events listeners/subscribers and the delete logic for a single entity
      * @param \TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract $eventArgs
      * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
      * @throws \InvalidArgumentException
@@ -742,6 +776,7 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
+     * Processes a single entity, used for Create, Update and Delete operations
      * @param GenericEventArgsContract $eventArgs
      * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
      * @param bool $remove
@@ -785,6 +820,7 @@ class DataBindHelper implements DataBindHelperContract
 
 
     /**
+     * Makes sure that more entities have not been requested for the batch than is allowed in the options for the repository.
      * @param array $values
      * @param array $options
      * @param array $optionOverrides
@@ -809,6 +845,7 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
+     * Takes params written in the simple param syntax convert it to the verbose param syntax
      * @param array $params
      * @param array $frontEndOptions
      * @return array
@@ -825,6 +862,7 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
+     * Does the nitty gritty of the conversion from simple to verbose param syntax.
      * @param array $params
      * @param bool $topLevel
      * @param string $defaultAssignType
@@ -925,6 +963,7 @@ class DataBindHelper implements DataBindHelperContract
     }
 
     /**
+     * Handles chain requests in params when they are being converted from simple to verbose syntax.
      * @param array $params
      * @return array
      */

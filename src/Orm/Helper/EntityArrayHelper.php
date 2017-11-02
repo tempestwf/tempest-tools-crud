@@ -16,7 +16,11 @@ use TempestTools\Crud\Orm\Builder\ArrayToAssociationPropertyBuilder;
 use TempestTools\Crud\Orm\Builder\ArrayToFieldPropertyBuilder;
 use TempestTools\Crud\Orm\Builder\PrePersistEntityBuilder;
 
-
+/**
+ * An array helper with functionality added to process data related to entities.
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
 {
     use AccessorMethodNameTrait;
@@ -30,6 +34,14 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     /** @var  PrePersistEntityBuilderContract $persistEntityBuilder*/
     protected $prePersistEntityBuilder;
 
+    /**
+     * EntityArrayHelper constructor.
+     *
+     * @param ArrayObject|null $array
+     * @param ArrayToFieldPropertyBuilderContract|null $arrayToFieldPropertyBuilder
+     * @param ArrayToAssociationPropertyBuilderContract|null $arrayToAssociationPropertyBuilder
+     * @param PrePersistEntityBuilderContract|null $prePersistEntityBuilder
+     */
     public function __construct(
         ArrayObject $array = null,
         /** @noinspection PhpHierarchyChecksInspection */
@@ -51,6 +63,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Converts an entity to an array and handles all the rules and chaining involved there in.
      * @param EntityContract $entity
      * @param array $settings
      * @param mixed $slatedToTransform
@@ -95,6 +108,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * The core functionality of the toArray features
      * @param EntityContract $entity
      * @param array $settings
      * @param null $slatedToTransform
@@ -179,6 +193,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     }
 
     /**
+     * Gets configurations for a specific field
      * @param string $fieldName
      * @param string $keyName
      * @return mixed
@@ -191,6 +206,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Checks if the type of chaining that is requested is allowed for the requested association in the config for the entity
      * @param EntityContract $entity
      * @param string $associationName
      * @param string $chainType
@@ -221,6 +237,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Checks if the requested assignment type is allowed for the specified field in the current config
      * @param EntityContract $entity
      * @param string $associationName
      * @param string $assignType
@@ -256,6 +273,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     }
 
     /**
+     * Checks if the current operation is allowed in the config for the entity
      * @param EntityContract $entity
      * @param bool $nosey
      * @return bool
@@ -278,6 +296,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
 
 
     /**
+     * Gets settings for a specific field in the config for the entity
      * @param string $fieldName
      * @param $params
      * @return array
@@ -289,6 +308,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     }
 
     /**
+     * Processes the data to be set on a specific field
      * @param EntityContract $entity
      * @param array $params
      * @return mixed
@@ -315,6 +335,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     }
 
     /**
+     * Processes the params for a passed for a specific association
      * @param EntityContract $entity
      * @param array $params
      * @return array
@@ -345,6 +366,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     }
 
     /**
+     * Runs on pre persist to validate and mutate the entity
      * @param EntityContract $entity
      * @throws \RuntimeException
      */
@@ -363,6 +385,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
 
 
     /**
+     * Sets a field on an entity
      * @param EntityContract $entity
      * @param string $fieldName
      * @param $value
@@ -386,6 +409,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     }
 
     /**
+     * Processes the params for an association
      * @param EntityContract $entity
      * @param string $associationName
      * @param array $values
@@ -411,6 +435,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Binds data for a specific association on the entity
      * @param EntityContract $entity
      * @param string $assignType
      * @param string $associationName
@@ -456,6 +481,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
     }
 
     /**
+     * Gets the values for specified fields on teh current entity
      * @param EntityContract $entity
      * @param array $fields
      * @return array

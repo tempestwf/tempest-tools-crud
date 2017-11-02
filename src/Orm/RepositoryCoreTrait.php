@@ -14,6 +14,11 @@ use TempestTools\Crud\Orm\Helper\QueryBuilderHelper;
 use TempestTools\Common\Contracts\ArrayHelperContract;
 use TempestTools\Crud\Orm\Utility\EventManagerWrapperTrait;
 
+/**
+ * A trait that provides the packages repository related functionality to a class
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 trait RepositoryCoreTrait
 {
     use TTConfigTrait, EventManagerWrapperTrait;
@@ -36,6 +41,7 @@ trait RepositoryCoreTrait
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Initializes the classes with the helpers and config context path information
      * @param ArrayHelperContract|null $arrayHelper
      * @param array|null $path
      * @param array|null $fallBack
@@ -52,6 +58,10 @@ trait RepositoryCoreTrait
 
     }
 
+    /**
+     * Initializes the entity manager wrapper
+     * @param bool $force
+     */
     protected function entityManagerInit (bool $force= true):void
     {
         if ($force === true || $this->getEm() === null) {
@@ -59,6 +69,7 @@ trait RepositoryCoreTrait
         }
     }
     /** @noinspection MoreThanThreeArgumentsInspection
+     * Initializes the data bind helper
      * @param bool $force
      * @throws \RuntimeException
      */
@@ -71,6 +82,7 @@ trait RepositoryCoreTrait
     }
 
     /**
+     * Find entities based on array keys
      * @param array $array
      * @return array
      */
@@ -83,6 +95,7 @@ trait RepositoryCoreTrait
 
     /** @noinspection MoreThanThreeArgumentsInspection */
     /**
+     * Initializes the query builder helper
      * @param bool $force
      * @throws \RuntimeException
      */
@@ -97,6 +110,7 @@ trait RepositoryCoreTrait
 
 
     /**
+     * Gets the alias for an entity to be used by default in the query
      * @return string
      */
     public function getEntityAlias():string
@@ -112,7 +126,7 @@ trait RepositoryCoreTrait
     abstract public function getEntityNameBase(): string;
 
     /**
-     *
+     * Regex used to make sure an entity name is appropriate
      */
     protected static function getEntityNameRegex():string {
         return '/\w+$/';
@@ -154,6 +168,7 @@ trait RepositoryCoreTrait
      */
     abstract public function getClassNameBase():string;
     /**
+     * Handles a create operation
      * @param array $params
      * @param array $optionOverrides
      * @param array $frontEndOptions
@@ -172,6 +187,7 @@ trait RepositoryCoreTrait
     }
 
     /**
+     * Handles an update operation
      * @param array $params
      * @param array $optionOverrides
      * @param array $frontEndOptions
@@ -191,6 +207,7 @@ trait RepositoryCoreTrait
 
 
     /**
+     * Handles an delete operation
      * @param array $params
      * @param array $optionOverrides
      * @param array $frontEndOptions
@@ -209,6 +226,7 @@ trait RepositoryCoreTrait
     }
 
     /**
+     * Handles a read operation
      * @param array $params
      * @param array $optionOverrides
      * @param array $frontEndOptions
@@ -225,6 +243,7 @@ trait RepositoryCoreTrait
 
 
     /**
+     * Creates a query builder wrapper
      * @param string $entityAlias
      * @return QueryBuilderWrapperContract
      * @throws \RuntimeException
@@ -232,6 +251,7 @@ trait RepositoryCoreTrait
     abstract public function createQueryWrapper(string $entityAlias):QueryBuilderWrapperContract;
 
     /**
+     * Convenience method for find in functionality
      * @param string $fieldName
      * @param array $values
      * @return mixed
@@ -312,6 +332,7 @@ trait RepositoryCoreTrait
     abstract public function createEntityManagerWrapper():EntityManagerWrapperContract;
 
     /**
+     * Locates all the ids and class names of entities that could be pre populated for use with the current request.
      * @param array $params
      * @param array $gathered
      * @return array
@@ -324,6 +345,7 @@ trait RepositoryCoreTrait
     }
 
     /**
+     * Clears the pre-populated entities for the shared array object at the end of a transaction.
      * @internal param array $params
      * @internal param array $gathered
      */

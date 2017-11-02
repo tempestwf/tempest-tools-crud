@@ -11,6 +11,11 @@ namespace TempestTools\Crud\Orm\Utility;
 
 use TempestTools\Crud\Contracts\Orm\RepositoryContract;
 
+/**
+ * A trait that adds convenience methods for access a repository to a class
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 trait RepositoryTrait
 {
     /**

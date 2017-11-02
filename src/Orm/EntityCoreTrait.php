@@ -13,7 +13,11 @@ use TempestTools\Crud\Contracts\Orm\Helper\EntityArrayHelperContract;
 use Doctrine\ORM\Mapping as ORM;
 use TempestTools\Crud\Orm\Utility\EventManagerWrapperTrait;
 
-
+/**
+ * A trait that adds entity functionality to a class that facilitates use of the functionality of the package
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 trait EntityCoreTrait
 {
     use TTConfigTrait, EvmTrait, EventManagerWrapperTrait;
@@ -39,6 +43,7 @@ trait EntityCoreTrait
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Initialization the entity with the helpers and anc config context.
      * @param string $mode
      * @param ArrayHelperContract|null $arrayHelper
      * @param array|null $path
@@ -57,6 +62,7 @@ trait EntityCoreTrait
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Converts the entity an array representation of it's fields values
      * @param array $settings
      * @param mixed $slatedToTransform
      * @return array
@@ -79,7 +85,8 @@ trait EntityCoreTrait
         return $this->getConfigArrayHelper()->toArray($this, $settings, $slatedToTransform);
     }
 
-    /** @noinspection MoreThanThreeArgumentsInspection
+    /**
+     * Utilized by toArray functionality to convert a property of the entity to an array representation.
      * @param $propertyValue
      * @param array $settings
      * @param bool $force
@@ -89,6 +96,7 @@ trait EntityCoreTrait
     abstract public function parseToArrayPropertyValue($propertyValue, array $settings = [], bool $force = false);
 
     /**
+     * Initializes the entity array helper
      * @param bool $force
      * @param string $mode
      * @throws \RuntimeException
@@ -102,6 +110,7 @@ trait EntityCoreTrait
     }
 
     /**
+     * Sets a field on the entity
      * @param string $fieldName
      * @param $value
      * @throws RuntimeException
@@ -115,6 +124,7 @@ trait EntityCoreTrait
 
 
     /**
+     * Processes the params for an association of the entity
      * @param string $associationName
      * @param array $values
      * @return array
@@ -130,6 +140,7 @@ trait EntityCoreTrait
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Binds data to an association of the entity
      * @param string $assignType
      * @param string $associationName
      * @param EntityContract $entityToBind
@@ -144,7 +155,7 @@ trait EntityCoreTrait
     }
 
     /**
-     * Makes event args to use
+     * Makes event args to use with the events system
      *
      * @param array $params
      * @return \TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract
@@ -193,7 +204,7 @@ trait EntityCoreTrait
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
-     *
+     * Uses the validation factory to validate the data passed to the method.
      * @param array $values
      * @param array $rules
      * @param array $messages
@@ -204,6 +215,7 @@ trait EntityCoreTrait
 
 
     /**
+     * Gets the values for specified fields on teh current entity
      * @param array $fields
      * @return array
      */
@@ -215,6 +227,7 @@ trait EntityCoreTrait
     }
 
     /**
+     * Gets the params that were bound to the entity
      * @return array|null
      */
     public function getBindParams(): ?array
@@ -231,6 +244,7 @@ trait EntityCoreTrait
     }
 
     /**
+     * Verifies the current operation is allowed
      * @param bool $nosey
      * @return bool
      * @throws \RuntimeException

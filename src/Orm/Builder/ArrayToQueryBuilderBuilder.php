@@ -14,11 +14,17 @@ use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
 use TempestTools\Crud\Exceptions\Orm\Helper\QueryBuilderHelperException;
 use TempestTools\Crud\Orm\Utility\BadBuilderCallTrait;
 
+/**
+ * A builder that takes data store on an array, verifies it and modifies it as needed. This is used when processing data that will be used in regards to an a query being built.
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
 {
     use BadBuilderCallTrait;
 
     /** @noinspection MoreThanThreeArgumentsInspection
+     * Verifies that the parameters passed to this method to be used as part of a front end specified filter are valid by passing them through a closure stored in the config
      * @param string $key
      * @param array $settings
      * @param ArrayHelperContract $arrayHelper
@@ -42,6 +48,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
 
 
     /** @noinspection MoreThanThreeArgumentsInspection
+     * Modifies the parameters passed to this method to be used as part of a front end specified filter using a closure stored in the config
      * @param string $key
      * @param array $settings
      * @param ArrayHelperContract $arrayHelper
@@ -63,6 +70,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
 
 
     /**
+     * Builds the select part of a query
      * @param array $entries
      * @param QueryBuilderWrapperContract $qb
      * @param ArrayHelperContract $arrayHelper
@@ -91,6 +99,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Builds the from part of a query
      * @param array $entries
      * @param QueryBuilderWrapperContract $qb
      * @param ArrayHelperContract $arrayHelper
@@ -114,6 +123,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Builds the left join part of a query
      * @param array $entries
      * @param QueryBuilderWrapperContract $qb
      * @param ArrayHelperContract $arrayHelper
@@ -133,6 +143,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Builds the inner join part of a query
      * @param array $entries
      * @param QueryBuilderWrapperContract $qb
      * @param ArrayHelperContract $arrayHelper
@@ -152,6 +163,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Builds the where part of the query
      * @param array $entries
      * @param QueryBuilderWrapperContract $qb
      * @param ArrayHelperContract $arrayHelper
@@ -177,6 +189,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Builds the having part of the query
      * @param array $entries
      * @param QueryBuilderWrapperContract $qb
      * @param ArrayHelperContract $arrayHelper
@@ -201,6 +214,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Builds the order by part of the query
      * @param array $entries
      * @param QueryBuilderWrapperContract $qb
      * @param ArrayHelperContract $arrayHelper
@@ -220,6 +234,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Builds the group by part of the query
      * @param array $entries
      * @param QueryBuilderWrapperContract $qb
      * @param ArrayHelperContract $arrayHelper
@@ -244,6 +259,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
 
 
     /**
+     * Prepares data to build the from part of the query
      * @param array $array
      * @param QueryBuilderWrapperContract $qb
      * @param array $extra
@@ -265,6 +281,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Prepares data for a where or having part of the query
      * @param array $array
      * @param array $defaults
      * @param QueryBuilderWrapperContract $qb
@@ -285,6 +302,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Creates a query part by calling an expression
      * @param $value
      * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $extra
@@ -310,6 +328,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Prepares data for a join part of the query
      * @param array $array
      * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $extra
@@ -331,6 +350,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
+     * Prepares data for a order by part of the query
      * @param array $array
      * @param QueryBuilderWrapperContract $qb
      * @param array $extra

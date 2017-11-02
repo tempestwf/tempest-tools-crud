@@ -11,6 +11,11 @@ namespace TempestTools\Crud\Orm\Utility;
 
 use TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException;
 
+/**
+ * A trait used on multiple builder classes where an unused builder method call will throw an exception
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 trait BadBuilderCallTrait
 {
     /**

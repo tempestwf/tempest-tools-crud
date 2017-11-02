@@ -14,18 +14,25 @@ use TempestTools\Crud\Contracts\Orm\Builder\ArrayToFieldPropertyBuilderContract;
 use TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException;
 use TempestTools\Crud\Orm\Utility\BadBuilderCallTrait;
 
+/**
+ * A builder that takes data store on an array, verifies it and modifies it as needed. This is used when processing data that will be used in regards to an entity field that isn't an association.
+ * @link    https://github.com/tempestwf
+ * @author  William Tempest Wright Ferrer <https://github.com/tempestwf>
+ */
 class ArrayToFieldPropertyBuilder implements ArrayToFieldPropertyBuilderContract
 {
 
     use BadBuilderCallTrait;
 
     /** @noinspection MoreThanThreeArgumentsInspection
+     * Enforces that a field value matches with the config
      * @param ArrayHelperContract $arrayHelper
      * @param string $fieldName
      * @param $value
      * @param array $params
      * @param mixed $fieldSetting
      * @return mixed
+     * @throws \RuntimeException
      * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
      */
     public function enforce(ArrayHelperContract $arrayHelper, string $fieldName, $value, array $params, $fieldSetting)
@@ -39,14 +46,15 @@ class ArrayToFieldPropertyBuilder implements ArrayToFieldPropertyBuilderContract
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection
+     * Uses a closure to validate a value being set on a field.
      * @param ArrayHelperContract $arrayHelper
      * @param string $fieldName
      * @param $value
      * @param array $params
      * @param mixed $fieldSetting
      * @return mixed
+     * @throws \RuntimeException
      * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
-     * @internal param EntityContract $entity
      */
     public function closure(ArrayHelperContract $arrayHelper, string $fieldName, $value, array $params, $fieldSetting)
     {
@@ -57,13 +65,15 @@ class ArrayToFieldPropertyBuilder implements ArrayToFieldPropertyBuilderContract
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection
+     * Changes a value that is about to be set on a field to match with the value stored in the config.
+     *
      * @param ArrayHelperContract $arrayHelper
      * @param string $fieldName
      * @param $params
      * @param $value
      * @param mixed $fieldSetting
      * @return mixed
-     * @internal param EntityContract $entity
+     * @throws \RuntimeException
      */
     public function setTo (ArrayHelperContract $arrayHelper, string $fieldName, $value, array $params, $fieldSetting)
     {
@@ -71,13 +81,14 @@ class ArrayToFieldPropertyBuilder implements ArrayToFieldPropertyBuilderContract
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection
+     * Mutates a value about to be set on a field using a closure.
      * @param ArrayHelperContract $arrayHelper
      * @param string $fieldName
      * @param $value
      * @param array $params
      * @param mixed $fieldSetting
      * @return mixed
-     * @internal param EntityContract $entity
+     * @throws \RuntimeException
      */
     public function mutate (ArrayHelperContract $arrayHelper, string $fieldName, $value, array $params, $fieldSetting) {
         return $arrayHelper->parse($fieldSetting, $params);
