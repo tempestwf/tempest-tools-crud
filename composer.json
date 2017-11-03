@@ -4,6 +4,7 @@
     "keywords": ["doctrine", "orm", "database", "laravel", "acl", "access control layer", "middleware", "tempest tools"],
     "require": {
         "php": ">=7.1.0",
+        "laravel/framework": "5.3.*",
         "laravel-doctrine/orm": "1.2.*",
         "tempest-tools/common": "1.0.*"
     },
