@@ -6,7 +6,7 @@
  * Time: 5:19 PM
  */
 
-namespace TempestTools\Crud\Contracts;
+namespace TempestTools\Scribe\Contracts;
 
 interface HasTTConfig
 {

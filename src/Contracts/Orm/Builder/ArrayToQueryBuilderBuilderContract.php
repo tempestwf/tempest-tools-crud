@@ -6,10 +6,10 @@
  * Time: 2:27 PM
  */
 
-namespace TempestTools\Crud\Contracts\Orm\Builder;
+namespace TempestTools\Scribe\Contracts\Orm\Builder;
 
 use TempestTools\Common\Contracts\ArrayHelperContract;
-use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
+use TempestTools\Scribe\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
 
 /**
  * @link    https://github.com/tempestwf

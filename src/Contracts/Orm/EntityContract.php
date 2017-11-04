@@ -1,14 +1,14 @@
 <?php
 
-namespace TempestTools\Crud\Contracts\Orm;
+namespace TempestTools\Scribe\Contracts\Orm;
 
 use RuntimeException;
 use TempestTools\Common\Contracts\ArrayHelperContract;
 use Doctrine\ORM\Mapping as ORM;
-use TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract;
-use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
-use TempestTools\Crud\Contracts\Orm\Helper\EntityArrayHelperContract;
-use TempestTools\Crud\Contracts\HasTTConfig;
+use TempestTools\Scribe\Contracts\Orm\Wrapper\EventManagerWrapperContract;
+use TempestTools\Scribe\Contracts\Orm\Events\GenericEventArgsContract;
+use TempestTools\Scribe\Contracts\Orm\Helper\EntityArrayHelperContract;
+use TempestTools\Scribe\Contracts\HasTTConfig;
 
 /**
  * @link    https://github.com/tempestwf
@@ -148,7 +148,7 @@ interface EntityContract extends HasTTConfig
     public function allowed($nosey = true): bool;
 
     /**
-     * @return NULL|\TempestTools\Crud\Contracts\Orm\Helper\EntityArrayHelperContract
+     * @return NULL|\TempestTools\Scribe\Contracts\Orm\Helper\EntityArrayHelperContract
      */
     public function getConfigArrayHelper(): ?EntityArrayHelperContract;
 
@@ -173,7 +173,7 @@ interface EntityContract extends HasTTConfig
     public function getEventManager(): ?EventManagerWrapperContract;
 
     /**
-     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract $eventManagerWrapper
+     * @param \TempestTools\Scribe\Contracts\Orm\Wrapper\EventManagerWrapperContract $eventManagerWrapper
      */
     public function setEventManager(EventManagerWrapperContract $eventManagerWrapper): void;
 

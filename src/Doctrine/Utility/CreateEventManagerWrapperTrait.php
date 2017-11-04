@@ -6,11 +6,11 @@
  * Time: 8:28 PM
  */
 
-namespace TempestTools\Crud\Doctrine\Utility;
+namespace TempestTools\Scribe\Doctrine\Utility;
 
 
-use TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract;
-use TempestTools\Crud\Doctrine\Wrapper\EventManagerWrapper;
+use TempestTools\Scribe\Contracts\Orm\Wrapper\EventManagerWrapperContract;
+use TempestTools\Scribe\Doctrine\Wrapper\EventManagerWrapper;
 
 /**
  * A trait which allows a class to return an event manager wrapper.

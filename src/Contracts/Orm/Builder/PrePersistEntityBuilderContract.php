@@ -6,9 +6,9 @@
  * Time: 5:15 PM
  */
 
-namespace TempestTools\Crud\Contracts\Orm\Builder;
+namespace TempestTools\Scribe\Contracts\Orm\Builder;
 
-use TempestTools\Crud\Contracts\Orm\EntityContract;
+use TempestTools\Scribe\Contracts\Orm\EntityContract;
 
 /**
  * @link    https://github.com/tempestwf
@@ -49,7 +49,7 @@ interface PrePersistEntityBuilderContract
     /**
      * @param $name
      * @param $arguments
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\EntityArrayHelperException
      */
     public function __call($name, $arguments):void;
 }

@@ -6,10 +6,10 @@
  * Time: 6:37 PM
  */
 
-namespace TempestTools\Crud\Orm\Utility;
+namespace TempestTools\Scribe\Orm\Utility;
 
 
-use TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract;
+use TempestTools\Scribe\Contracts\Orm\Wrapper\EventManagerWrapperContract;
 
 /**
  * A trait that adds convenience methods to a class for accessing an event manager wrapper
@@ -30,7 +30,7 @@ trait EventManagerWrapperTrait
     }
 
     /**
-     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract $eventManagerWrapper
+     * @param \TempestTools\Scribe\Contracts\Orm\Wrapper\EventManagerWrapperContract $eventManagerWrapper
      */
     public function setEventManager(EventManagerWrapperContract $eventManagerWrapper):void
     {
@@ -54,7 +54,7 @@ trait EventManagerWrapperTrait
     }
 
     /**
-     * @return \TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract
+     * @return \TempestTools\Scribe\Contracts\Orm\Wrapper\EventManagerWrapperContract
      * @throws \RuntimeException
      */
     abstract protected function createEventManagerWrapper ():EventManagerWrapperContract;

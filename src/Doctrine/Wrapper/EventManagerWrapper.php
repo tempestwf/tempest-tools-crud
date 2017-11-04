@@ -6,13 +6,13 @@
  * Time: 5:54 PM
  */
 
-namespace TempestTools\Crud\Doctrine\Wrapper;
+namespace TempestTools\Scribe\Doctrine\Wrapper;
 
 use Doctrine\Common\EventManager;
 use Doctrine\Common\EventSubscriber;
 use TempestTools\Common\Utility\EvmTrait;
-use TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract;
-use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
+use TempestTools\Scribe\Contracts\Orm\Wrapper\EventManagerWrapperContract;
+use TempestTools\Scribe\Contracts\Orm\Events\GenericEventArgsContract;
 
 /**
  * A wrapper class to provide a universal interface for accessing Doctrine Event Manager functionality.

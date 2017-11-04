@@ -6,13 +6,13 @@
  * Time: 4:53 PM
  */
 
-namespace TempestTools\Crud\Orm\Builder;
+namespace TempestTools\Scribe\Orm\Builder;
 
 
 use TempestTools\Common\Contracts\ArrayHelperContract;
-use TempestTools\Crud\Contracts\Orm\Builder\ArrayToFieldPropertyBuilderContract;
-use TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException;
-use TempestTools\Crud\Orm\Utility\BadBuilderCallTrait;
+use TempestTools\Scribe\Contracts\Orm\Builder\ArrayToFieldPropertyBuilderContract;
+use TempestTools\Scribe\Exceptions\Orm\Helper\EntityArrayHelperException;
+use TempestTools\Scribe\Orm\Utility\BadBuilderCallTrait;
 
 /**
  * A builder that takes data store on an array, verifies it and modifies it as needed. This is used when processing data that will be used in regards to an entity field that isn't an association.
@@ -33,7 +33,7 @@ class ArrayToFieldPropertyBuilder implements ArrayToFieldPropertyBuilderContract
      * @param mixed $fieldSetting
      * @return mixed
      * @throws \RuntimeException
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\EntityArrayHelperException
      */
     public function enforce(ArrayHelperContract $arrayHelper, string $fieldName, $value, array $params, $fieldSetting)
     {
@@ -54,7 +54,7 @@ class ArrayToFieldPropertyBuilder implements ArrayToFieldPropertyBuilderContract
      * @param mixed $fieldSetting
      * @return mixed
      * @throws \RuntimeException
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\EntityArrayHelperException
      */
     public function closure(ArrayHelperContract $arrayHelper, string $fieldName, $value, array $params, $fieldSetting)
     {

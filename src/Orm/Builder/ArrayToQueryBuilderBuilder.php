@@ -6,13 +6,13 @@
  * Time: 4:53 PM
  */
 
-namespace TempestTools\Crud\Orm\Builder;
+namespace TempestTools\Scribe\Orm\Builder;
 
 use TempestTools\Common\Contracts\ArrayHelperContract;
-use TempestTools\Crud\Contracts\Orm\Builder\ArrayToQueryBuilderBuilderContract;
-use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
-use TempestTools\Crud\Exceptions\Orm\Helper\QueryBuilderHelperException;
-use TempestTools\Crud\Orm\Utility\BadBuilderCallTrait;
+use TempestTools\Scribe\Contracts\Orm\Builder\ArrayToQueryBuilderBuilderContract;
+use TempestTools\Scribe\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
+use TempestTools\Scribe\Exceptions\Orm\Helper\QueryBuilderHelperException;
+use TempestTools\Scribe\Orm\Utility\BadBuilderCallTrait;
 
 /**
  * A builder that takes data store on an array, verifies it and modifies it as needed. This is used when processing data that will be used in regards to an a query being built.
@@ -34,7 +34,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
      * @internal param \Closure $fieldSetting
      * @return array
      * @throws \RuntimeException
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\QueryBuilderHelperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\QueryBuilderHelperException
      */
     public function closure(string $key=null, $settings, ArrayHelperContract $arrayHelper, $closure, array $extra):array
     {
@@ -304,7 +304,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
     /**
      * Creates a query part by calling an expression
      * @param $value
-     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
+     * @param \TempestTools\Scribe\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $extra
      * @param ArrayHelperContract $arrayHelper
      * @return null|string
@@ -330,7 +330,7 @@ class ArrayToQueryBuilderBuilder implements ArrayToQueryBuilderBuilderContract
     /**
      * Prepares data for a join part of the query
      * @param array $array
-     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
+     * @param \TempestTools\Scribe\Contracts\Orm\Wrapper\QueryBuilderWrapperContract $qb
      * @param array $extra
      * @param ArrayHelperContract $arrayHelper
      * @return array

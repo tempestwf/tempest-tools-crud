@@ -6,11 +6,11 @@
  * Time: 4:33 PM
  */
 
-namespace TempestTools\Crud\Doctrine\Wrapper;
+namespace TempestTools\Scribe\Doctrine\Wrapper;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 
-use TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException;
+use TempestTools\Scribe\Exceptions\Orm\Wrapper\QueryBuilderWrapperException;
 /**
  * A wrapper class to provide a universal interface for accessing Doctrine Sql Query Builder functionality.
  * @link    https://github.com/tempestwf
@@ -65,7 +65,7 @@ class QueryBuilderSqlWrapper extends QueryBuilderDqlWrapper
      * @param bool $hydrate
      * @return mixed
      * @throws \Doctrine\DBAL\DBALException
-     * @throws \TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
      */
     public function getResult(bool $paginate=false, bool $returnCount=true, int $hydrationType=null, bool $fetchJoin = false, array $cacheSettings, bool $hydrate)
     {

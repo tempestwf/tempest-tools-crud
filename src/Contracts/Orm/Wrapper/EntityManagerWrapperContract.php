@@ -6,12 +6,12 @@
  * Time: 8:46 PM
  */
 
-namespace TempestTools\Crud\Contracts\Orm\Wrapper;
+namespace TempestTools\Scribe\Contracts\Orm\Wrapper;
 
 
 
-use TempestTools\Crud\Contracts\Orm\EntityContract;
-use TempestTools\Crud\Contracts\Orm\RepositoryContract;
+use TempestTools\Scribe\Contracts\Orm\EntityContract;
+use TempestTools\Scribe\Contracts\Orm\RepositoryContract;
 
 /**
  * @link    https://github.com/tempestwf

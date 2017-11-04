@@ -1,9 +1,9 @@
 <?php
 
-namespace TempestTools\Crud\Orm\Transformers;
+namespace TempestTools\Scribe\Orm\Transformers;
 
 use TempestTools\Common\Doctrine\Transformers\SimpleTransformerAbstract;
-use TempestTools\Crud\Contracts\Orm\EntityContract;
+use TempestTools\Scribe\Contracts\Orm\EntityContract;
 
 /**
  * Created by PhpStorm.

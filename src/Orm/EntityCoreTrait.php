@@ -1,17 +1,17 @@
 <?php
-namespace TempestTools\Crud\Orm;
+namespace TempestTools\Scribe\Orm;
 
 use RuntimeException;
 use TempestTools\Common\Contracts\ArrayHelperContract;
 use TempestTools\Common\Utility\EvmTrait;
 use TempestTools\Common\Utility\TTConfigTrait;
-use TempestTools\Crud\Constants\EntityEventsConstants;
-use TempestTools\Crud\Contracts\Orm\EntityContract;
-use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
-use TempestTools\Crud\Orm\Helper\EntityArrayHelper;
-use TempestTools\Crud\Contracts\Orm\Helper\EntityArrayHelperContract;
+use TempestTools\Scribe\Constants\EntityEventsConstants;
+use TempestTools\Scribe\Contracts\Orm\EntityContract;
+use TempestTools\Scribe\Contracts\Orm\Events\GenericEventArgsContract;
+use TempestTools\Scribe\Orm\Helper\EntityArrayHelper;
+use TempestTools\Scribe\Contracts\Orm\Helper\EntityArrayHelperContract;
 use Doctrine\ORM\Mapping as ORM;
-use TempestTools\Crud\Orm\Utility\EventManagerWrapperTrait;
+use TempestTools\Scribe\Orm\Utility\EventManagerWrapperTrait;
 
 /**
  * A trait that adds entity functionality to a class that facilitates use of the functionality of the package
@@ -158,7 +158,7 @@ trait EntityCoreTrait
      * Makes event args to use with the events system
      *
      * @param array $params
-     * @return \TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract
+     * @return \TempestTools\Scribe\Contracts\Orm\Events\GenericEventArgsContract
      */
     abstract public function makeEventArgs(array $params): GenericEventArgsContract;
 
@@ -257,7 +257,7 @@ trait EntityCoreTrait
     }
 
     /**
-     * @return NULL|\TempestTools\Crud\Contracts\Orm\Helper\EntityArrayHelperContract
+     * @return NULL|\TempestTools\Scribe\Contracts\Orm\Helper\EntityArrayHelperContract
      */
     public function getConfigArrayHelper():?EntityArrayHelperContract
     {

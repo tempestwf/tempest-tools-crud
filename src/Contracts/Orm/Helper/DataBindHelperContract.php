@@ -1,10 +1,10 @@
 <?php
-namespace TempestTools\Crud\Contracts\Orm\Helper;
+namespace TempestTools\Scribe\Contracts\Orm\Helper;
 
 
-use TempestTools\Crud\Contracts\Orm\EntityContract;
-use TempestTools\Crud\Contracts\Orm\RepositoryContract;
-use TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException;
+use TempestTools\Scribe\Contracts\Orm\EntityContract;
+use TempestTools\Scribe\Contracts\Orm\RepositoryContract;
+use TempestTools\Scribe\Exceptions\Orm\Helper\DataBindHelperException;
 
 /**
  * @link    https://github.com/tempestwf
@@ -14,10 +14,10 @@ interface DataBindHelperContract
 {
 
     /**
-     * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
+     * @param \TempestTools\Scribe\Contracts\Orm\EntityContract $entity
      * @param array $params
-     * @return \TempestTools\Crud\Contracts\Orm\EntityContract
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException
+     * @return \TempestTools\Scribe\Contracts\Orm\EntityContract
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\DataBindHelperException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \RuntimeException
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -29,7 +29,7 @@ interface DataBindHelperContract
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
-     * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
+     * @param \TempestTools\Scribe\Contracts\Orm\EntityContract $entity
      * @param string $associationName
      * @param array $params
      * @param string $targetClass
@@ -39,13 +39,13 @@ interface DataBindHelperContract
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Exception
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\DataBindHelperException
      */
     public function bindAssociation(EntityContract $entity, string $associationName, array $params = null, string $targetClass): void;
 
     /**
      * @param array $entities
-     * @param \TempestTools\Crud\Contracts\Orm\EntityContract $targetEntity
+     * @param \TempestTools\Scribe\Contracts\Orm\EntityContract $targetEntity
      * @param string $associationName
      * @throws \RuntimeException
      */
@@ -109,7 +109,7 @@ interface DataBindHelperContract
     public function delete(array $params, array $optionOverrides = [], array $frontEndOptions = []): array;
 
     /**
-     * @return \TempestTools\Crud\Contracts\Orm\RepositoryContract
+     * @return \TempestTools\Scribe\Contracts\Orm\RepositoryContract
      */
     public function getRepository(): RepositoryContract;
 

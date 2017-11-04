@@ -1,16 +1,16 @@
 <?php
-namespace TempestTools\Crud\Orm\Helper;
+namespace TempestTools\Scribe\Orm\Helper;
 
-use TempestTools\AclMiddleware\Contracts\HasIdContract;
+use TempestTools\Moat\Contracts\HasIdContract;
 use TempestTools\Common\Constants\CommonArrayObjectKeyConstants;
-use TempestTools\Crud\Constants\RepositoryEventsConstants;
-use TempestTools\Crud\Contracts\Orm\Helper\DataBindHelperContract;
-use TempestTools\Crud\Contracts\Orm\EntityContract;
-use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
-use TempestTools\Crud\Contracts\Orm\RepositoryContract;
-use TempestTools\Crud\Doctrine\EntityAbstract;
-use TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException;
-use TempestTools\Crud\Orm\Utility\RepositoryTrait;
+use TempestTools\Scribe\Constants\RepositoryEventsConstants;
+use TempestTools\Scribe\Contracts\Orm\Helper\DataBindHelperContract;
+use TempestTools\Scribe\Contracts\Orm\EntityContract;
+use TempestTools\Scribe\Contracts\Orm\Events\GenericEventArgsContract;
+use TempestTools\Scribe\Contracts\Orm\RepositoryContract;
+use TempestTools\Scribe\Doctrine\EntityAbstract;
+use TempestTools\Scribe\Exceptions\Orm\Helper\DataBindHelperException;
+use TempestTools\Scribe\Orm\Utility\RepositoryTrait;
 
 /**
  * A helper used to bind data that was passed to an entity. This helper is used by a repository for common functionality related to create, update and delete requests.
@@ -34,7 +34,7 @@ class DataBindHelper implements DataBindHelperContract
     /**
      * DataBindHelper constructor.
      *
-     * @param \TempestTools\Crud\Contracts\Orm\RepositoryContract $repository
+     * @param \TempestTools\Scribe\Contracts\Orm\RepositoryContract $repository
      */
     public function __construct(RepositoryContract $repository)
     {
@@ -142,10 +142,10 @@ class DataBindHelper implements DataBindHelperContract
     }
     /**
      * Binds data based on the params passed to the method to fields and associations on an entity.
-     * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
+     * @param \TempestTools\Scribe\Contracts\Orm\EntityContract $entity
      * @param array $params
-     * @return \TempestTools\Crud\Contracts\Orm\EntityContract
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException
+     * @return \TempestTools\Scribe\Contracts\Orm\EntityContract
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\DataBindHelperException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \RuntimeException
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -201,7 +201,7 @@ class DataBindHelper implements DataBindHelperContract
 
     /**
      * Binds data to an association on an entity
-     * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
+     * @param \TempestTools\Scribe\Contracts\Orm\EntityContract $entity
      * @param string $associationName
      * @param array $params
      * @param string $targetClass
@@ -211,7 +211,7 @@ class DataBindHelper implements DataBindHelperContract
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Exception
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\DataBindHelperException
      */
     public function bindAssociation(EntityContract $entity, string $associationName, array $params = NULL, string $targetClass): void
     {
@@ -234,7 +234,7 @@ class DataBindHelper implements DataBindHelperContract
     /**
      * Binds multiple entities to an association on another entity.
      * @param array $entities
-     * @param \TempestTools\Crud\Contracts\Orm\EntityContract $targetEntity
+     * @param \TempestTools\Scribe\Contracts\Orm\EntityContract $targetEntity
      * @param string $associationName
      * @throws \RuntimeException
      */
@@ -259,7 +259,7 @@ class DataBindHelper implements DataBindHelperContract
      * @param string $chainType
      * @param array $params
      * @param array $chainOverrides
-     * @param \TempestTools\Crud\Contracts\Orm\RepositoryContract $repo
+     * @param \TempestTools\Scribe\Contracts\Orm\RepositoryContract $repo
      * @return array|null
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
@@ -293,7 +293,7 @@ class DataBindHelper implements DataBindHelperContract
 
     /**
      * Prepares and verifies data that relates to an association of the current entity.
-     * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
+     * @param \TempestTools\Scribe\Contracts\Orm\EntityContract $entity
      * @param string $associationName
      * @param array $paramsForEntities
      * @param string|null $chainType
@@ -317,10 +317,10 @@ class DataBindHelper implements DataBindHelperContract
      */
     public function findEntitiesFromArrayKeys (array $array):array {
         [$keys, $entities] = $this->retrievePrePopulatedEntities($array);
-        /** @var \TempestTools\Crud\Contracts\Orm\EntityContract|HasIdContract[] $entities */
+        /** @var \TempestTools\Scribe\Contracts\Orm\EntityContract|HasIdContract[] $entities */
         $foundEntities = $keys !== []?$this->getRepository()->findIn('id', $keys):[];
         $entities = array_merge($entities, $foundEntities);
-        /** @var \TempestTools\Crud\Contracts\Orm\EntityContract|HasIdContract $entity */
+        /** @var \TempestTools\Scribe\Contracts\Orm\EntityContract|HasIdContract $entity */
         foreach ($entities as $entity) {
             $entity->setBindParams($array[$entity->getId()]);
         }
@@ -368,7 +368,7 @@ class DataBindHelper implements DataBindHelperContract
      * @throws \RuntimeException
      */
     public function getRepoForRelation(string $targetClass):RepositoryContract {
-        /** @var \TempestTools\Crud\Contracts\Orm\RepositoryContract $repo */
+        /** @var \TempestTools\Scribe\Contracts\Orm\RepositoryContract $repo */
         /** @noinspection NullPointerExceptionInspection */
         $myRepo = $this->getRepository();
         $repo = $myRepo->getEm()->getRepository($targetClass);
@@ -567,7 +567,7 @@ class DataBindHelper implements DataBindHelperContract
      * @throws \Exception
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\DataBindHelperException
      */
     protected function doCreate (GenericEventArgsContract $eventArgs):void
     {
@@ -583,9 +583,9 @@ class DataBindHelper implements DataBindHelperContract
 
     /**
      * Creates a single entity
-     * @param \TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract $eventArgs
-     * @return \TempestTools\Crud\Contracts\Orm\EntityContract
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException
+     * @param \TempestTools\Scribe\Contracts\Orm\Events\GenericEventArgsContract $eventArgs
+     * @return \TempestTools\Scribe\Contracts\Orm\EntityContract
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\DataBindHelperException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Exception
@@ -673,15 +673,15 @@ class DataBindHelper implements DataBindHelperContract
 
     /**
      * Handles the integration between events listeners/subscribers and the update logic for a single entity
-     * @param \TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract $eventArgs
-     * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
+     * @param \TempestTools\Scribe\Contracts\Orm\Events\GenericEventArgsContract $eventArgs
+     * @param \TempestTools\Scribe\Contracts\Orm\EntityContract $entity
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \Exception
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\DataBindHelperException
      */
     protected function doUpdate (GenericEventArgsContract $eventArgs, EntityContract $entity):void
     {
@@ -753,15 +753,15 @@ class DataBindHelper implements DataBindHelperContract
 
     /**
      * Handles the integration between events listeners/subscribers and the delete logic for a single entity
-     * @param \TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract $eventArgs
-     * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
+     * @param \TempestTools\Scribe\Contracts\Orm\Events\GenericEventArgsContract $eventArgs
+     * @param \TempestTools\Scribe\Contracts\Orm\EntityContract $entity
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Exception
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\DataBindHelperException
      */
     protected function doDelete (GenericEventArgsContract $eventArgs, EntityContract $entity):void
     {
@@ -778,10 +778,10 @@ class DataBindHelper implements DataBindHelperContract
     /**
      * Processes a single entity, used for Create, Update and Delete operations
      * @param GenericEventArgsContract $eventArgs
-     * @param \TempestTools\Crud\Contracts\Orm\EntityContract $entity
+     * @param \TempestTools\Scribe\Contracts\Orm\EntityContract $entity
      * @param bool $remove
-     * @return \TempestTools\Crud\Contracts\Orm\EntityContract
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\DataBindHelperException
+     * @return \TempestTools\Scribe\Contracts\Orm\EntityContract
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\DataBindHelperException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Exception

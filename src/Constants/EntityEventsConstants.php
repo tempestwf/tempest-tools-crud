@@ -6,7 +6,7 @@
  * Time: 5:51 PM
  */
 
-namespace TempestTools\Crud\Constants;
+namespace TempestTools\Scribe\Constants;
 
 /**
  * Constants related to events that will be fired on entities

@@ -6,7 +6,7 @@
  * Time: 6:52 PM
  */
 
-namespace TempestTools\Crud\Exceptions\Orm\Wrapper;
+namespace TempestTools\Scribe\Exceptions\Orm\Wrapper;
 
 /**
  * Exception for errors that can happen on the query builder wrappers.

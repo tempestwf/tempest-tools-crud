@@ -6,7 +6,7 @@
  * Time: 5:15 PM
  */
 
-namespace TempestTools\Crud\Contracts\Orm\Builder;
+namespace TempestTools\Scribe\Contracts\Orm\Builder;
 
 use TempestTools\Common\Contracts\ArrayHelperContract;
 
@@ -23,7 +23,7 @@ interface ArrayToAssociationPropertyBuilderContract
      * @param array $params
      * @param mixed $fieldSetting
      * @return mixed
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\EntityArrayHelperException
      */
     public function enforce(ArrayHelperContract $arrayHelper, string $fieldName, array $values, array $params, $fieldSetting);
 
@@ -34,7 +34,7 @@ interface ArrayToAssociationPropertyBuilderContract
      * @param array $params
      * @param mixed $fieldSetting
      * @return mixed
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\EntityArrayHelperException
      * @internal param EntityContract $entity
      */
     public function closure(ArrayHelperContract $arrayHelper, string $fieldName, array $values, array $params, $fieldSetting);
@@ -64,7 +64,7 @@ interface ArrayToAssociationPropertyBuilderContract
     /**
      * @param $name
      * @param $arguments
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\EntityArrayHelperException
      */
     public function __call($name, $arguments):void;
 }

@@ -6,7 +6,7 @@
  * Time: 6:23 PM
  */
 
-namespace TempestTools\Crud\Contracts\Orm\Events;
+namespace TempestTools\Scribe\Contracts\Orm\Events;
 
 /**
  * @link    https://github.com/tempestwf

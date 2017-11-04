@@ -6,11 +6,11 @@
  * Time: 8:31 PM
  */
 
-namespace TempestTools\Crud\Doctrine\Events;
+namespace TempestTools\Scribe\Doctrine\Events;
 
 
 use Doctrine\Common\EventArgs;
-use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
+use TempestTools\Scribe\Contracts\Orm\Events\GenericEventArgsContract;
 
 /**
  * A class for a simple object that stores arguments for events.
@@ -32,7 +32,7 @@ class GenericEventArgs extends EventArgs implements GenericEventArgsContract
     }
     /**
      * @param \ArrayObject $args
-     * @return \TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract
+     * @return \TempestTools\Scribe\Contracts\Orm\Events\GenericEventArgsContract
      */
     public function setArgs(\ArrayObject $args): GenericEventArgsContract
     {

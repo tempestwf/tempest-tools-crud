@@ -6,11 +6,11 @@
  * Time: 7:03 PM
  */
 
-namespace TempestTools\Crud\Contracts\Controller\Helper;
+namespace TempestTools\Scribe\Contracts\Controller\Helper;
 
 use ArrayObject;
 use TempestTools\Common\Contracts\ArrayHelperContract;
-use TempestTools\Crud\Contracts\Controller\ControllerContract;
+use TempestTools\Scribe\Contracts\Controller\ControllerContract;
 
 /**
  * @link    https://github.com/tempestwf

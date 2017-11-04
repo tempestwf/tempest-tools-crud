@@ -6,7 +6,7 @@
  * Time: 6:52 PM
  */
 
-namespace TempestTools\Crud\Exceptions\Orm\Helper;
+namespace TempestTools\Scribe\Exceptions\Orm\Helper;
 
 /**
  * Exception for errors that can happen on the query builder helper.

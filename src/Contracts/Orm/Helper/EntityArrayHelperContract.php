@@ -1,14 +1,14 @@
 <?php
 
-namespace TempestTools\Crud\Contracts\Orm\Helper;
+namespace TempestTools\Scribe\Contracts\Orm\Helper;
 
 
 use RuntimeException;
 use TempestTools\Common\Contracts\ArrayHelperContract;
-use TempestTools\Crud\Contracts\Orm\Builder\ArrayToAssociationPropertyBuilderContract;
-use TempestTools\Crud\Contracts\Orm\Builder\ArrayToFieldPropertyBuilderContract;
-use TempestTools\Crud\Contracts\Orm\Builder\PrePersistEntityBuilderContract;
-use TempestTools\Crud\Contracts\Orm\EntityContract;
+use TempestTools\Scribe\Contracts\Orm\Builder\ArrayToAssociationPropertyBuilderContract;
+use TempestTools\Scribe\Contracts\Orm\Builder\ArrayToFieldPropertyBuilderContract;
+use TempestTools\Scribe\Contracts\Orm\Builder\PrePersistEntityBuilderContract;
+use TempestTools\Scribe\Contracts\Orm\EntityContract;
 
 /**
  * @link    https://github.com/tempestwf
@@ -50,7 +50,7 @@ interface EntityArrayHelperContract extends ArrayHelperContract
      * @param bool $nosey
      * @return bool
      * @throws \RuntimeException
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\EntityArrayHelperException
      */
     public function canAssign(EntityContract $entity, string $associationName, string $assignType = null, array $fieldSettings = null, bool $nosey = true): bool;
 
@@ -58,7 +58,7 @@ interface EntityArrayHelperContract extends ArrayHelperContract
      * @param EntityContract $entity
      * @param bool $nosey
      * @return bool
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\EntityArrayHelperException
      */
     public function allowed(EntityContract $entity, $nosey = true): bool;
 

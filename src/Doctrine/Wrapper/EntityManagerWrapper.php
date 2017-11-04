@@ -6,13 +6,13 @@
  * Time: 5:54 PM
  */
 
-namespace TempestTools\Crud\Doctrine\Wrapper;
+namespace TempestTools\Scribe\Doctrine\Wrapper;
 
 use Doctrine\ORM\EntityManager;
 use TempestTools\Common\Doctrine\Utility\EmTrait;
-use TempestTools\Crud\Contracts\Orm\EntityContract;
-use TempestTools\Crud\Contracts\Orm\Wrapper\EntityManagerWrapperContract;
-use TempestTools\Crud\Contracts\Orm\RepositoryContract;
+use TempestTools\Scribe\Contracts\Orm\EntityContract;
+use TempestTools\Scribe\Contracts\Orm\Wrapper\EntityManagerWrapperContract;
+use TempestTools\Scribe\Contracts\Orm\RepositoryContract;
 
 /**
  * A wrapper class to provide a universal interface for accessing Doctrine Entity Manager functionality.

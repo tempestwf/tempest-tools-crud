@@ -1,18 +1,18 @@
 <?php
-namespace TempestTools\Crud\Orm;
+namespace TempestTools\Scribe\Orm;
 
 use \Exception;
 use TempestTools\Common\Utility\TTConfigTrait;
-use TempestTools\Crud\Constants\RepositoryEventsConstants;
-use TempestTools\Crud\Contracts\Orm\Wrapper\EntityManagerWrapperContract;
-use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
-use TempestTools\Crud\Contracts\Orm\Helper\QueryBuilderHelperContract;
-use TempestTools\Crud\Contracts\Orm\Helper\DataBindHelperContract;
-use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
-use TempestTools\Crud\Orm\Helper\DataBindHelper;
-use TempestTools\Crud\Orm\Helper\QueryBuilderHelper;
+use TempestTools\Scribe\Constants\RepositoryEventsConstants;
+use TempestTools\Scribe\Contracts\Orm\Wrapper\EntityManagerWrapperContract;
+use TempestTools\Scribe\Contracts\Orm\Events\GenericEventArgsContract;
+use TempestTools\Scribe\Contracts\Orm\Helper\QueryBuilderHelperContract;
+use TempestTools\Scribe\Contracts\Orm\Helper\DataBindHelperContract;
+use TempestTools\Scribe\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
+use TempestTools\Scribe\Orm\Helper\DataBindHelper;
+use TempestTools\Scribe\Orm\Helper\QueryBuilderHelper;
 use TempestTools\Common\Contracts\ArrayHelperContract;
-use TempestTools\Crud\Orm\Utility\EventManagerWrapperTrait;
+use TempestTools\Scribe\Orm\Utility\EventManagerWrapperTrait;
 
 /**
  * A trait that provides the repository related functionality to a class

@@ -1,20 +1,20 @@
 <?php
-namespace TempestTools\Crud\Doctrine;
+namespace TempestTools\Scribe\Doctrine;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
-use TempestTools\Crud\Contracts\Orm\Wrapper\EntityManagerWrapperContract;
-use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
-use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
-use TempestTools\Crud\Contracts\Orm\RepositoryContract;
-use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
-use TempestTools\Crud\Doctrine\Utility\CreateEventManagerWrapperTrait;
-use TempestTools\Crud\Doctrine\Wrapper\EntityManagerWrapper;
-use TempestTools\Crud\Doctrine\Wrapper\QueryBuilderDqlWrapper;
-use TempestTools\Crud\Doctrine\Wrapper\QueryBuilderSqlWrapper;
-use TempestTools\Crud\Exceptions\Orm\RepositoryException;
-use TempestTools\Crud\Orm\RepositoryCoreTrait;
+use TempestTools\Scribe\Contracts\Orm\Wrapper\EntityManagerWrapperContract;
+use TempestTools\Scribe\Contracts\Orm\Events\GenericEventArgsContract;
+use TempestTools\Scribe\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
+use TempestTools\Scribe\Contracts\Orm\RepositoryContract;
+use TempestTools\Scribe\Doctrine\Events\GenericEventArgs;
+use TempestTools\Scribe\Doctrine\Utility\CreateEventManagerWrapperTrait;
+use TempestTools\Scribe\Doctrine\Wrapper\EntityManagerWrapper;
+use TempestTools\Scribe\Doctrine\Wrapper\QueryBuilderDqlWrapper;
+use TempestTools\Scribe\Doctrine\Wrapper\QueryBuilderSqlWrapper;
+use TempestTools\Scribe\Exceptions\Orm\RepositoryException;
+use TempestTools\Scribe\Orm\RepositoryCoreTrait;
 
 /**
  * An abstract class for Repositories that Doctrine Repositories must extend to use the functionality of this package.
@@ -58,7 +58,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * @param array $params
      * @param array $optionOverrides
      * @param array $frontEndOptions
-     * @return \TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract
+     * @return \TempestTools\Scribe\Contracts\Orm\Events\GenericEventArgsContract
      * @throws \RuntimeException
      */
     public function makeEventArgs(array $params, array $optionOverrides = [], array $frontEndOptions=[]): GenericEventArgsContract
@@ -87,7 +87,7 @@ abstract class RepositoryAbstract extends EntityRepository implements EventSubsc
      * Creates a query builder wrapper
      * @param string $entityAlias
      * @return QueryBuilderWrapperContract
-     * @throws \TempestTools\Crud\Exceptions\Orm\RepositoryException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\RepositoryException
      */
     public function createQueryWrapper(string $entityAlias = null):QueryBuilderWrapperContract
     {

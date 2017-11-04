@@ -6,7 +6,7 @@
  * Time: 5:45 PM
  */
 
-namespace TempestTools\Crud\Laravel\Controllers;
+namespace TempestTools\Scribe\Laravel\Controllers;
 use ArrayObject;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -14,22 +14,22 @@ use Illuminate\Http\Request;
 use TempestTools\Common\Contracts\ArrayHelperContract;
 use TempestTools\Common\Contracts\Doctrine\Transformers\SimpleTransformerContract;
 use TempestTools\Common\Utility\TTConfigTrait;
-use TempestTools\Crud\Constants\ControllerEventsConstants;
-use TempestTools\Crud\Contracts\Controller\Helper\ControllerArrayHelperContract;
-use TempestTools\Crud\Contracts\Orm\RepositoryContract;
-use TempestTools\Crud\Controller\Helper\ControllerArrayHelper;
-use TempestTools\Crud\Exceptions\Laravel\Controller\ControllerException;
-use TempestTools\Crud\Laravel\Events\Controller\Init;
-use TempestTools\Crud\Laravel\Events\Controller\PostDestroy;
-use TempestTools\Crud\Laravel\Events\Controller\PostIndex;
-use TempestTools\Crud\Laravel\Events\Controller\PostShow;
-use TempestTools\Crud\Laravel\Events\Controller\PostStore;
-use TempestTools\Crud\Laravel\Events\Controller\PostUpdate;
-use TempestTools\Crud\Laravel\Events\Controller\PreDestroy;
-use TempestTools\Crud\Laravel\Events\Controller\PreIndex;
-use TempestTools\Crud\Laravel\Events\Controller\PreShow;
-use TempestTools\Crud\Laravel\Events\Controller\PreStore;
-use TempestTools\Crud\Laravel\Events\Controller\PreUpdate;
+use TempestTools\Scribe\Constants\ControllerEventsConstants;
+use TempestTools\Scribe\Contracts\Controller\Helper\ControllerArrayHelperContract;
+use TempestTools\Scribe\Contracts\Orm\RepositoryContract;
+use TempestTools\Scribe\Controller\Helper\ControllerArrayHelper;
+use TempestTools\Scribe\Exceptions\Laravel\Controller\ControllerException;
+use TempestTools\Scribe\Laravel\Events\Controller\Init;
+use TempestTools\Scribe\Laravel\Events\Controller\PostDestroy;
+use TempestTools\Scribe\Laravel\Events\Controller\PostIndex;
+use TempestTools\Scribe\Laravel\Events\Controller\PostShow;
+use TempestTools\Scribe\Laravel\Events\Controller\PostStore;
+use TempestTools\Scribe\Laravel\Events\Controller\PostUpdate;
+use TempestTools\Scribe\Laravel\Events\Controller\PreDestroy;
+use TempestTools\Scribe\Laravel\Events\Controller\PreIndex;
+use TempestTools\Scribe\Laravel\Events\Controller\PreShow;
+use TempestTools\Scribe\Laravel\Events\Controller\PreStore;
+use TempestTools\Scribe\Laravel\Events\Controller\PreUpdate;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 /**
  * A trait that can be applied to a controller to facilitate the packages functionality.
@@ -127,7 +127,7 @@ trait RestfulControllerTrait
      * Show the form for creating a new resource.
      *
      * @return JsonResponse
-     * @throws \TempestTools\Crud\Exceptions\Laravel\Controller\ControllerException
+     * @throws \TempestTools\Scribe\Exceptions\Laravel\Controller\ControllerException
      */
     public function create(): JsonResponse
     {
@@ -204,7 +204,7 @@ trait RestfulControllerTrait
     /**
      * Show the form for editing the specified resource.
      *
-     * @throws \TempestTools\Crud\Exceptions\Laravel\Controller\ControllerException
+     * @throws \TempestTools\Scribe\Exceptions\Laravel\Controller\ControllerException
      */
     public function edit(): JsonResponse
     {

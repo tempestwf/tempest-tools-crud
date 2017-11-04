@@ -1,7 +1,7 @@
 <?php
 
-namespace TempestTools\Crud\Laravel\Events\Controller;
-use TempestTools\Crud\Laravel\Events\SimpleEventAbstract;
+namespace TempestTools\Scribe\Laravel\Events\Controller;
+use TempestTools\Scribe\Laravel\Events\SimpleEventAbstract;
 
 /**
  * PostDestroy event

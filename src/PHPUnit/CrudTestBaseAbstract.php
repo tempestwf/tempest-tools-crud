@@ -1,6 +1,6 @@
 <?php
 
-namespace TempestTools\Crud\PHPUnit;
+namespace TempestTools\Scribe\PHPUnit;
 
 use App\API\V1\Entities\User;
 use TempestTools\Common\Doctrine\Utility\MakeEmTrait;

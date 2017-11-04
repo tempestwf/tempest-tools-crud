@@ -6,7 +6,7 @@
  * Time: 6:23 PM
  */
 
-namespace TempestTools\Crud\Contracts\Orm\Wrapper;
+namespace TempestTools\Scribe\Contracts\Orm\Wrapper;
 
 
 /**

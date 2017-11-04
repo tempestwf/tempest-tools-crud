@@ -6,13 +6,13 @@
  * Time: 6:22 PM
  */
 
-namespace TempestTools\Crud\Contracts\Controller;
+namespace TempestTools\Scribe\Contracts\Controller;
 
 
 use TempestTools\Common\Contracts\ArrayHelperContract;
 use TempestTools\Common\Contracts\Doctrine\Transformers\SimpleTransformerContract;
-use TempestTools\Crud\Contracts\HasTTConfig;
-use TempestTools\Crud\Contracts\Orm\RepositoryContract;
+use TempestTools\Scribe\Contracts\HasTTConfig;
+use TempestTools\Scribe\Contracts\Orm\RepositoryContract;
 
 /**
  * @link    https://github.com/tempestwf

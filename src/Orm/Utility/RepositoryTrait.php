@@ -6,10 +6,10 @@
  * Time: 6:37 PM
  */
 
-namespace TempestTools\Crud\Orm\Utility;
+namespace TempestTools\Scribe\Orm\Utility;
 
 
-use TempestTools\Crud\Contracts\Orm\RepositoryContract;
+use TempestTools\Scribe\Contracts\Orm\RepositoryContract;
 
 /**
  * A trait that adds convenience methods for access a repository to a class
@@ -19,12 +19,12 @@ use TempestTools\Crud\Contracts\Orm\RepositoryContract;
 trait RepositoryTrait
 {
     /**
-     * @var \TempestTools\Crud\Contracts\Orm\RepositoryContract $repository
+     * @var \TempestTools\Scribe\Contracts\Orm\RepositoryContract $repository
      */
     protected $repository;
 
     /**
-     * @return \TempestTools\Crud\Contracts\Orm\RepositoryContract
+     * @return \TempestTools\Scribe\Contracts\Orm\RepositoryContract
      */
     public function getRepository(): RepositoryContract
     {

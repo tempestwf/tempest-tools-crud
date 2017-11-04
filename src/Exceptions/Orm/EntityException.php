@@ -6,7 +6,7 @@
  * Time: 6:52 PM
  */
 
-namespace TempestTools\Crud\Exceptions\Orm;
+namespace TempestTools\Scribe\Exceptions\Orm;
 
 /**
  * Exception for errors that can happen on an entity

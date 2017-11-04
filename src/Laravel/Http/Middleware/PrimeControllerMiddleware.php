@@ -6,14 +6,14 @@
  * Time: 5:14 PM
  */
 
-namespace TempestTools\Crud\Laravel\Http\Middleware;
+namespace TempestTools\Scribe\Laravel\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
 use TempestTools\Common\ArrayObject\DefaultTTArrayObject;
 use TempestTools\Common\Exceptions\Laravel\Http\Middleware\CommonMiddlewareException;
 use TempestTools\Common\Helper\ArrayHelper;
-use TempestTools\Crud\Contracts\Controller\ControllerContract;
+use TempestTools\Scribe\Contracts\Controller\ControllerContract;
 
 
 /**

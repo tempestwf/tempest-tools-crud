@@ -6,13 +6,13 @@
  * Time: 5:59 PM
  */
 
-namespace TempestTools\Crud\Laravel\Doctrine;
+namespace TempestTools\Scribe\Laravel\Doctrine;
 
 use TempestTools\Common\Laravel\Validation\ValidationFactoryHelper;
 use TempestTools\Common\Utility\ValidationFactoryTrait;
 use \Illuminate\Contracts\Validation\Factory;
-use TempestTools\Crud\Doctrine\EntityAbstract as EntityAbstractBase;
-use TempestTools\Crud\Exceptions\Orm\EntityException;
+use TempestTools\Scribe\Doctrine\EntityAbstract as EntityAbstractBase;
+use TempestTools\Scribe\Exceptions\Orm\EntityException;
 /**
  * An abstract class which Doctrine entities must extend to use the functionality of this package
  * @link    https://github.com/tempestwf
@@ -49,7 +49,7 @@ abstract class EntityAbstract extends EntityAbstractBase
      * @param array $rules
      * @param array $messages
      * @param array $customAttributes
-     * @throws \TempestTools\Crud\Exceptions\Orm\EntityException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\EntityException
      * @throws \RuntimeException
      */
     public function validate(array $values, array $rules, array $messages = [], array $customAttributes = []):void

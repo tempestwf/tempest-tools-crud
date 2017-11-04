@@ -6,18 +6,18 @@
  * Time: 6:12 PM
  */
 
-namespace TempestTools\Crud\Contracts\Orm;
+namespace TempestTools\Scribe\Contracts\Orm;
 
 use \Exception;
 
 use TempestTools\Common\Contracts\ArrayHelperContract;
-use TempestTools\Crud\Contracts\HasTTConfig;
-use TempestTools\Crud\Contracts\Orm\Wrapper\EntityManagerWrapperContract;
-use TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract;
-use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
-use TempestTools\Crud\Contracts\Orm\Helper\DataBindHelperContract;
-use TempestTools\Crud\Contracts\Orm\Helper\QueryBuilderHelperContract;
-use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
+use TempestTools\Scribe\Contracts\HasTTConfig;
+use TempestTools\Scribe\Contracts\Orm\Wrapper\EntityManagerWrapperContract;
+use TempestTools\Scribe\Contracts\Orm\Wrapper\EventManagerWrapperContract;
+use TempestTools\Scribe\Contracts\Orm\Events\GenericEventArgsContract;
+use TempestTools\Scribe\Contracts\Orm\Helper\DataBindHelperContract;
+use TempestTools\Scribe\Contracts\Orm\Helper\QueryBuilderHelperContract;
+use TempestTools\Scribe\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
 
 /**
  * @link    https://github.com/tempestwf
@@ -161,12 +161,12 @@ interface RepositoryContract extends HasTTConfig
     public function arrayHelper(): ArrayHelperContract;
 
     /**
-     * @return \TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract
+     * @return \TempestTools\Scribe\Contracts\Orm\Wrapper\EventManagerWrapperContract
      */
     public function getEventManager(): ?EventManagerWrapperContract;
 
     /**
-     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract $eventManagerWrapper
+     * @param \TempestTools\Scribe\Contracts\Orm\Wrapper\EventManagerWrapperContract $eventManagerWrapper
      */
     public function setEventManager(EventManagerWrapperContract $eventManagerWrapper): void;
 
@@ -176,12 +176,12 @@ interface RepositoryContract extends HasTTConfig
     public function getEntityNameBase(): string;
 
     /**
-     * @return \TempestTools\Crud\Contracts\Orm\Wrapper\EntityManagerWrapperContract
+     * @return \TempestTools\Scribe\Contracts\Orm\Wrapper\EntityManagerWrapperContract
      */
     public function getEm(): ?EntityManagerWrapperContract;
 
     /**
-     * @param \TempestTools\Crud\Contracts\Orm\Wrapper\EntityManagerWrapperContract $em
+     * @param \TempestTools\Scribe\Contracts\Orm\Wrapper\EntityManagerWrapperContract $em
      */
     public function setEm(EntityManagerWrapperContract $em): void;
 
@@ -215,7 +215,7 @@ interface RepositoryContract extends HasTTConfig
     public function getEntityAlias(): string;
 
     /**
-     * @return \TempestTools\Crud\Contracts\Orm\Wrapper\EventManagerWrapperContract
+     * @return \TempestTools\Scribe\Contracts\Orm\Wrapper\EventManagerWrapperContract
      * @throws \RuntimeException
      */
     public function createEventManagerWrapper(): EventManagerWrapperContract;

@@ -1,7 +1,7 @@
 {
-    "name": "tempest-tools/crud",
+    "name": "tempest-tools/scribe",
     "description": "Tools for building restful apis with Laravel and Doctrine 2",
-    "keywords": ["doctrine", "orm", "database", "laravel", "acl", "access control layer", "middleware", "tempest tools"],
+    "keywords": ["doctrine", "orm", "database", "laravel", "middleware", "tempest tools", "REST"],
     "require": {
         "php": ">=7.1.0",
         "laravel/framework": "5.3.*",

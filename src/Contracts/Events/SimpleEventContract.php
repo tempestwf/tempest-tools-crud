@@ -6,7 +6,7 @@
  * Time: 5:32 PM
  */
 
-namespace TempestTools\Crud\Contracts\Events;
+namespace TempestTools\Scribe\Contracts\Events;
 
 use ArrayObject;
 

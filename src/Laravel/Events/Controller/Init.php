@@ -1,8 +1,8 @@
 <?php
 
-namespace TempestTools\Crud\Laravel\Events\Controller;
+namespace TempestTools\Scribe\Laravel\Events\Controller;
 
-use TempestTools\Crud\Laravel\Events\SimpleEventAbstract;
+use TempestTools\Scribe\Laravel\Events\SimpleEventAbstract;
 
 /**
  * Init event

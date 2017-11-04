@@ -6,15 +6,15 @@
  * Time: 4:33 PM
  */
 
-namespace TempestTools\Crud\Doctrine\Wrapper;
+namespace TempestTools\Scribe\Doctrine\Wrapper;
 
 use Doctrine\Common\Cache\Cache;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\QueryBuilder as BaseQueryBuilder;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use TempestTools\Crud\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
-use TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException;
+use TempestTools\Scribe\Contracts\Orm\Wrapper\QueryBuilderWrapperContract;
+use TempestTools\Scribe\Exceptions\Orm\Wrapper\QueryBuilderWrapperException;
 use Doctrine\ORM\Query;
 
 /**
@@ -64,7 +64,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
      * @param bool $hydrate
      * @return mixed
      * @throws \Doctrine\ORM\ORMException
-     * @throws \TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
      */
     public function getResult(bool $paginate=false, bool $returnCount=true, int $hydrationType=1, bool $fetchJoin = false, array $cacheSettings, bool $hydrate)
     {
@@ -174,7 +174,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
      * @param string $expr
      * @param array $arguments
      * @return string
-     * @throws \TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
      */
     public function useExpression(string $expr, array $arguments):string
     {
@@ -187,7 +187,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
      * @param string $placeholderName
      * @param $argument
      * @param null $type
-     * @throws \TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
      */
     public function setParameter(string $placeholderName, $argument, $type=null):void
     {
@@ -298,7 +298,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
      * @param string $field
      * @param bool $noisy
      * @return bool
-     * @throws \TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
      */
     public function verifyFieldFormat (string $field, bool $noisy = true):bool
     {
@@ -317,7 +317,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
      * @param string $direction
      * @param bool $noisy
      * @return bool
-     * @throws \TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
      */
     public function verifyDirectionFormat (string $direction, bool $noisy = true):bool
     {
@@ -334,7 +334,7 @@ class QueryBuilderDqlWrapper implements QueryBuilderWrapperContract
     /**
      * Verifies that the operator for a front end filter is one of the allowed types.
      * @param string $operator
-     * @throws \TempestTools\Crud\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Wrapper\QueryBuilderWrapperException
      */
     public function verifyOperatorAllowed(string $operator):void
     {

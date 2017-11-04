@@ -6,13 +6,13 @@
  * Time: 4:53 PM
  */
 
-namespace TempestTools\Crud\Orm\Builder;
+namespace TempestTools\Scribe\Orm\Builder;
 
 use TempestTools\Common\Utility\AccessorMethodNameTrait;
-use TempestTools\Crud\Contracts\Orm\Builder\PrePersistEntityBuilderContract;
-use TempestTools\Crud\Contracts\Orm\EntityContract;
-use TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException;
-use TempestTools\Crud\Orm\Utility\BadBuilderCallTrait;
+use TempestTools\Scribe\Contracts\Orm\Builder\PrePersistEntityBuilderContract;
+use TempestTools\Scribe\Contracts\Orm\EntityContract;
+use TempestTools\Scribe\Exceptions\Orm\Helper\EntityArrayHelperException;
+use TempestTools\Scribe\Orm\Utility\BadBuilderCallTrait;
 
 /**
  * A builder that takes data store on an array, verifies it and modifies it as needed. This is used when processing data from an entity during the pre-persist event.
@@ -30,7 +30,7 @@ class PrePersistEntityBuilder implements PrePersistEntityBuilderContract
      * @param array $fieldSetting
      * @return mixed
      * @throws \RuntimeException
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\EntityArrayHelperException
      */
     public function enforce(EntityContract $entity, array $fieldSetting):void
     {
@@ -63,7 +63,7 @@ class PrePersistEntityBuilder implements PrePersistEntityBuilderContract
      * @param EntityContract $entity
      * @param \Closure $fieldSetting
      * @return mixed
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\EntityArrayHelperException
      */
     public function closure(EntityContract $entity, \Closure $fieldSetting):void
     {

@@ -6,10 +6,10 @@
  * Time: 5:09 PM
  */
 
-namespace TempestTools\Crud\Orm\Utility;
+namespace TempestTools\Scribe\Orm\Utility;
 
 
-use TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException;
+use TempestTools\Scribe\Exceptions\Orm\Helper\EntityArrayHelperException;
 
 /**
  * A trait used on multiple builder classes where an unused builder method call will throw an exception
@@ -21,7 +21,7 @@ trait BadBuilderCallTrait
     /**
      * @param $name
      * @param $arguments
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\EntityArrayHelperException
      */
     public function __call($name, $arguments):void
     {

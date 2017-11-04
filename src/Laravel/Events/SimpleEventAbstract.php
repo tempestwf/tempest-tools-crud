@@ -6,11 +6,11 @@
  * Time: 7:02 PM
  */
 
-namespace TempestTools\Crud\Laravel\Events;
+namespace TempestTools\Scribe\Laravel\Events;
 
 
 use ArrayObject;
-use \TempestTools\Crud\Contracts\Events\SimpleEventContract;
+use \TempestTools\Scribe\Contracts\Events\SimpleEventContract;
 
 /**
  * An abstract class to be extended by events. This allows the event to have an array object of "arguments" assigned to it.

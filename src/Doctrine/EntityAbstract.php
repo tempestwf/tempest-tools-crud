@@ -1,16 +1,16 @@
 <?php
-namespace TempestTools\Crud\Doctrine;
+namespace TempestTools\Scribe\Doctrine;
 
 use DateTimeInterface;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\PersistentCollection;
-use TempestTools\AclMiddleware\Contracts\HasIdContract;
-use TempestTools\Crud\Contracts\Orm\EntityContract;
-use TempestTools\Crud\Contracts\Orm\Events\GenericEventArgsContract;
-use TempestTools\Crud\Doctrine\Events\GenericEventArgs;
-use TempestTools\Crud\Doctrine\Utility\CreateEventManagerWrapperTrait;
-use TempestTools\Crud\Orm\EntityCoreTrait;
+use TempestTools\Moat\Contracts\HasIdContract;
+use TempestTools\Scribe\Contracts\Orm\EntityContract;
+use TempestTools\Scribe\Contracts\Orm\Events\GenericEventArgsContract;
+use TempestTools\Scribe\Doctrine\Events\GenericEventArgs;
+use TempestTools\Scribe\Doctrine\Utility\CreateEventManagerWrapperTrait;
+use TempestTools\Scribe\Orm\EntityCoreTrait;
 
 
 /**

@@ -1,20 +1,20 @@
 <?php
-namespace TempestTools\Crud\Orm\Helper;
+namespace TempestTools\Scribe\Orm\Helper;
 
 use ArrayObject;
 use RuntimeException;
 use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Common\Utility\AccessorMethodNameTrait;
-use TempestTools\Crud\Constants\EntityEventsConstants;
-use TempestTools\Crud\Contracts\Orm\Builder\ArrayToAssociationPropertyBuilderContract;
-use TempestTools\Crud\Contracts\Orm\Builder\ArrayToFieldPropertyBuilderContract;
-use TempestTools\Crud\Contracts\Orm\Builder\PrePersistEntityBuilderContract;
-use TempestTools\Crud\Contracts\Orm\EntityContract;
-use TempestTools\Crud\Contracts\Orm\Helper\EntityArrayHelperContract;
-use TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException;
-use TempestTools\Crud\Orm\Builder\ArrayToAssociationPropertyBuilder;
-use TempestTools\Crud\Orm\Builder\ArrayToFieldPropertyBuilder;
-use TempestTools\Crud\Orm\Builder\PrePersistEntityBuilder;
+use TempestTools\Scribe\Constants\EntityEventsConstants;
+use TempestTools\Scribe\Contracts\Orm\Builder\ArrayToAssociationPropertyBuilderContract;
+use TempestTools\Scribe\Contracts\Orm\Builder\ArrayToFieldPropertyBuilderContract;
+use TempestTools\Scribe\Contracts\Orm\Builder\PrePersistEntityBuilderContract;
+use TempestTools\Scribe\Contracts\Orm\EntityContract;
+use TempestTools\Scribe\Contracts\Orm\Helper\EntityArrayHelperContract;
+use TempestTools\Scribe\Exceptions\Orm\Helper\EntityArrayHelperException;
+use TempestTools\Scribe\Orm\Builder\ArrayToAssociationPropertyBuilder;
+use TempestTools\Scribe\Orm\Builder\ArrayToFieldPropertyBuilder;
+use TempestTools\Scribe\Orm\Builder\PrePersistEntityBuilder;
 
 /**
  * An array helper with functionality added to process data related to entities.
@@ -245,7 +245,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param bool $nosey
      * @return bool
      * @throws \RuntimeException
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\EntityArrayHelperException
      */
     public function canAssign (EntityContract $entity, string $associationName, string $assignType=null, array $fieldSettings = NULL, bool $nosey = true):bool
     {
@@ -278,7 +278,7 @@ class EntityArrayHelper extends ArrayHelper implements EntityArrayHelperContract
      * @param bool $nosey
      * @return bool
      * @throws \RuntimeException
-     * @throws \TempestTools\Crud\Exceptions\Orm\Helper\EntityArrayHelperException
+     * @throws \TempestTools\Scribe\Exceptions\Orm\Helper\EntityArrayHelperException
      */
     public function allowed (EntityContract $entity, $nosey = true):bool {
 

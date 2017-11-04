@@ -6,7 +6,7 @@
  * Time: 8:00 PM
  */
 
-namespace TempestTools\Crud\Exceptions\Laravel\Controller;
+namespace TempestTools\Scribe\Exceptions\Laravel\Controller;
 
 /**
  * Exception for errors that can happen on a controller.
