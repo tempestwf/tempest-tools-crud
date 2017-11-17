@@ -8,6 +8,7 @@
 
 namespace TempestTools\Scribe\Laravel\Controllers;
 use ArrayObject;
+use Dingo\Api\Exception\ResourceException;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -191,6 +192,9 @@ trait RestfulControllerTrait
             $this->getConfigArrayHelper()->start();
             event(new PreShow($settings));
             $result = $repo->read($settings['query'], $settings['frontEndOptions'], $settings['overrides']);
+            if (count($result['result']) === 0) {
+                throw new ResourceException('Error: your requested resource does not exist, or you do not have access to it.');
+            }
             $settings['result'] = $result['result'][0];
             event(new PostShow($settings));
         } catch (Exception $e) {
@@ -234,6 +238,9 @@ trait RestfulControllerTrait
             $this->getConfigArrayHelper()->start();
             event(new PreUpdate($settings));
             $result = $repo->update($settings['params'], $settings['overrides'], $settings['frontEndOptions']);
+            if ($id !== 'batch' && count($result) === 0) {
+                throw new ResourceException('Error: the resource you attempted to update does not exist, or you do not have access to it.');
+            }
             $transformerSettings = $this->getTransformerSettings($settings);
             $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
             $settings['result'] = $id === 'batch'?$settings['result']:$settings['result'][0];
@@ -268,6 +275,9 @@ trait RestfulControllerTrait
             event(new PreDestroy($settings));
             $result = $repo->delete($settings['params'], $settings['overrides'], $settings['frontEndOptions']);
             $transformerSettings = $this->getTransformerSettings($settings);
+            if ($id !== 'batch' && count($result) === 0) {
+                throw new ResourceException('Error: the resource you attempted to destroy does not exist, or you do not have access to it.');
+            }
             $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
             $settings['result'] = $id === 'batch'?$settings['result']:$settings['result'][0];
             event(new PostDestroy($settings));
