@@ -34,7 +34,7 @@ $repoConfig = [
                     '<string>'=>[ // Optional. Can be null to disable the block. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
                         'join'=>'<string>', // A join part of the query, such as <table alias>.<relationship being joined to>. When using a queryType of sql use: <from alias>.<name of table to join too>. IE: t.Albums //Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
                         'alias'=>'<string>', // The alias the table will be joined as. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
-                        'conditionType'=>'<"ON" | "WITH" | null>', // A condition type for the join such as: Expr\Join::WITH. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
+                        'conditionType'=>'<"ON" | "WITH" | null>', // Defaults to "ON". A condition type for the join such as: Expr\Join::WITH. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
                         'condition'=>'<string | null>', // A condition to join on such as x = x. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
                         'indexBy'=>'<string | null>', // Optional. Doctrine indexBy functionality. Tested in: testGeneralQueryBuilding. Sql tested in testSqlQueryFunctionality
                     ]
@@ -183,9 +183,11 @@ $backendOptionsForRepo = [
         'fetchJoin'=>'<boolean|null>', // Defaults to true. Whether or not to use a fetch join on a paginated query result. Tested in: testGeneralDataRetrieval
         'hydrate'=>'<boolean|null>', // Defaults to true. Whether or not to hydrate the results of a query. If false then the query object and info about the query is returned instead by the repo. Tested in: testGeneralDataRetrieval
         'hydrationType'=>'<Doctrine\ORM\Query::* constant|null>', // Defaults to: Query::HYDRATE_ARRAY. The hydration type for result sets. Tested in: testGeneralDataRetrieval
-        '<string>'=>[  // Optional. Can be null to disable the block. Keys of placeholders to inject into queries. Tested in: testGeneralDataRetrieval
-            'value'=>'<mixed>', // The value of the placeholder
-            'type'=>'<PDO::PARAM_* | \Doctrine\DBAL\Types\Type::* constant | null>' // Optional. type of the placeholders.
+        'placeholders'=>[ // Optional. Can be null to disable the block. Permissions for placeholders requests from front end.
+            '<string>'=>[  // Optional. Can be null to disable the block. Keys of placeholders to inject into queries. Tested in: testGeneralDataRetrieval
+                'value'=>'<mixed>', // The value of the placeholder
+                'type'=>'<PDO::PARAM_* | \Doctrine\DBAL\Types\Type::* constant | null>' // Optional. type of the placeholders.
+            ]
         ],
         'queryCacheProfile'=>'<\Doctrine\DBAL\Cache\QueryCacheProfile|null>', // Optional. See Doctrine docs for more details.  Used only by SQL queries. Use a QueryCacheProfile object
         'queryCacheDrive'=>'<\Doctrine\Common\Cache\Cache|null>', // Optional. Query cache driver, see Doctrine docs for more details. Tested in: testGeneralQueryBuilding
