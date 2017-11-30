@@ -4,7 +4,7 @@
 // This is returned in the getTTConfig method of a repository.
 $repoConfig = [
     '<string>'=>[ // Context keys may be layered as deep as you like. They are part of the contextual config nature of Scribe. See documentation for more details.
-        'extends'=>['<array|null>'], // Optional. An array of string paths to extend from else where in the array. The values from array at the paths specified will be used as defaults for for the config.
+        'extends'=>['<string>'], // Optional. An array of string paths to extend from else where in the array. The values from array at the paths specified will be used as defaults for for the config.
         'read'=>[ // Optional.
             'query'=>[ // Optional.
                 'select'=>[ // Optional. A list of arbitrary key names with select strings to use in the query. Tested in: testBasicRead
@@ -214,7 +214,7 @@ $backendOptionsForRepo = [
 $entityConfig = [
     '<string>'=>[ // Context keys may be layered as deep as you like. They are part of the contextual config nature of Scribe. See documentation for more details.
         '<"create" | "update" | "delete">'=>[ // Optional. Can be null to disable the block. Configs work the same for create, update and delete
-            'extends'=>['<array|null>'], // Optional. An array of string paths to extend from else where in the array. The values from array at the paths specified will be used as defaults for for the config.
+            'extends'=>'<array|null>', // Optional. An array of string paths to extend from else where in the array. The values from array at the paths specified will be used as defaults for for the config.
             'allowed'=>'<boolean|null>', // Defaults to true. Whether ot not this type of operation is permitted. Tested in: testAllowedWorks
             'permissive'=>'<boolean|null>', // Defaults to true. Whether or not to use "permissive" permissions. Permissive true means that we assume that everything is allowed unless specified other wise, and false works in the opposite manner.Tested in: testPermissiveWorks1
             'settings'=>[ // Optional. Can be null to disable the block. Settings related to the type of operation.
@@ -295,20 +295,20 @@ $entityConfig = [
 
 $controllerConfig = [
     '<string>'=>[ // Context keys may be layered as deep as you like. They are part of the contextual config nature of Scribe. See documentation for more details.
-        '<"GET" | "POST" | "PUT" | "DELETE" | null>'=> [ // GET, POST, PUT, DELETE. Corresponds to the request method used
-            'extends'=>['<array|null>'], // Optional. An array of string paths to extend from else where in the array. The values from array at the paths specified will be used as defaults for for the config.
+        '<"GET" | "POST" | "PUT" | "DELETE" >'=> [ // GET, POST, PUT, DELETE. Corresponds to the request method used
+            'extends'=>'<array|null>', // Optional. An array of string paths to extend from else where in the array. The values from array at the paths specified will be used as defaults for for the config.
             'transaction'=>'<boolean|null>', // Defaults to false. Whether or not an additional transactions should be started at the controller level. This is useful if you mean to call one more than 1 repo in the controller using events.
             'overrides'=>['<array|null>'], // Optional. Overrides passed to the repo that will override the default options set on the repo.
             'transformerSettings'=>[ // Optional. Can be null to disable the block. Settings to be passed to the transformer, generally toArray settings. Tested in testToArrayArrayStorage and as part of all transformation tests
                 'defaultMode'=>'<"create" | "read" | "update" | "delete" | null>', // Defaults to 'read'. This is the mode that will be initiated on the entity if no mode is currently active on the entity being transformed
                 'defaultArrayHelper'=>'<\TempestTools\Common\Contracts\ArrayHelperContract | null>',// Optional.  If no array helper is set for the entity already this one will be used.
-                'defaultPath'=>['<array|null>'],// Optional.  A contextual config path. If no path is set for the entity already this will be used
-                'defaultFallBack'=>['array|null>'], // Optional.  A contextual config path. If no fall back is set for the entity already this will be used
+                'defaultPath'=>'<array|null>',// Optional.  A contextual config path. If no path is set for the entity already this will be used
+                'defaultFallBack'=>'<array|null>', // Optional.  A contextual config path. If no fall back is set for the entity already this will be used
                 'force'=>'<boolean|null>', // Defaults to false. If true then the entity will be forced to use the path, mode, fall back and array helper that you are setting as defaults, regardless of if the entity has there own already.
                 'store'=>'<boolean|null>', //Defaults to true. Whether or not the toArray result should be stored to be used again if toArray is called again.
                 'recompute'=>'<boolean|null>', // Defaults to false. Whether or not to recompute toArray, even if one was previously stored.
                 'useStored'=>'<boolean|null>', // Defaults to true. Whether or not to use a previously stored toArray result if one is found. If false then it will return a freshly generated result.
-                'frontEndOptions'=>['<array|null>'], // Optional.  Options passed from the front end with the request, you may set these on the controller as defaults if you like but they will be overridden by data passed from the front end.
+                'frontEndOptions'=>'<array|null>', // Optional.  Options passed from the front end with the request, you may set these on the controller as defaults if you like but they will be overridden by data passed from the front end.
             ],
             'resourceIdConversion'=>[ // Optional. This lets you set up resource ids passed in the url that are automatically converted to placeholders in the filter from the front end. This is useful for filtering a query semi automatically based on the resource ids in the url path. Tested in testAlbumController
                 '<string>'=>'<string|null>'// Placeholder as it appear in the url string.  If null then the placeholder will not be generated, other wise it will be converted to a placeholder with the name of value
