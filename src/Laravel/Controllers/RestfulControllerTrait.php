@@ -32,6 +32,7 @@ use TempestTools\Scribe\Laravel\Events\Controller\PreShow;
 use TempestTools\Scribe\Laravel\Events\Controller\PreStore;
 use TempestTools\Scribe\Laravel\Events\Controller\PreUpdate;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Events\Dispatcher;
 /**
  * A trait that can be applied to a controller to facilitate the packages functionality.
  * @link    https://github.com/tempestwf
@@ -291,19 +292,23 @@ trait RestfulControllerTrait
     /**
      * Register the listeners for the subscriber.
      *
-     * @param DispatcherContract|\Illuminate\Events\Dispatcher $events
+     * @param Dispatcher |\Illuminate\Events\Dispatcher $events
      */
-    public function subscribe(DispatcherContract $events):void
+    public function subscribe(Dispatcher $events):void
     {
         /** @noinspection CallableParameterUseCaseInTypeContextInspection */
         $eventsInfo = ControllerEventsConstants::getAll();
 
         foreach ($eventsInfo as $eventInfo) {
             if (method_exists($this, $eventInfo['on'])) {
-                $events->listen(
-                    $eventInfo['class'],
-                    static::class . '@' . $eventInfo['on']
-                );
+                $listeners = $events->getListeners($eventInfo['class']);
+                if (count($listeners) === 0)
+                {
+                    $events->listen(
+                        $eventInfo['class'],
+                        static::class . '@' . $eventInfo['on']
+                    );
+                }
             }
         }
     }
