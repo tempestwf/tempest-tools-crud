@@ -31,7 +31,6 @@ use TempestTools\Scribe\Laravel\Events\Controller\PreIndex;
 use TempestTools\Scribe\Laravel\Events\Controller\PreShow;
 use TempestTools\Scribe\Laravel\Events\Controller\PreStore;
 use TempestTools\Scribe\Laravel\Events\Controller\PreUpdate;
-use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Events\Dispatcher;
 /**
  * A trait that can be applied to a controller to facilitate the packages functionality.
