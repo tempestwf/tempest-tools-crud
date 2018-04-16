@@ -561,11 +561,7 @@ abstract class CrudTestBaseAbstract extends \TestCase
      * @return string
      */
     protected function getToken ():string {
-        $userRepo = $this->em->getRepository(User::class);
-
-        $testUser = $userRepo->findOneBy(['id'=>1]);
-
-        $response = $this->json('POST', '/auth/authenticate', ['email' => $testUser->getEmail(), 'password' => 'password']);
+        $response = $this->json('POST', '/auth/authenticate', ['email' => env('BASE_USER_EMAIL'), 'password' => env('BASE_USER_PASSWORD')]);
         $result = $response->decodeResponseJson();
 
         /** @var string $token */
