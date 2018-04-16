@@ -68,7 +68,7 @@ class PrePersistEntityBuilder implements PrePersistEntityBuilderContract
     public function closure(EntityContract $entity, \Closure $fieldSetting):void
     {
         /** @noinspection NullPointerExceptionInspection */
-        if ($entity->getArrayHelper()->parseClosure($fieldSetting, ['self' => $entity]) === false) {
+        if ($entity->getArrayHelper()->parse($fieldSetting, ['self' => $entity]) === false) {
             throw EntityArrayHelperException::closureFails();
         }
     }
@@ -102,7 +102,7 @@ class PrePersistEntityBuilder implements PrePersistEntityBuilderContract
     public function mutate (EntityContract $entity, $fieldSetting):void
     {
         /** @noinspection NullPointerExceptionInspection */
-        $entity->getArrayHelper()->parseClosure($fieldSetting, ['self' => $entity]);
+        $entity->getArrayHelper()->parse($fieldSetting, ['self' => $entity]);
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection

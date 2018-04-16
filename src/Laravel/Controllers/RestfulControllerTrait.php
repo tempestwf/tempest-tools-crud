@@ -31,7 +31,6 @@ use TempestTools\Scribe\Laravel\Events\Controller\PreIndex;
 use TempestTools\Scribe\Laravel\Events\Controller\PreShow;
 use TempestTools\Scribe\Laravel\Events\Controller\PreStore;
 use TempestTools\Scribe\Laravel\Events\Controller\PreUpdate;
-use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Events\Dispatcher;
 /**
  * A trait that can be applied to a controller to facilitate the packages functionality.
@@ -107,6 +106,7 @@ trait RestfulControllerTrait
     {
 
         try {
+            $this->getConfigArrayHelper()->checkAllowed('index');
             $settings = $this->getConfigArrayHelper()->transformGetRequest($request->input(), $request->json()->all(), $request->route()->parameters());
             $repo = $this->getRepo();
             $repo->init($this->getArrayHelper(), $this->getTTPathNoMode(), $this->getTTFallBackNoMode());
@@ -152,6 +152,7 @@ trait RestfulControllerTrait
     public function store(Request $request): JsonResponse
     {
         try {
+            $this->getConfigArrayHelper()->checkAllowed('store');
             $settings = $this->getConfigArrayHelper()->transformNoneGetRequest($request->input(), $request->route()->parameters());
             $repo = $this->getRepo();
             $repo->init($this->getArrayHelper(), $this->getTTPathNoMode(), $this->getTTFallBackNoMode());
@@ -187,6 +188,7 @@ trait RestfulControllerTrait
     public function show(Request $request, $id=null): JsonResponse
     {
         try {
+            $this->getConfigArrayHelper()->checkAllowed('show');
             $settings = $this->getConfigArrayHelper()->transformGetRequest($request->input(), $request->json()->all(), $request->route()->parameters(), $id);
             $repo = $this->getRepo();
             $repo->init($this->getArrayHelper(), $this->getTTPathNoMode(), $this->getTTFallBackNoMode());
@@ -233,6 +235,7 @@ trait RestfulControllerTrait
     public function update(Request $request, $id=null): JsonResponse
     {
         try {
+            $this->getConfigArrayHelper()->checkAllowed('update');
             $settings = $this->getConfigArrayHelper()->transformNoneGetRequest($request->input(), $request->route()->parameters(), $id);
             $repo = $this->getRepo();
             $repo->init($this->getArrayHelper(), $this->getTTPathNoMode(), $this->getTTFallBackNoMode());
@@ -269,6 +272,7 @@ trait RestfulControllerTrait
     public function destroy(Request $request, $id = null): JsonResponse
     {
         try {
+            $this->getConfigArrayHelper()->checkAllowed('destroy');
             $settings = $this->getConfigArrayHelper()->transformNoneGetRequest($request->input(), $request->route()->parameters(), $id);
             $repo = $this->getRepo();
             $repo->init($this->getArrayHelper(), $this->getTTPathNoMode(), $this->getTTFallBackNoMode());
@@ -276,7 +280,7 @@ trait RestfulControllerTrait
             event(new PreDestroy($settings));
             $result = $repo->delete($settings['params'], $settings['overrides'], $settings['frontEndOptions']);
             $transformerSettings = $this->getTransformerSettings($settings);
-            if ($id !== 'batch' && count($result) === 0) {
+            if ($id !== 'batch' && \count($result) === 0) {
                 throw new ResourceException('Error: the resource you attempted to destroy does not exist, or you do not have access to it.');
             }
             $settings['result'] = $this->getTransformer()->setSettings($transformerSettings)->transform($result);
@@ -302,7 +306,7 @@ trait RestfulControllerTrait
         foreach ($eventsInfo as $eventInfo) {
             if (method_exists($this, $eventInfo['on'])) {
                 $listeners = $events->getListeners($eventInfo['class']);
-                if (count($listeners) === 0)
+                if (\count($listeners) === 0)
                 {
                     $events->listen(
                         $eventInfo['class'],
