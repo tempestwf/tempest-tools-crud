@@ -577,6 +577,7 @@ class DataBindHelper implements DataBindHelperContract
         $evm->dispatchEvent(RepositoryEventsConstants::VERIFY_CREATE, $eventArgs);
         $result = $this->doCreateSingle($eventArgs);
         $eventArgs->getArgs()['results'][] = $result;
+        $eventArgs->getArgs()['lastResult'] = $result;
         $evm->dispatchEvent(RepositoryEventsConstants::PROCESS_RESULTS_CREATE, $eventArgs);
         $evm->dispatchEvent(RepositoryEventsConstants::POST_CREATE, $eventArgs);
     }
@@ -691,6 +692,7 @@ class DataBindHelper implements DataBindHelperContract
         $evm->dispatchEvent(RepositoryEventsConstants::VERIFY_UPDATE, $eventArgs);
         $result = $this->processSingleEntity($eventArgs, $entity);
         $eventArgs->getArgs()['results'][] = $result;
+        $eventArgs->getArgs()['lastResult'] = $result;
         $evm->dispatchEvent(RepositoryEventsConstants::PROCESS_RESULTS_UPDATE, $eventArgs);
         $evm->dispatchEvent(RepositoryEventsConstants::POST_UPDATE, $eventArgs);
     }
@@ -771,6 +773,7 @@ class DataBindHelper implements DataBindHelperContract
         $evm->dispatchEvent(RepositoryEventsConstants::VERIFY_DELETE, $eventArgs);
         $result = $this->processSingleEntity($eventArgs, $entity, true);
         $eventArgs->getArgs()['results'][] = $result;
+        $eventArgs->getArgs()['lastResult'] = $result;
         $evm->dispatchEvent(RepositoryEventsConstants::PROCESS_RESULTS_DELETE, $eventArgs);
         $evm->dispatchEvent(RepositoryEventsConstants::POST_DELETE, $eventArgs);
     }
