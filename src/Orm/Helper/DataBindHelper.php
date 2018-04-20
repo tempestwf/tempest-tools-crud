@@ -687,6 +687,7 @@ class DataBindHelper implements DataBindHelperContract
     protected function doUpdate (GenericEventArgsContract $eventArgs, EntityContract $entity):void
     {
         $evm = $this->getRepository()->getEventManager();
+        $eventArgs->getArgs()['entity'] = $entity;
         $evm->dispatchEvent(RepositoryEventsConstants::PRE_UPDATE, $eventArgs);
         $evm->dispatchEvent(RepositoryEventsConstants::VALIDATE_UPDATE, $eventArgs);
         $evm->dispatchEvent(RepositoryEventsConstants::VERIFY_UPDATE, $eventArgs);
@@ -768,6 +769,7 @@ class DataBindHelper implements DataBindHelperContract
     protected function doDelete (GenericEventArgsContract $eventArgs, EntityContract $entity):void
     {
         $evm = $this->getRepository()->getEventManager();
+        $eventArgs->getArgs()['entity'] = $entity;
         $evm->dispatchEvent(RepositoryEventsConstants::PRE_DELETE, $eventArgs);
         $evm->dispatchEvent(RepositoryEventsConstants::VALIDATE_DELETE, $eventArgs);
         $evm->dispatchEvent(RepositoryEventsConstants::VERIFY_DELETE, $eventArgs);
