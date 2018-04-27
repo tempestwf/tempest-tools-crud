@@ -139,6 +139,9 @@ class DataBindHelper implements DataBindHelperContract
     {
         /** @noinspection NullPointerExceptionInspection */
         $this->getRepository()->getArrayHelper()->getArray()[CommonArrayObjectKeyConstants::ORM_KEY_NAME][static::PRE_POPULATED_ENTITIES_KEY] = null;
+
+        //$arrayCopy = $this->getRepository()->getArrayHelper()->getArray()->getArrayCopy();
+        //$test = 1;
     }
     /**
      * Binds data based on the params passed to the method to fields and associations on an entity.
