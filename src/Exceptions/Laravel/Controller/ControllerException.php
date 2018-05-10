@@ -23,4 +23,13 @@ class ControllerException extends \RunTimeException
     {
         return new self (sprintf('Error: Method not implemented on controller. method = %s', $method));
     }
+
+    /**
+     * @param string $action
+     * @return ControllerException
+     */
+    public static function actionNotAllowed (string $action): ControllerException
+    {
+        return new self (sprintf('Error: This action is not allowed for this context on this controller. action = %s', $action));
+    }
 }

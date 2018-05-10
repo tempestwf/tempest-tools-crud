@@ -3,6 +3,8 @@
 This package is the centerpiece of Tempest Tools.
 Scribe provides a robust set of features for rapid building of RESTful APIs without limiting the developer in terms of the functionality they can implement on top of what the package does out of the box.
 
+A key insight of Scribe is that a RESTful API can be defined as a set of configurations with closures and event listeners providing extension beyond base functionality. This saves time and provides a clear predictable structure to your code.
+
 ## Key features
 
 Some of the key features of Scribe are as follows:
