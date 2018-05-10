@@ -242,6 +242,8 @@ trait RestfulControllerTrait
             $this->getConfigArrayHelper()->start();
             event(new PreUpdate($settings));
             $result = $repo->update($settings['params'], $settings['overrides'], $settings['frontEndOptions']);
+
+            //$arrayCopy = $this->getArrayHelper()->getArray()->getArrayCopy();
             if ($id !== 'batch' && count($result) === 0) {
                 throw new ResourceException('Error: the resource you attempted to update does not exist, or you do not have access to it.');
             }
