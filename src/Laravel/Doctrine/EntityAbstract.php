@@ -8,6 +8,7 @@
 
 namespace TempestTools\Scribe\Laravel\Doctrine;
 
+use TempestTools\Common\Contracts\ArrayHelperContract;
 use TempestTools\Common\Laravel\Validation\ValidationFactoryHelper;
 use TempestTools\Common\Utility\ValidationFactoryTrait;
 use \Illuminate\Contracts\Validation\Factory;
@@ -27,7 +28,26 @@ abstract class EntityAbstract extends EntityAbstractBase
      */
     public function __construct()
     {
+
+    }
+
+    /**
+       * Initialization the entity with helpers and and config context.
+       * @param string $mode
+       * @param ArrayHelperContract|null $arrayHelper
+       * @param array|null $path
+       * @param array|null $fallBack
+       * @param bool $force
+       * @throws \RuntimeException
+       */
+    public function init(string $mode, ArrayHelperContract $arrayHelper = null, array $path = null, array $fallBack = null, bool $force = false):void
+    {
         $this->setValidationFactoryHelper(new ValidationFactoryHelper());
+
+        $force = $this->coreInit($arrayHelper, $path, $fallBack, $force, $mode);
+        $this->entityArrayHelperInit($force, $mode);
+        $this->eventManagerInit($force);
+        $this->setLastMode($mode);
     }
 
     /**

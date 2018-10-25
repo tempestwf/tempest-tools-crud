@@ -42,23 +42,6 @@ trait EntityCoreTrait
 
     /** @noinspection MoreThanThreeArgumentsInspection */
 
-    /**
-     * Initialization the entity with helpers and and config context.
-     * @param string $mode
-     * @param ArrayHelperContract|null $arrayHelper
-     * @param array|null $path
-     * @param array|null $fallBack
-     * @param bool $force
-     * @throws \RuntimeException
-     */
-    public function init(string $mode, ArrayHelperContract $arrayHelper = null, array $path = null, array $fallBack = null, bool $force = false):void
-    {
-        $force = $this->coreInit($arrayHelper, $path, $fallBack, $force, $mode);
-        $this->entityArrayHelperInit($force, $mode);
-        $this->eventManagerInit($force);
-        $this->setLastMode($mode);
-    }
-
     /** @noinspection MoreThanThreeArgumentsInspection */
 
     /**
@@ -183,6 +166,7 @@ trait EntityCoreTrait
      * On an entity with HasLifecycleCallbacks it will run the special features of tt entities before persist
      *
      * @ORM\PrePersist
+     * @ORM\PreUpdate
      * @throws \RuntimeException
      */
     public function ttPrePersist():void
