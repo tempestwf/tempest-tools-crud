@@ -128,7 +128,7 @@ class PrePersistEntityBuilder implements PrePersistEntityBuilderContract
         $customAttributes = $fieldSetting['customAttributes'] ?? [];
         /** @noinspection NullPointerExceptionInspection */
         $customAttributes = $arrayHelper->parse($customAttributes, $extra);
-        $values = $entity->getValuesOfFields($fields);
+        $values = $entity->getBindParams();
         $entity->validate($values, $rules, $messages, $customAttributes);
     }
 
