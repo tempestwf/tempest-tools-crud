@@ -49,7 +49,7 @@ class PrePersistEntityBuilder implements PrePersistEntityBuilderContract
                     $methodName = $this->accessorMethodName('get', $key2);
                     $result2 = $result->$methodName();
                     if ($result2 !== $value2) {
-                        throw EntityArrayHelperException::enforcementFails();
+                        throw EntityArrayHelperException::enforcementFails($key2);
                     }
                 }
             } else if ($result !== $value) {
