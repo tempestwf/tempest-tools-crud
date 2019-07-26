@@ -139,6 +139,9 @@ class DataBindHelper implements DataBindHelperContract
     {
         /** @noinspection NullPointerExceptionInspection */
         $this->getRepository()->getArrayHelper()->getArray()[CommonArrayObjectKeyConstants::ORM_KEY_NAME][static::PRE_POPULATED_ENTITIES_KEY] = null;
+
+        //$arrayCopy = $this->getRepository()->getArrayHelper()->getArray()->getArrayCopy();
+        //$test = 1;
     }
     /**
      * Binds data based on the params passed to the method to fields and associations on an entity.
@@ -577,6 +580,7 @@ class DataBindHelper implements DataBindHelperContract
         $evm->dispatchEvent(RepositoryEventsConstants::VERIFY_CREATE, $eventArgs);
         $result = $this->doCreateSingle($eventArgs);
         $eventArgs->getArgs()['results'][] = $result;
+        $eventArgs->getArgs()['lastResult'] = $result;
         $evm->dispatchEvent(RepositoryEventsConstants::PROCESS_RESULTS_CREATE, $eventArgs);
         $evm->dispatchEvent(RepositoryEventsConstants::POST_CREATE, $eventArgs);
     }
@@ -686,11 +690,13 @@ class DataBindHelper implements DataBindHelperContract
     protected function doUpdate (GenericEventArgsContract $eventArgs, EntityContract $entity):void
     {
         $evm = $this->getRepository()->getEventManager();
+        $eventArgs->getArgs()['entity'] = $entity;
         $evm->dispatchEvent(RepositoryEventsConstants::PRE_UPDATE, $eventArgs);
         $evm->dispatchEvent(RepositoryEventsConstants::VALIDATE_UPDATE, $eventArgs);
         $evm->dispatchEvent(RepositoryEventsConstants::VERIFY_UPDATE, $eventArgs);
         $result = $this->processSingleEntity($eventArgs, $entity);
         $eventArgs->getArgs()['results'][] = $result;
+        $eventArgs->getArgs()['lastResult'] = $result;
         $evm->dispatchEvent(RepositoryEventsConstants::PROCESS_RESULTS_UPDATE, $eventArgs);
         $evm->dispatchEvent(RepositoryEventsConstants::POST_UPDATE, $eventArgs);
     }
@@ -766,11 +772,13 @@ class DataBindHelper implements DataBindHelperContract
     protected function doDelete (GenericEventArgsContract $eventArgs, EntityContract $entity):void
     {
         $evm = $this->getRepository()->getEventManager();
+        $eventArgs->getArgs()['entity'] = $entity;
         $evm->dispatchEvent(RepositoryEventsConstants::PRE_DELETE, $eventArgs);
         $evm->dispatchEvent(RepositoryEventsConstants::VALIDATE_DELETE, $eventArgs);
         $evm->dispatchEvent(RepositoryEventsConstants::VERIFY_DELETE, $eventArgs);
         $result = $this->processSingleEntity($eventArgs, $entity, true);
         $eventArgs->getArgs()['results'][] = $result;
+        $eventArgs->getArgs()['lastResult'] = $result;
         $evm->dispatchEvent(RepositoryEventsConstants::PROCESS_RESULTS_DELETE, $eventArgs);
         $evm->dispatchEvent(RepositoryEventsConstants::POST_DELETE, $eventArgs);
     }

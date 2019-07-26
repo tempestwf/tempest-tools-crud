@@ -65,4 +65,12 @@ interface ControllerArrayHelperContract extends ArrayHelperContract
      * @param ControllerContract $controller
      */
     public function setController(ControllerContract $controller): void;
+
+    /**
+     * Checks if the current action is allowed.
+     *
+     * @param string $action
+     * @throws \TempestTools\Scribe\Exceptions\Laravel\Controller\ControllerException
+     */
+    public function checkAllowed (string $action):void;
 }

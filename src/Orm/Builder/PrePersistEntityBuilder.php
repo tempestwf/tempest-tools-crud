@@ -49,7 +49,7 @@ class PrePersistEntityBuilder implements PrePersistEntityBuilderContract
                     $methodName = $this->accessorMethodName('get', $key2);
                     $result2 = $result->$methodName();
                     if ($result2 !== $value2) {
-                        throw EntityArrayHelperException::enforcementFails();
+                        throw EntityArrayHelperException::enforcementFails($key2);
                     }
                 }
             } else if ($result !== $value) {
@@ -68,7 +68,7 @@ class PrePersistEntityBuilder implements PrePersistEntityBuilderContract
     public function closure(EntityContract $entity, \Closure $fieldSetting):void
     {
         /** @noinspection NullPointerExceptionInspection */
-        if ($entity->getArrayHelper()->parseClosure($fieldSetting, ['self' => $entity]) === false) {
+        if ($entity->getArrayHelper()->parse($fieldSetting, ['self' => $entity]) === false) {
             throw EntityArrayHelperException::closureFails();
         }
     }
@@ -102,7 +102,7 @@ class PrePersistEntityBuilder implements PrePersistEntityBuilderContract
     public function mutate (EntityContract $entity, $fieldSetting):void
     {
         /** @noinspection NullPointerExceptionInspection */
-        $entity->getArrayHelper()->parseClosure($fieldSetting, ['self' => $entity]);
+        $entity->getArrayHelper()->parse($fieldSetting, ['self' => $entity]);
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection
@@ -128,7 +128,7 @@ class PrePersistEntityBuilder implements PrePersistEntityBuilderContract
         $customAttributes = $fieldSetting['customAttributes'] ?? [];
         /** @noinspection NullPointerExceptionInspection */
         $customAttributes = $arrayHelper->parse($customAttributes, $extra);
-        $values = $entity->getValuesOfFields($fields);
+        $values = $entity->getBindParams();
         $entity->validate($values, $rules, $messages, $customAttributes);
     }
 

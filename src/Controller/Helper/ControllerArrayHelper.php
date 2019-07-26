@@ -12,6 +12,7 @@ use ArrayObject;
 use TempestTools\Common\Helper\ArrayHelper;
 use TempestTools\Scribe\Contracts\Controller\ControllerContract;
 use TempestTools\Scribe\Contracts\Controller\Helper\ControllerArrayHelperContract;
+use TempestTools\Scribe\Exceptions\Laravel\Controller\ControllerException;
 
 /**
  * A helper used for controllers
@@ -34,6 +35,24 @@ class ControllerArrayHelper extends ArrayHelper implements ControllerArrayHelper
     {
         $this->setController($controller);
         parent::__construct($array);
+    }
+
+    /**
+     * Checks if the current action is allowed.
+     *
+     * @param string $action
+     * @throws \TempestTools\Scribe\Exceptions\Laravel\Controller\ControllerException
+     */
+    public function checkAllowed (string $action):void {
+        if ($action === 'index') {
+            $allowed = $this->getArray()['allowIndex'] ?? true;
+        } else {
+            $allowed = $this->getArray()['allowed'] ?? true;
+        }
+        $allowed = $this->getController()->getArrayHelper()->parse($allowed, ['self'=>$this]);
+        if ($allowed === false) {
+            throw ControllerException::actionNotAllowed($action);
+        }
     }
 
     /** @noinspection MoreThanThreeArgumentsInspection */
